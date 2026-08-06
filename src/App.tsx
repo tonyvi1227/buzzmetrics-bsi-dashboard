@@ -22,6 +22,7 @@ import { DataImportModal } from './components/DataImportModal';
 import { ExportModal } from './components/ExportModal';
 import { AdminLoginModal } from './components/AdminLoginModal';
 import { SupabaseConfigModal } from './components/SupabaseConfigModal';
+import { Footer } from './components/Footer';
 
 const DashboardContent: React.FC = () => {
   const [dataset, setDataset] = useState<CampaignRecord[]>(() => getStoredCampaigns());
@@ -318,6 +319,9 @@ const DashboardContent: React.FC = () => {
         onClose={() => setIsSupabaseModalOpen(false)}
         onConnected={handleSupabaseConnected}
       />
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
