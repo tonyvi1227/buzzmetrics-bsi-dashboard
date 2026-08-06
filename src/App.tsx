@@ -15,6 +15,7 @@ import { TimelineComboChart } from './components/TimelineComboChart';
 import { ChannelShareChart } from './components/ChannelShareChart';
 import { BrandMatrixChart } from './components/BrandMatrixChart';
 import { CategoryComparisonChart } from './components/CategoryComparisonChart';
+import { CampaignTypeChart } from './components/CampaignTypeChart';
 import { CampaignTable } from './components/CampaignTable';
 import { CampaignDetailModal } from './components/CampaignDetailModal';
 import { DataImportModal } from './components/DataImportModal';
@@ -55,6 +56,7 @@ const DashboardContent: React.FC = () => {
     availableYears,
     availableMonths,
     availableCategories,
+    availableCampaignTypes,
     filteredData,
   } = useSmartFilters(dataset);
 
@@ -216,6 +218,7 @@ const DashboardContent: React.FC = () => {
         availableYears={availableYears}
         availableMonths={availableMonths}
         availableCategories={availableCategories}
+        availableCampaignTypes={availableCampaignTypes}
         filteredCount={filteredData.length}
       />
 
@@ -246,15 +249,15 @@ const DashboardContent: React.FC = () => {
             </div>
             <div className="text-left">
               <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wide flex items-center gap-2">
-                Biểu Đồ Phân Tích Chuyên Sâu (Ma Trận Vị Thế & QU Theo Ngành)
+                Biểu Đồ Phân Tích Chuyên Sâu (Ma Trận Vị Thế, QU Ngành & Tỷ Lệ Loại Campaign)
                 <span className="text-[10px] font-black bg-orange-100 dark:bg-orange-950 text-buzz dark:text-orange-300 border border-orange-300 dark:border-orange-800 px-2 py-0.5 rounded-full">
-                  +2 Advanced Charts
+                  +3 Advanced Charts
                 </span>
               </h3>
               <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                 {isAdvancedChartsExpanded
-                  ? 'Bấm để ẩn 2 biểu đồ phân tích chuyên sâu'
-                  : 'Bấm để mở rộng xem Ma trận BSI vs Buzz Volume & So sánh Content QU theo ngành'}
+                  ? 'Bấm để ẩn 3 biểu đồ phân tích chuyên sâu'
+                  : 'Bấm để mở rộng xem Ma trận BSI vs Buzz, Content QU theo ngành & Tỷ lệ loại campaign'}
               </p>
             </div>
           </div>
@@ -266,9 +269,10 @@ const DashboardContent: React.FC = () => {
         </button>
 
         {isAdvancedChartsExpanded && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4 animate-fadeIn">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-4 animate-fadeIn">
             <BrandMatrixChart data={filteredData} />
             <CategoryComparisonChart data={filteredData} />
+            <CampaignTypeChart data={filteredData} />
           </div>
         )}
       </div>
