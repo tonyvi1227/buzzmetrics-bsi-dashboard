@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   plugins: [react()],
-  base: '/',
+  base: './', // Use relative paths for built assets to work seamlessly on Netlify & custom domains
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -17,6 +17,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
+    emptyOutDir: true,
   },
   server: {
     port: 3000,
