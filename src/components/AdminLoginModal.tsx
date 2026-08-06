@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Lock, KeyRound, Check, AlertCircle } from 'lucide-react';
+import { X, Lock, KeyRound, AlertCircle } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 
 interface AdminLoginModalProps {
@@ -9,7 +9,7 @@ interface AdminLoginModalProps {
 }
 
 export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClose, onSuccess }) => {
-  const { loginAdmin, changePassword, adminPassword } = useAdmin();
+  const { loginAdmin, changePassword } = useAdmin();
   const [pinInput, setPinInput] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isChangingPass, setIsChangingPass] = useState(false);
@@ -25,7 +25,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
       setPinInput('');
       onSuccess();
     } else {
-      setError('Mật khẩu Admin không chính xác. Mật khẩu mặc định: CIMKT');
+      setError('Mật khẩu Admin không chính xác. Vui lòng thử lại.');
     }
   };
 
@@ -70,7 +70,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
                   type="password"
                   value={pinInput}
                   onChange={(e) => setPinInput(e.target.value)}
-                  placeholder="Nhập mật khẩu (Mặc định: CIMKT)"
+                  placeholder="Nhập mật khẩu Admin..."
                   className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl p-3 pl-10 text-sm focus:ring-2 focus:ring-buzz outline-none"
                   autoFocus
                 />
@@ -85,8 +85,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
               </div>
             )}
 
-            <div className="pt-2 flex justify-between items-center text-xs">
-              <span className="text-slate-400 font-bold">Mật khẩu mặc định: <code className="text-buzz font-black bg-orange-50 dark:bg-orange-950 px-1.5 py-0.5 rounded border border-orange-200 dark:border-orange-800">CIMKT</code></span>
+            <div className="pt-1 flex justify-end text-xs">
               <button
                 type="button"
                 onClick={() => setIsChangingPass(true)}
@@ -96,7 +95,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
               </button>
             </div>
 
-            <div className="pt-4 flex justify-end gap-2">
+            <div className="pt-3 flex justify-end gap-2">
               <button
                 type="button"
                 onClick={onClose}
@@ -115,7 +114,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
         ) : (
           <form onSubmit={handleChangePassword} className="p-6 space-y-4">
             <p className="text-xs font-bold text-slate-600 dark:text-slate-300">
-              Nhập mật khẩu Admin mới để thay thế cho mật khẩu mặc định (CIMKT).
+              Nhập mật khẩu Admin mới để thay thế cho mật khẩu hiện tại.
             </p>
 
             <div className="space-y-1.5">
@@ -125,7 +124,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
 
               <div className="relative">
                 <input
-                  type="text"
+                  type="password"
                   value={newPin}
                   onChange={(e) => setNewPin(e.target.value)}
                   placeholder="Nhập mật khẩu mới..."
