@@ -71,7 +71,7 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
         legend: {
           labels: {
             color: textColor,
-            font: { family: 'Inter', size: 11, weight: 'bold' as const },
+            font: { family: "'Inter', sans-serif", size: 11, weight: 'bold' as const },
           },
           position: 'top' as const,
         },
@@ -79,6 +79,8 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
         tooltip: {
           padding: 10,
           cornerRadius: 8,
+          titleFont: { family: "'Inter', sans-serif", size: 12, weight: 'bold' as const },
+          bodyFont: { family: "'Inter', sans-serif", size: 11, weight: 'bold' as const },
           callbacks: {
             label: (ctx: any) => {
               const idx = ctx.dataIndex;
@@ -101,14 +103,14 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
           title: {
             display: true,
             text: 'Số lượng Content QU & QU User Trung Bình',
-            font: { size: 10, weight: 'bold' as const },
+            font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const },
             color: textColor,
           },
-          ticks: { color: textColor, font: { family: 'Inter', size: 9, weight: 'bold' as const } },
+          ticks: { color: textColor, font: { family: "'Inter', sans-serif", size: 9, weight: 'bold' as const } },
           grid: { display: false }, // NO GRID LINES
         },
         y: {
-          ticks: { color: textColor, font: { family: 'Inter', size: 9, weight: 'bold' as const } },
+          ticks: { color: textColor, font: { family: "'Inter', sans-serif", size: 9, weight: 'bold' as const } },
           grid: { display: false }, // NO GRID LINES
         },
       },

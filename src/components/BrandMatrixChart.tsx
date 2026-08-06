@@ -90,6 +90,8 @@ export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
         tooltip: {
           padding: 10,
           cornerRadius: 8,
+          titleFont: { family: "'Inter', sans-serif", size: 12, weight: 'bold' as const },
+          bodyFont: { family: "'Inter', sans-serif", size: 11, weight: 'bold' as const },
           callbacks: {
             label: (ctx: any) => {
               const item = ctx.raw;
@@ -110,10 +112,10 @@ export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
           title: {
             display: true,
             text: 'Average Buzz Volume (K)',
-            font: { size: 10, weight: 'bold' as const },
+            font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const },
             color: textColor,
           },
-          ticks: { color: textColor, font: { weight: 'bold' as const } },
+          ticks: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' as const } },
           grid: { display: false }, // NO GRID LINES
         },
         y: {
@@ -121,10 +123,10 @@ export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
           title: {
             display: true,
             text: 'Average BSI Score',
-            font: { size: 10, weight: 'bold' as const },
+            font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const },
             color: textColor,
           },
-          ticks: { color: textColor, font: { weight: 'bold' as const } },
+          ticks: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' as const } },
           grid: { display: false }, // NO GRID LINES
         },
       },

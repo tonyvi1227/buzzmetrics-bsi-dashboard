@@ -19,7 +19,6 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
     const monthOrder = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const timelineSet = new Set<string>();
 
-    // Initial 18 months fallback structure to ensure full chart view
     const default18Months = [
       'Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025', 'May 2025', 'Jun 2025',
       'Jul 2025', 'Aug 2025', 'Sep 2025', 'Oct 2025', 'Nov 2025', 'Dec 2025',
@@ -98,7 +97,7 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
       plugins: {
         legend: {
           labels: {
-            font: { family: 'Inter', size: 11, weight: 'bold' as const },
+            font: { family: "'Inter', sans-serif", size: 11, weight: 'bold' as const },
             color: textColor,
           },
           position: 'top' as const,
@@ -111,27 +110,27 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
           intersect: false,
           padding: 10,
           cornerRadius: 8,
-          bodyFont: { family: 'Inter', size: 12, weight: 'bold' as const },
-          titleFont: { family: 'Inter', size: 13, weight: 'bold' as const },
+          bodyFont: { family: "'Inter', sans-serif", size: 12, weight: 'bold' as const },
+          titleFont: { family: "'Inter', sans-serif", size: 13, weight: 'bold' as const },
         },
       },
       scales: {
         x: {
-          ticks: { color: textColor, font: { family: 'Inter', size: 9, weight: 'bold' as const } },
+          ticks: { color: textColor, font: { family: "'Inter', sans-serif", size: 9, weight: 'bold' as const } },
           grid: { display: false },
         },
         y: {
           type: 'linear' as const,
           position: 'left' as const,
-          title: { display: true, text: 'Buzz Vol (Tr)', font: { size: 10, weight: 'bold' as const }, color: textColor },
-          ticks: { color: textColor, font: { weight: 'bold' as const } },
+          title: { display: true, text: 'Buzz Vol (Tr)', font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const }, color: textColor },
+          ticks: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' as const } },
           grid: { display: false },
         },
         y1: {
           type: 'linear' as const,
           position: 'right' as const,
-          title: { display: true, text: 'Số Campaign', font: { size: 10, weight: 'bold' as const }, color: textColor },
-          ticks: { color: textColor, font: { weight: 'bold' as const } },
+          title: { display: true, text: 'Số Campaign', font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const }, color: textColor },
+          ticks: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' as const } },
           grid: { display: false },
         },
       },

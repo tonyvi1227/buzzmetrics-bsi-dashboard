@@ -61,13 +61,13 @@ export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) =>
         legend: {
           labels: {
             color: textColor,
-            font: { family: 'Inter', size: 10, weight: 'bold' as const },
+            font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const },
           },
           position: 'bottom' as const,
         },
         datalabels: {
           color: '#ffffff',
-          font: { family: 'Inter', weight: 'bold' as const, size: 11 },
+          font: { family: "'Inter', sans-serif", weight: 'bold' as const, size: 11 },
           formatter: (value: number, ctx: any) => {
             const sum = ctx.dataset.data.reduce((a: number, b: number) => a + b, 0);
             if (sum === 0 || value === 0) return '';
@@ -78,6 +78,8 @@ export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) =>
         tooltip: {
           padding: 10,
           cornerRadius: 8,
+          titleFont: { family: "'Inter', sans-serif", size: 12, weight: 'bold' as const },
+          bodyFont: { family: "'Inter', sans-serif", size: 11, weight: 'bold' as const },
           callbacks: {
             label: (ctx: any) => {
               const item = typeStats[ctx.dataIndex];
