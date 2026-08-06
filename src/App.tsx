@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
-import { Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Sparkles, ChevronDown, ChevronUp, Database } from 'lucide-react';
 import { ThemeProvider } from './context/ThemeContext';
 import { AdminProvider, useAdmin } from './context/AdminContext';
 import { CampaignRecord, BenchmarkMetrics, CategoryBenchmark } from './types/dashboard';
 import { getStoredCampaigns, saveStoredCampaigns, resetStoredCampaigns } from './utils/storage';
+import { fetchCampaignsFromSupabase, uploadCampaignsToSupabase, getSupabaseCredentials } from './utils/supabaseClient';
 import { useSmartFilters, ALL_OPTION } from './hooks/useSmartFilters';
 import { Header } from './components/Header';
 import { BenchmarkPanel } from './components/BenchmarkPanel';
@@ -19,6 +20,7 @@ import { CampaignDetailModal } from './components/CampaignDetailModal';
 import { DataImportModal } from './components/DataImportModal';
 import { ExportModal } from './components/ExportModal';
 import { AdminLoginModal } from './components/AdminLoginModal';
+import { SupabaseConfigModal } from './components/SupabaseConfigModal';
 
 const DashboardContent: React.FC = () => {
   const [dataset, setDataset] = useState<CampaignRecord[]>(() => getStoredCampaigns());
@@ -26,9 +28,25 @@ const DashboardContent: React.FC = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+  const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
   const [isAdvancedChartsExpanded, setIsAdvancedChartsExpanded] = useState(false);
+  const [isCloudSynced, setIsCloudSynced] = useState(false);
 
   const { isAdmin } = useAdmin();
+
+  // On App Mount: Attempt to fetch live data from Supabase Cloud DB if connected
+  useEffect(() => {
+    const creds = getSupabaseCredentials();
+    if (creds.url && creds.anonKey) {
+      fetchCampaignsFromSupabase().then(cloudData => {
+        if (cloudData && cloudData.length > 0) {
+          setDataset(cloudData);
+          saveStoredCampaigns(cloudData);
+          setIsCloudSynced(true);
+        }
+      });
+    }
+  }, []);
 
   const {
     filters,
@@ -115,7 +133,7 @@ const DashboardContent: React.FC = () => {
   };
 
   // Handle Importing New Data (Append or Overwrite)
-  const handleImportData = (newRecords: CampaignRecord[], mode: 'append' | 'overwrite') => {
+  const handleImportData = async (newRecords: CampaignRecord[], mode: 'append' | 'overwrite') => {
     let updatedDataset: CampaignRecord[] = [];
 
     if (mode === 'overwrite') {
@@ -134,6 +152,15 @@ const DashboardContent: React.FC = () => {
 
     setDataset(updatedDataset);
     saveStoredCampaigns(updatedDataset);
+
+    // Sync to Supabase Cloud if connected
+    const creds = getSupabaseCredentials();
+    if (creds.url && creds.anonKey) {
+      const success = await uploadCampaignsToSupabase(updatedDataset, mode);
+      if (success) {
+        setIsCloudSynced(true);
+      }
+    }
   };
 
   // Reset Data to Initial Default 18-month Dataset
@@ -142,6 +169,15 @@ const DashboardContent: React.FC = () => {
     setDataset(defaults);
     resetFilters();
     setIsImportModalOpen(false);
+  };
+
+  const handleSupabaseConnected = async () => {
+    const cloudData = await fetchCampaignsFromSupabase();
+    if (cloudData && cloudData.length > 0) {
+      setDataset(cloudData);
+      saveStoredCampaigns(cloudData);
+      setIsCloudSynced(true);
+    }
   };
 
   return (
@@ -153,6 +189,22 @@ const DashboardContent: React.FC = () => {
         onOpenExport={() => setIsExportModalOpen(true)}
         totalRecordsCount={dataset.length}
       />
+
+      {/* Cloud Sync Status Indicator */}
+      <div className="mb-4 flex items-center justify-between gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 px-1">
+        <div className="flex items-center gap-2">
+          <Database className={`w-4 h-4 ${isCloudSynced ? 'text-emerald-500' : 'text-slate-400'}`} />
+          <span>Trạng thái kết nối Cloud: <strong className={isCloudSynced ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}>{isCloudSynced ? 'Đã đồng bộ Supabase Cloud DB' : 'Chưa kết nối (Đang chạy dữ liệu Nội bộ / Browser)'}</strong></span>
+        </div>
+        {isAdmin && (
+          <button
+            onClick={() => setIsSupabaseModalOpen(true)}
+            className="text-buzz hover:underline font-black flex items-center gap-1"
+          >
+            Cấu hình Supabase Cloud DB
+          </button>
+        )}
+      </div>
 
       {/* 1. Overall Dynamic Benchmark Panel */}
       <BenchmarkPanel metrics={overallBenchmark} />
@@ -255,6 +307,12 @@ const DashboardContent: React.FC = () => {
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         data={filteredData}
+      />
+
+      <SupabaseConfigModal
+        isOpen={isSupabaseModalOpen}
+        onClose={() => setIsSupabaseModalOpen(false)}
+        onConnected={handleSupabaseConnected}
       />
     </div>
   );
