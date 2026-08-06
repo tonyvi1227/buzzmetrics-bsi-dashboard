@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
 import { Users } from 'lucide-react';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, registerables } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
 import { formatNum } from '../utils/brandStandardizer';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
+ChartJS.register(...registerables);
 
 interface CategoryComparisonChartProps {
   data: CampaignRecord[];

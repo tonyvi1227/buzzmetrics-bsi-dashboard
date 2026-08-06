@@ -1,11 +1,11 @@
 import React from 'react';
 import { TrendingUp } from 'lucide-react';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, registerables } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(...registerables);
 
 interface TimelineComboChartProps {
   data: CampaignRecord[];
@@ -91,7 +91,6 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
   const options = React.useMemo(() => {
     const isDark = theme === 'dark';
     const textColor = isDark ? '#f8fafc' : '#0f172a';
-    const gridColor = isDark ? '#334155' : '#f1f5f9';
 
     return {
       responsive: true,

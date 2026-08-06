@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
 import { Compass } from 'lucide-react';
-import { Chart as ChartJS, LinearScale, PointElement, LineElement, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, registerables } from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
 import { formatNum } from '../utils/brandStandardizer';
 
-ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend);
+ChartJS.register(...registerables);
 
 interface BrandMatrixChartProps {
   data: CampaignRecord[];
