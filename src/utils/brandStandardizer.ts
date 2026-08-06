@@ -108,3 +108,9 @@ export function formatNum(num: number | null | undefined, decimals = 0): string 
     maximumFractionDigits: decimals,
   });
 }
+
+export function standardizeCategory(rawCategory: string): string {
+  const cat = (rawCategory || '').trim();
+  if (!cat) return 'Khác';
+  return cat;
+}

@@ -1,7 +1,7 @@
 import { CampaignRecord } from '../types/dashboard';
 import { initialCampaigns } from '../data/campaignDataset';
 
-const STORAGE_KEY = 'buzzmetrics_dashboard_data_v3';
+const STORAGE_KEY = 'buzzmetrics_dashboard_data_v4';
 
 export function getStoredCampaigns(): CampaignRecord[] {
   try {

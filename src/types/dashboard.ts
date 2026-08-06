@@ -1,3 +1,10 @@
+export type CampaignType =
+  | 'Product Launch & Rebranding'
+  | 'Sponsor & Event'
+  | 'Promotion'
+  | 'CSR & Sustainability'
+  | 'Thematic & Brand Building';
+
 export interface CampaignRecord {
   id: string;
   year: string;
@@ -6,6 +13,7 @@ export interface CampaignRecord {
   category: string;
   brand: string;
   campaign: string;
+  campaignType: CampaignType;
   bsi: number;
   buzzVolume: number;
   contentQU: number;
@@ -23,7 +31,9 @@ export interface FilterState {
   year: string;
   month: string;
   category: string;
-  search: string;
+  campaignType: string;
+  brandSearch: string;
+  search?: string;
 }
 
 export interface BenchmarkMetrics {
@@ -53,22 +63,12 @@ export interface CategoryBenchmark {
 
 export interface BrandStat {
   brand: string;
-  bsi: number;
-  count: number;
-  buzzVolume: number;
+  totalBSI: number;
+  totalBuzz: number;
+  campaignCount: number;
+  avgSentiment: number;
 }
 
-export type SortColumn = 
-  | 'brand'
-  | 'category'
-  | 'campaign'
-  | 'time'
-  | 'buzzVolume'
-  | 'contentQU'
-  | 'quUser'
-  | 'bsi'
-  | 'sentiment'
-  | 'relevancy'
-  | 'earnedPct';
-
+export type SortColumn = 'time' | 'year' | 'month' | 'brand' | 'category' | 'campaign' | 'campaignType' | 'buzzVolume' | 'bsi' | 'contentQU' | 'quUser' | 'sentiment' | 'relevancy' | 'earnedPct';
+export type SortOrder = 'asc' | 'desc';
 export type SortDirection = 'asc' | 'desc';

@@ -1,5 +1,6 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { CampaignRecord } from '../types/dashboard';
+import { classifyCampaignType } from './csvParser';
 
 const DEFAULT_SUPABASE_URL = 'https://pfuyxwdboqcjxnpvgrgv.supabase.co';
 const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_DRM2reRGhDnyNBlFPI1grw_KugMnmnb';
@@ -33,14 +34,19 @@ export function getSupabaseClient(): SupabaseClient | null {
  * Map Supabase DB row (snake_case) to CampaignRecord (camelCase)
  */
 export function mapDbRowToRecord(row: any): CampaignRecord {
+  const campaign = row.campaign || '';
+  const brand = row.brand || 'KHÁC';
+  const campaignType = row.campaign_type || classifyCampaignType(campaign, brand);
+
   return {
     id: row.id || `rec_${row.year}_${row.month}_${Math.random()}`,
     year: String(row.year || ''),
     month: String(row.month || ''),
     rawCategory: row.raw_category || row.category || 'Khác',
     category: row.category || 'Khác',
-    brand: row.brand || 'KHÁC',
-    campaign: row.campaign || '',
+    brand,
+    campaign,
+    campaignType,
     bsi: Number(row.bsi || 0),
     buzzVolume: Number(row.buzz_volume || 0),
     contentQU: Number(row.content_qu || 0),
@@ -67,6 +73,7 @@ export function mapRecordToDbRow(r: CampaignRecord): any {
     category: r.category,
     brand: r.brand,
     campaign: r.campaign,
+    campaign_type: r.campaignType,
     bsi: r.bsi,
     buzz_volume: r.buzzVolume,
     content_qu: r.contentQU,

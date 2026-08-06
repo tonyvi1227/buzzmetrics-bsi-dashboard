@@ -1,45 +1,109 @@
 import Papa from 'papaparse';
-import { CampaignRecord } from '../types/dashboard';
-import { standardizeBrand } from './brandStandardizer';
+import { CampaignRecord, CampaignType } from '../types/dashboard';
+import { standardizeCategory, standardizeBrand } from './brandStandardizer';
+
+export function classifyCampaignType(campaignName: string, brandName: string): CampaignType {
+  const name = (campaignName || '').toUpperCase();
+  const brand = (brandName || '').toUpperCase();
+
+  // 1. Brand TW ĐOÀN TNCS HỒ CHÍ MINH -> Sponsor & Event
+  if (
+    brand.includes('TW ĐOÀN') || brand.includes('ĐOÀN TNCS') || brand.includes('TNCS HỒ CHÍ MINH') ||
+    name.includes('TW ĐOÀN') || name.includes('ĐOÀN TNCS')
+  ) {
+    return 'Sponsor & Event';
+  }
+
+  // 2. Product Launch & Rebranding (Override for New Package / Limited Edition / Launching)
+  if (
+    name.includes('LAUNCH') || name.includes('RA MẮT') || name.includes('RA MAT') ||
+    name.includes('REBRANDING') || name.includes('SERIES') || name.includes('S26') ||
+    name.includes('FIND X') || name.includes('MỚI') || name.includes('MOI') ||
+    name.includes('NEW') || name.includes('PHIÊN BẢN GIỚI HẠN') || name.includes('PHIEN BAN GIOI HAN') ||
+    name.includes('BAO BÌ MỚI') || name.includes('BAO BI MOI') || name.includes('NEW PACKAGE') ||
+    name.includes('PHIÊN BẢN')
+  ) {
+    return 'Product Launch & Rebranding';
+  }
+
+  // 3. Sponsor & Event
+  if (
+    name.includes('SPONSOR') || name.includes('TÀI TRỢ') || name.includes('TAI TRO') ||
+    name.includes('CONCERT') || name.includes('MUSIC') || name.includes('FESTIVAL') ||
+    name.includes('EVENT') || name.includes('LỄ HỘI') || name.includes('LE HOI') ||
+    name.includes('SHOW') || name.includes('ANH TRAI') || name.includes('CHỊ ĐẸP') ||
+    name.includes('NGOẠI HẠNG ANH') || name.includes('WORLD CUP') || name.includes('MARATHON') ||
+    name.includes('FANDOM') || name.includes('COUNTDOWN') || name.includes('GIẢI ĐẤU') ||
+    name.includes('GIAI DAU') || name.includes('MATCH') || name.includes('FAN MEETING')
+  ) {
+    return 'Sponsor & Event';
+  }
+
+  // 4. Promotion
+  if (
+    name.includes('PROMO') || name.includes('SĂN') || name.includes('SAN') ||
+    name.includes('TRÚNG') || name.includes('TRUNG') || name.includes('QUÉT MÃ') ||
+    name.includes('QUET MA') || name.includes('BẬT LON') || name.includes('BAT LON') ||
+    name.includes('GIẬT NẮP') || name.includes('GIAT NAP') || name.includes('COMBO') ||
+    name.includes('TẶNG') || name.includes('TANG') || name.includes('VOUCHER') ||
+    name.includes('FREE MÃ') || name.includes('FREE MA') || name.includes('ĐỔI QUÀ') ||
+    name.includes('DOI QUA') || name.includes('CODE') || name.includes('ƯU ĐÃI')
+  ) {
+    return 'Promotion';
+  }
+
+  // 5. CSR & Sustainability
+  if (
+    name.includes('CSR') || name.includes('MẦM XANH') || name.includes('MAM XANH') ||
+    name.includes('RỪNG') || name.includes('RUNG') || name.includes('SỐNG XANH') ||
+    name.includes('SONG XANH') || name.includes('CHUYỂN XANH') || name.includes('CHUYEN XANH') ||
+    name.includes('MÔI TRƯỜNG') || name.includes('MOI TRUONG') || name.includes('VÌ MỘT') ||
+    name.includes('VI MOT') || name.includes('HPV') || name.includes('UNG THƯ') ||
+    name.includes('UNG THU') || name.includes('TIÊM CHỦNG') || name.includes('TIEM CHUNG') ||
+    name.includes('SỨC KHỎE')
+  ) {
+    return 'CSR & Sustainability';
+  }
+
+  // 6. Default Fallback
+  return 'Thematic & Brand Building';
+}
 
 export function parseCSVData(csvText: string): CampaignRecord[] {
-  const parsed = Papa.parse<string[]>(csvText.trim(), {
+  const parsed = Papa.parse<string[]>(csvText, {
     skipEmptyLines: true,
   });
 
-  const lines = parsed.data;
-  if (!lines || lines.length < 2) return [];
+  const rows = parsed.data;
+  if (!rows || rows.length <= 1) return [];
 
-  const rawRecords: Omit<CampaignRecord, 'id' | 'category'>[] = [];
+  const records: CampaignRecord[] = [];
   const brandCatFreq: Record<string, Record<string, number>> = {};
 
-  for (let i = 1; i < lines.length; i++) {
-    const row = lines[i];
-    if (!row || row.length < 21) continue;
+  for (let i = 1; i < rows.length; i++) {
+    const r = rows[i];
+    if (!r || r.length < 10) continue;
 
-    const year = row[0] ? row[0].trim() : '';
-    const month = row[1] ? row[1].trim() : '';
-    const campaignFull = row[4] ? row[4].trim() : '';
+    const year = (r[0] || '').trim();
+    const month = (r[1] || '').trim();
+    const campaignFull = (r[4] || '').trim();
+
+    if (!year || !month || !campaignFull) continue;
 
     let category = 'Khác';
-    let brandRaw = 'Khác';
+    let brandRaw = 'OTHERS';
     let campaignName = campaignFull;
 
-    const catMatch = campaignFull.match(/\[(.*?)\]/);
-    if (catMatch && catMatch[1]) {
-      category = catMatch[1].trim();
-      const rest = campaignFull.replace(/\[.*?\]/, '').trim();
-      
-      if (rest.includes('_')) {
-        const parts = rest.split('_');
-        brandRaw = parts[0].trim();
-        campaignName = parts.slice(1).join('_').trim();
-      } else if (rest.includes('-')) {
-        const parts = rest.split('-');
-        brandRaw = parts[0].trim();
-        campaignName = parts.slice(1).join('-').trim();
+    const match = campaignFull.match(/^\[(.*?)\]\s*(.*?)$/);
+    if (match) {
+      category = standardizeCategory(match[1].trim());
+      const rest = match[2].trim();
+      const underscoreIdx = rest.indexOf('_');
+      if (underscoreIdx !== -1) {
+        brandRaw = rest.substring(0, underscoreIdx).trim();
+        campaignName = rest.substring(underscoreIdx + 1).trim();
       } else {
-        brandRaw = rest.split(' ')[0].trim();
+        brandRaw = rest;
         campaignName = rest;
       }
     }
@@ -55,50 +119,49 @@ export function parseCSVData(csvText: string): CampaignRecord[] {
     if (!brandCatFreq[brand]) brandCatFreq[brand] = {};
     brandCatFreq[brand][category] = (brandCatFreq[brand][category] || 0) + 1;
 
-    const cleanNum = (str: string) => {
-      if (!str) return 0;
-      const cleaned = str.replace(/,/g, '').replace('%', '').trim();
-      const val = parseFloat(cleaned);
-      return isNaN(val) ? 0 : val;
+    const cleanNum = (val: string) => {
+      if (!val) return 0;
+      const s = val.replace(/,/g, '').replace(/%/g, '').trim();
+      const n = parseFloat(s);
+      return isNaN(n) ? 0 : n;
     };
 
-    rawRecords.push({
+    const bsi = cleanNum(r[5]);
+    const buzzVolume = cleanNum(r[6]);
+    const contentQU = cleanNum(r[7]);
+    const quBuzzPct = cleanNum(r[8]);
+    const sentiment = cleanNum(r[9]);
+    const quUser = cleanNum(r[10]);
+    const relevancy = cleanNum(r[11]);
+    const earnedPct = cleanNum(r[18]);
+    const owned = cleanNum(r[19]);
+    const paid = cleanNum(r[20]);
+    const earned = cleanNum(r[21]);
+
+    const campaignType = classifyCampaignType(campaignName, brand);
+
+    records.push({
+      id: `rec_${year}_${month}_${i}_${Math.random().toString(36).substr(2, 4)}`,
       year,
       month,
       rawCategory: category,
+      category,
       brand,
-      campaign: campaignName || campaignFull,
-      bsi: cleanNum(row[5]),
-      buzzVolume: cleanNum(row[6]),
-      contentQU: cleanNum(row[7]),
-      quBuzzPct: cleanNum(row[8]),
-      sentiment: cleanNum(row[9]),
-      quUser: cleanNum(row[10]),
-      relevancy: cleanNum(row[11]),
-      earnedPct: cleanNum(row[18]),
-      owned: cleanNum(row[19]),
-      paid: cleanNum(row[20]),
-      earned: cleanNum(row[21]),
+      campaign: campaignName,
+      campaignType,
+      bsi,
+      buzzVolume,
+      contentQU,
+      quBuzzPct,
+      sentiment,
+      quUser,
+      relevancy,
+      earnedPct,
+      owned,
+      paid,
+      earned,
     });
   }
 
-  // Calculate majority category per standardized brand
-  const brandMajorityCategory: Record<string, string> = {};
-  Object.keys(brandCatFreq).forEach(b => {
-    let maxCount = -1;
-    let topCat = 'Khác';
-    Object.entries(brandCatFreq[b]).forEach(([cat, count]) => {
-      if (count > maxCount) {
-        maxCount = count;
-        topCat = cat;
-      }
-    });
-    brandMajorityCategory[b] = topCat;
-  });
-
-  return rawRecords.map((r, idx) => ({
-    ...r,
-    id: `rec_${r.year}_${r.month}_${idx}`,
-    category: brandMajorityCategory[r.brand] || r.rawCategory,
-  }));
+  return records;
 }

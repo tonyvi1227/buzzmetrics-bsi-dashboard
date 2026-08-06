@@ -1,6 +1,6 @@
-import React from 'react';
-import { Trophy, Award } from 'lucide-react';
-import { CampaignRecord, BrandStat } from '../types/dashboard';
+import React, { useMemo } from 'react';
+import { Award, Trophy } from 'lucide-react';
+import { CampaignRecord } from '../types/dashboard';
 import { formatNum } from '../utils/brandStandardizer';
 
 interface TopBrandsTableProps {
@@ -8,88 +8,70 @@ interface TopBrandsTableProps {
 }
 
 export const TopBrandsTable: React.FC<TopBrandsTableProps> = ({ data }) => {
-  const topBrands: BrandStat[] = React.useMemo(() => {
-    const brandStats: Record<string, { bsi: number; count: number; buzzVolume: number }> = {};
+  const topBrands = useMemo(() => {
+    const brandMap: Record<string, { brand: string; totalBSI: number; totalBuzz: number; count: number }> = {};
 
     data.forEach(d => {
-      if (!brandStats[d.brand]) {
-        brandStats[d.brand] = { bsi: 0, count: 0, buzzVolume: 0 };
+      if (!brandMap[d.brand]) {
+        brandMap[d.brand] = { brand: d.brand, totalBSI: 0, totalBuzz: 0, count: 0 };
       }
-      brandStats[d.brand].bsi += d.bsi;
-      brandStats[d.brand].count += 1;
-      brandStats[d.brand].buzzVolume += d.buzzVolume;
+      brandMap[d.brand].totalBSI += d.bsi;
+      brandMap[d.brand].totalBuzz += d.buzzVolume;
+      brandMap[d.brand].count += 1;
     });
 
-    return Object.entries(brandStats)
-      .map(([brand, stat]) => ({
-        brand,
-        bsi: stat.bsi,
-        count: stat.count,
-        buzzVolume: stat.buzzVolume,
-      }))
-      .sort((a, b) => b.bsi - a.bsi)
-      .slice(0, 5);
+    return Object.values(brandMap)
+      .sort((a, b) => b.totalBSI - a.totalBSI)
+      .slice(0, 5); // Top 5 Brands by BSI
   }, [data]);
 
   return (
     <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
       <div>
-        <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-          <Trophy className="w-4 h-4 text-buzz" /> Top 5 Thương Hiệu BSI Cao Nhất
-        </h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+            <Trophy className="w-4 h-4 text-amber-500" /> Bảng Xếp Hạng Top 5 Thương Hiệu Hàng Đầu
+          </h3>
+          <span className="text-[10px] font-black text-amber-600 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-0.5 rounded-full border border-amber-200 dark:border-amber-900">
+            Top BSI Score
+          </span>
+        </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-black uppercase border-b border-slate-200 dark:border-slate-700">
-              <tr>
-                <th className="p-2.5 text-center w-8">#</th>
-                <th className="p-2.5">Thương hiệu</th>
-                <th className="p-2.5 text-right">Tổng BSI</th>
-                <th className="p-2.5 text-right">Campaigns</th>
+            <thead>
+              <tr className="border-b border-slate-200 dark:border-slate-800 text-[10px] uppercase tracking-wider text-slate-400 font-extrabold">
+                <th className="py-2 pl-2">Hạng</th>
+                <th className="py-2">Thương Hiệu</th>
+                <th className="py-2 text-right">Tổng BSI</th>
+                <th className="py-2 text-right">Tổng Buzz</th>
+                <th className="py-2 text-center">Số Camp</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-black text-slate-900 dark:text-slate-100">
-              {topBrands.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="p-4 text-center text-slate-400 font-normal">
-                    Không có dữ liệu
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-bold">
+              {topBrands.map((b, idx) => (
+                <tr key={b.brand} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
+                  <td className="py-2.5 pl-2 font-black">
+                    {idx === 0 ? (
+                      <span className="w-5 h-5 rounded-full bg-amber-400 text-white inline-flex items-center justify-center text-[10px]">1</span>
+                    ) : idx === 1 ? (
+                      <span className="w-5 h-5 rounded-full bg-slate-300 dark:bg-slate-600 text-white inline-flex items-center justify-center text-[10px]">2</span>
+                    ) : idx === 2 ? (
+                      <span className="w-5 h-5 rounded-full bg-amber-700 text-white inline-flex items-center justify-center text-[10px]">3</span>
+                    ) : (
+                      <span className="text-slate-400 pl-1.5">{idx + 1}</span>
+                    )}
                   </td>
+                  <td className="py-2.5 font-black text-slate-900 dark:text-white">{b.brand}</td>
+                  <td className="py-2.5 text-right font-black text-buzz">{formatNum(b.totalBSI)}</td>
+                  <td className="py-2.5 text-right text-slate-600 dark:text-slate-300">{formatNum(b.totalBuzz)}</td>
+                  <td className="py-2.5 text-center text-slate-500 dark:text-slate-400">{b.count}</td>
                 </tr>
-              ) : (
-                topBrands.map((item, idx) => (
-                  <tr
-                    key={item.brand}
-                    className="hover:bg-orange-50/60 dark:hover:bg-slate-800/60 transition"
-                  >
-                    <td className="p-2.5 text-center font-black text-buzz">
-                      {idx === 0 ? (
-                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-500 text-white text-[10px]">
-                          1
-                        </span>
-                      ) : (
-                        idx + 1
-                      )}
-                    </td>
-                    <td className="p-2.5 font-black text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                      {item.brand}
-                    </td>
-                    <td className="p-2.5 text-right font-black text-amber-600 dark:text-amber-400">
-                      {formatNum(item.bsi)}
-                    </td>
-                    <td className="p-2.5 text-right font-black text-slate-700 dark:text-slate-300">
-                      {item.count}
-                    </td>
-                  </tr>
-                ))
-              )}
+              ))}
             </tbody>
           </table>
         </div>
       </div>
-
-      <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold mt-4 text-right">
-        *Xếp hạng theo tổng điểm BSI trong khoảng lọc
-      </p>
     </div>
   );
 };

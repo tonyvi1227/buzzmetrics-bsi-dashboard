@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sliders, Search, Filter } from 'lucide-react';
+import { Filter, Calendar, Layers, Search, Sparkles, Tag } from 'lucide-react';
 import { FilterState } from '../types/dashboard';
 import { ALL_OPTION } from '../hooks/useSmartFilters';
 
@@ -9,6 +9,7 @@ interface FilterBarProps {
   availableYears: string[];
   availableMonths: string[];
   availableCategories: string[];
+  availableCampaignTypes?: string[];
   filteredCount: number;
 }
 
@@ -18,94 +19,117 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   availableYears,
   availableMonths,
   availableCategories,
+  availableCampaignTypes = [],
   filteredCount,
 }) => {
   return (
-    <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm mb-6">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-xs font-black text-buzz uppercase tracking-wider flex items-center gap-2">
-          <Sliders className="w-4 h-4" /> Bộ Lọc Dữ Liệu Tương Tác Thông Minh (Smart Cascading Filters)
-        </h2>
-        <span className="text-[11px] font-black text-slate-500 dark:text-slate-400 flex items-center gap-1">
-          <Filter className="w-3 h-3 text-buzz" /> {filteredCount} kết quả khớp
-        </span>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        {/* 1. Year Filter */}
-        <div>
-          <label className="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">
-            Năm (Year)
-          </label>
-          <select
-            value={filters.year}
-            onChange={(e) => onUpdateFilter('year', e.target.value)}
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-buzz outline-none cursor-pointer"
-          >
-            {availableYears.map(y => (
-              <option key={y} value={y}>
-                {y === ALL_OPTION ? 'Tất cả các năm' : `Năm ${y}`}
-              </option>
-            ))}
-          </select>
+    <div className="glass-card p-4 md:p-5 rounded-2xl mb-6 shadow-sm border border-slate-200 dark:border-slate-800">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+        {/* Title */}
+        <div className="flex items-center gap-2">
+          <div className="p-2 rounded-xl bg-buzz-light dark:bg-orange-950/60 text-buzz border border-buzz-border dark:border-orange-800">
+            <Filter className="w-4 h-4" />
+          </div>
+          <div>
+            <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
+              Bộ Lọc Thông Minh (Smart Cascading Filters)
+              <span className="text-[10px] font-black bg-buzz text-white px-2 py-0.5 rounded-full">
+                {filteredCount} Kết quả
+              </span>
+            </h2>
+            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+              Lọc theo Năm ➔ Tháng ➔ Ngành Hàng ➔ Loại Chiến Dịch ➔ Từ Khóa
+            </p>
+          </div>
         </div>
 
-        {/* 2. Month Filter (Cascading based on Year) */}
-        <div>
-          <label className="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5 flex items-center justify-between">
-            <span>Tháng (Month)</span>
-            {filters.year !== ALL_OPTION && (
-              <span className="text-[10px] text-buzz font-extrabold">lọc theo {filters.year}</span>
-            )}
-          </label>
-          <select
-            value={filters.month}
-            onChange={(e) => onUpdateFilter('month', e.target.value)}
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-buzz outline-none cursor-pointer"
-          >
-            {availableMonths.map(m => (
-              <option key={m} value={m}>
-                {m === ALL_OPTION ? 'Tất cả các tháng' : `Tháng ${m}`}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* Filters Controls Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 w-full lg:w-auto">
+          {/* Year Dropdown */}
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+              <Calendar className="w-3 h-3 text-buzz" /> Năm
+            </label>
+            <select
+              value={filters.year}
+              onChange={(e) => onUpdateFilter('year', e.target.value)}
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz"
+            >
+              <option value={ALL_OPTION}>Tất cả năm</option>
+              {availableYears.map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+          </div>
 
-        {/* 3. Category Filter (Cascading based on Year & Month) */}
-        <div>
-          <label className="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5 flex items-center justify-between">
-            <span>Ngành Hàng (Category)</span>
-            {(filters.year !== ALL_OPTION || filters.month !== ALL_OPTION) && (
-              <span className="text-[10px] text-buzz font-extrabold">lọc theo thời gian</span>
-            )}
-          </label>
-          <select
-            value={filters.category}
-            onChange={(e) => onUpdateFilter('category', e.target.value)}
-            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-buzz outline-none cursor-pointer"
-          >
-            {availableCategories.map(c => (
-              <option key={c} value={c}>
-                {c === ALL_OPTION ? 'Tất cả Ngành hàng' : c}
-              </option>
-            ))}
-          </select>
-        </div>
+          {/* Month Dropdown */}
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+              <Calendar className="w-3 h-3 text-buzz" /> Tháng
+            </label>
+            <select
+              value={filters.month}
+              onChange={(e) => onUpdateFilter('month', e.target.value)}
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz"
+            >
+              <option value={ALL_OPTION}>Tất cả tháng</option>
+              {availableMonths.map(m => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
+          </div>
 
-        {/* 4. Keyword Search Input */}
-        <div>
-          <label className="block text-xs font-black text-slate-700 dark:text-slate-300 mb-1.5">
-            Tìm Chiến Dịch / Thương Hiệu
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              value={filters.search}
-              onChange={(e) => onUpdateFilter('search', e.target.value)}
-              placeholder="Nhập từ khóa..."
-              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl p-2.5 pl-9 text-xs focus:ring-2 focus:ring-buzz outline-none"
-            />
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+          {/* Category Dropdown */}
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+              <Layers className="w-3 h-3 text-buzz" /> Ngành Hàng
+            </label>
+            <select
+              value={filters.category}
+              onChange={(e) => onUpdateFilter('category', e.target.value)}
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz truncate"
+            >
+              <option value={ALL_OPTION}>Tất cả ngành hàng</option>
+              {availableCategories.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Campaign Type Dropdown */}
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+              <Tag className="w-3 h-3 text-buzz" /> Loại Campaign
+            </label>
+            <select
+              value={filters.campaignType}
+              onChange={(e) => onUpdateFilter('campaignType', e.target.value)}
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz truncate"
+            >
+              <option value={ALL_OPTION}>Tất cả loại campaign</option>
+              <option value="Product Launch & Rebranding">🚀 Product Launch</option>
+              <option value="Sponsor & Event">🎭 Sponsor & Event</option>
+              <option value="Promotion">🎁 Promotion</option>
+              <option value="CSR & Sustainability">🌿 CSR & Sustainability</option>
+              <option value="Thematic & Brand Building">💎 Thematic</option>
+            </select>
+          </div>
+
+          {/* Keyword Search Input */}
+          <div className="space-y-1 col-span-2 sm:col-span-1">
+            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+              <Search className="w-3 h-3 text-buzz" /> Tìm Thương Hiệu / Camp
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={filters.brandSearch || filters.search || ''}
+                onChange={(e) => onUpdateFilter('brandSearch', e.target.value)}
+                placeholder="Nhập tên Brand/Camp..."
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
+              />
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3" />
+            </div>
           </div>
         </div>
       </div>
