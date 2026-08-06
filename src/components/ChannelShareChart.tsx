@@ -25,7 +25,7 @@ export const ChannelShareChart: React.FC<ChannelShareChartProps> = ({ data }) =>
       datasets: [
         {
           data: [totalEarned, totalPaid, totalOwned],
-          backgroundColor: ['#7CAAD9', '#2BB59B', '#F57888'],
+          backgroundColor: ['#125876', '#e68228', '#e69650'], // Buzzmetrics Palette: Dark Blue, Orange, Light Orange
           borderWidth: 2,
           borderColor: theme === 'dark' ? '#0f172a' : '#ffffff',
         },
@@ -53,8 +53,8 @@ export const ChannelShareChart: React.FC<ChannelShareChartProps> = ({ data }) =>
           font: { family: "'Inter', sans-serif", weight: 'bold' as const, size: 11 },
           formatter: (value: number, ctx: any) => {
             const sum = ctx.dataset.data.reduce((a: number, b: number) => a + b, 0);
-            if (sum === 0) return '0.00%';
-            return ((value * 100) / sum).toFixed(2) + '%';
+            if (sum === 0) return '0.0%';
+            return ((value * 100) / sum).toFixed(1) + '%'; // Format XX.X% per guideline
           },
         },
       },

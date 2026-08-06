@@ -16,13 +16,14 @@ interface CampaignTypeChartProps {
 export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) => {
   const { theme } = useTheme();
 
+  // Aggregate stats per campaign type and sort from largest to smallest per guideline
   const typeStats = useMemo(() => {
-    const map: Record<string, { type: string; count: number; buzz: number }> = {
-      'Product Launch & Rebranding': { type: '🚀 Product Launch', count: 0, buzz: 0 },
-      'Sponsor & Event': { type: '🎭 Sponsor & Event', count: 0, buzz: 0 },
-      'Promotion': { type: '🎁 Promotion', count: 0, buzz: 0 },
-      'CSR & Sustainability': { type: '🌿 CSR & Sustainability', count: 0, buzz: 0 },
-      'Thematic & Brand Building': { type: '💎 Thematic', count: 0, buzz: 0 },
+    const map: Record<string, { type: string; rawType: string; count: number; buzz: number }> = {
+      'Thematic & Brand Building': { type: '💎 Thematic', rawType: 'Thematic & Brand Building', count: 0, buzz: 0 },
+      'Product Launch & Rebranding': { type: '🚀 Product Launch', rawType: 'Product Launch & Rebranding', count: 0, buzz: 0 },
+      'Sponsor & Event': { type: '🎭 Sponsor & Event', rawType: 'Sponsor & Event', count: 0, buzz: 0 },
+      'Promotion': { type: '🎁 Promotion', rawType: 'Promotion', count: 0, buzz: 0 },
+      'CSR & Sustainability': { type: '🌿 CSR & Sustainability', rawType: 'CSR & Sustainability', count: 0, buzz: 0 },
     };
 
     data.forEach(d => {
@@ -33,16 +34,21 @@ export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) =>
       }
     });
 
-    return Object.values(map);
+    return Object.values(map).sort((a, b) => b.count - a.count);
   }, [data]);
 
+  const totalCount = useMemo(() => data.length, [data]);
+
   const chartData = useMemo(() => {
+    // Buzzmetrics Official Palette: Dark Blue, Signature Orange, Light Orange, Sandy Orange, Grey
+    const buzzPalette = ['#e68228', '#125876', '#e69650', '#fabe8c', '#969696'];
+
     return {
       labels: typeStats.map(t => t.type),
       datasets: [
         {
           data: typeStats.map(t => t.count),
-          backgroundColor: ['#8B5CF6', '#0284C7', '#F59E0B', '#10B981', '#E57D24'],
+          backgroundColor: buzzPalette.slice(0, typeStats.length),
           borderWidth: 2,
           borderColor: theme === 'dark' ? '#0f172a' : '#ffffff',
         },
@@ -72,7 +78,7 @@ export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) =>
             const sum = ctx.dataset.data.reduce((a: number, b: number) => a + b, 0);
             if (sum === 0 || value === 0) return '';
             const pct = ((value * 100) / sum).toFixed(1);
-            return `${pct}%`;
+            return `${pct}%`; // Guideline XX.X% format
           },
         },
         tooltip: {
@@ -103,15 +109,15 @@ export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) =>
             <Tag className="w-4 h-4 text-buzz" /> Phân Bổ Tỷ Lệ % Theo Loại Hình Chiến Dịch
           </h3>
           <span className="text-[10px] font-black text-buzz bg-buzz-light dark:bg-orange-950/60 px-2.5 py-0.5 rounded-full border border-buzz-border dark:border-orange-800">
-            5 Loại Hình
+            N = {formatNum(totalCount)}
           </span>
         </div>
 
         <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mb-3">
-          Tỷ lệ % phân bổ số lượng các loại hình Marketing (Launch, Sponsor & Event, Promo, CSR, Thematic).
+          Tỷ lệ % phân bổ số lượng các loại hình Marketing (xắp xếp giảm dần từ lớn nhất).
         </p>
 
-        <div className="h-64 flex justify-center items-center">
+        <div className="h-64 flex justify-center items-center relative">
           <Doughnut data={chartData} options={options} />
         </div>
       </div>

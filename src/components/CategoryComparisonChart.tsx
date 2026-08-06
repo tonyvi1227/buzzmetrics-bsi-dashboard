@@ -46,13 +46,13 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
         {
           label: 'Avg Content QU (CFQU)',
           data: categoryStats.map(c => c.avgContentQU),
-          backgroundColor: '#E57D24',
+          backgroundColor: '#e68228', // Buzzmetrics Signature Orange
           borderRadius: 4,
         },
         {
           label: 'Avg QU User',
           data: categoryStats.map(c => c.avgQUUser),
-          backgroundColor: '#2BB59B',
+          backgroundColor: '#125876', // Buzzmetrics Dark Blue
           borderRadius: 4,
         },
       ],
@@ -107,11 +107,11 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
             color: textColor,
           },
           ticks: { color: textColor, font: { family: "'Inter', sans-serif", size: 9, weight: 'bold' as const } },
-          grid: { display: false }, // NO GRID LINES
+          grid: { display: false }, // Flat design - plain background
         },
         y: {
           ticks: { color: textColor, font: { family: "'Inter', sans-serif", size: 9, weight: 'bold' as const } },
-          grid: { display: false }, // NO GRID LINES
+          grid: { display: false }, // Flat design - plain background
         },
       },
     };

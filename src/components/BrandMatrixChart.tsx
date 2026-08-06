@@ -52,8 +52,6 @@ export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
   }, [data]);
 
   const chartData = useMemo(() => {
-    const isDark = theme === 'dark';
-
     return {
       datasets: [
         {
@@ -67,15 +65,15 @@ export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
             avgSentiment: b.avgSentiment,
             count: b.count,
           })),
-          backgroundColor: '#E57D24',
-          borderColor: isDark ? '#f97316' : '#c2410c',
+          backgroundColor: '#e68228', // Buzzmetrics Signature Orange
+          borderColor: '#125876', // Buzzmetrics Dark Blue border
           borderWidth: 2,
           pointRadius: 8,
           pointHoverRadius: 11,
         },
       ],
     };
-  }, [matrixData, theme]);
+  }, [matrixData]);
 
   const options = useMemo(() => {
     const isDark = theme === 'dark';
@@ -116,7 +114,7 @@ export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
             color: textColor,
           },
           ticks: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' as const } },
-          grid: { display: false }, // NO GRID LINES
+          grid: { display: false }, // Flat design - plain background
         },
         y: {
           type: 'linear' as const,
@@ -127,7 +125,7 @@ export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
             color: textColor,
           },
           ticks: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' as const } },
-          grid: { display: false }, // NO GRID LINES
+          grid: { display: false }, // Flat design - plain background
         },
       },
     };

@@ -4,6 +4,7 @@ import { Chart as ChartJS, registerables } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
+import { formatNum } from '../utils/brandStandardizer';
 
 ChartJS.register(...registerables);
 
@@ -14,7 +15,6 @@ interface TimelineComboChartProps {
 export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) => {
   const { theme } = useTheme();
 
-  // Extract unique sorted timeline months from data
   const timelineMonths = React.useMemo(() => {
     const monthOrder = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const timelineSet = new Set<string>();
@@ -57,8 +57,6 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
     const buzzVolMillions = timelineMonths.map(k => parseFloat((map[k].buzz / 1000000).toFixed(2)));
     const campaignCounts = timelineMonths.map(k => map[k].count);
 
-    const isDark = theme === 'dark';
-
     return {
       labels: timelineMonths,
       datasets: [
@@ -66,9 +64,7 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
           type: 'bar' as const,
           label: 'Buzz Vol (Tr)',
           data: buzzVolMillions,
-          backgroundColor: isDark ? 'rgba(229, 125, 36, 0.4)' : '#FCDCC2',
-          borderColor: '#E57D24',
-          borderWidth: 1.5,
+          backgroundColor: '#e68228', // Signature Buzzmetrics Orange
           borderRadius: 4,
           yAxisID: 'y',
         },
@@ -76,16 +72,16 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
           type: 'line' as const,
           label: 'Số Campaign',
           data: campaignCounts,
-          borderColor: isDark ? '#38bdf8' : '#0f172a',
-          backgroundColor: isDark ? '#38bdf8' : '#0f172a',
+          borderColor: '#125876', // Buzzmetrics Dark Blue
+          backgroundColor: '#125876',
           borderWidth: 2.5,
-          pointRadius: 3,
-          tension: 0.2,
+          pointRadius: 3.5,
+          tension: 0.4, // Smooth line in charting to express softness & friendliness
           yAxisID: 'y1',
         },
       ],
     };
-  }, [data, timelineMonths, theme]);
+  }, [data, timelineMonths]);
 
   const options = React.useMemo(() => {
     const isDark = theme === 'dark';
@@ -102,9 +98,7 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
           },
           position: 'top' as const,
         },
-        datalabels: {
-          display: false,
-        },
+        datalabels: { display: false },
         tooltip: {
           mode: 'index' as const,
           intersect: false,
@@ -117,7 +111,7 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
       scales: {
         x: {
           ticks: { color: textColor, font: { family: "'Inter', sans-serif", size: 9, weight: 'bold' as const } },
-          grid: { display: false },
+          grid: { display: false }, // Flat design - plain background
         },
         y: {
           type: 'linear' as const,
