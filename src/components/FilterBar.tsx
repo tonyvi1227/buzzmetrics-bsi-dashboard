@@ -1,5 +1,5 @@
 import React from 'react';
-import { Filter, Calendar, Layers, Search, Sparkles, Tag } from 'lucide-react';
+import { Filter, Calendar, Layers, Search, Tag } from 'lucide-react';
 import { FilterState } from '../types/dashboard';
 import { ALL_OPTION } from '../hooks/useSmartFilters';
 
@@ -24,31 +24,33 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 }) => {
   return (
     <div className="glass-card p-4 md:p-5 rounded-2xl mb-6 shadow-sm border border-slate-200 dark:border-slate-800">
-      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-        {/* Title */}
-        <div className="flex items-center gap-2">
-          <div className="p-2 rounded-xl bg-buzz-light dark:bg-orange-950/60 text-buzz border border-buzz-border dark:border-orange-800">
+      <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
+        {/* Title & Badge */}
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-buzz-light dark:bg-orange-950/60 text-buzz border border-buzz-border dark:border-orange-800 flex-shrink-0">
             <Filter className="w-4 h-4" />
           </div>
           <div>
-            <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
-              Bộ Lọc Thông Minh (Smart Cascading Filters)
-              <span className="text-[10px] font-black bg-buzz text-white px-2 py-0.5 rounded-full">
-                {filteredCount} Kết quả
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+              <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white leading-snug">
+                BỘ LỌC THÔNG MINH (SMART CASCADING FILTERS)
+              </h2>
+              <span className="whitespace-nowrap inline-flex items-center justify-center flex-shrink-0 text-[10px] font-black bg-buzz text-white px-2.5 py-0.5 rounded-full shadow-sm">
+                {filteredCount} KẾT QUẢ
               </span>
-            </h2>
-            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+            </div>
+            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
               Lọc theo Năm ➔ Tháng ➔ Ngành Hàng ➔ Loại Chiến Dịch ➔ Từ Khóa
             </p>
           </div>
         </div>
 
         {/* Filters Controls Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 w-full lg:w-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 w-full xl:w-auto">
           {/* Year Dropdown */}
           <div className="space-y-1">
             <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-              <Calendar className="w-3 h-3 text-buzz" /> Năm
+              <Calendar className="w-3 h-3 text-buzz" /> NĂM
             </label>
             <select
               value={filters.year}
@@ -65,7 +67,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           {/* Month Dropdown */}
           <div className="space-y-1">
             <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-              <Calendar className="w-3 h-3 text-buzz" /> Tháng
+              <Calendar className="w-3 h-3 text-buzz" /> THÁNG
             </label>
             <select
               value={filters.month}
@@ -82,7 +84,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           {/* Category Dropdown */}
           <div className="space-y-1">
             <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-              <Layers className="w-3 h-3 text-buzz" /> Ngành Hàng
+              <Layers className="w-3 h-3 text-buzz" /> NGÀNH HÀNG
             </label>
             <select
               value={filters.category}
@@ -99,7 +101,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           {/* Campaign Type Dropdown */}
           <div className="space-y-1">
             <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-              <Tag className="w-3 h-3 text-buzz" /> Loại Campaign
+              <Tag className="w-3 h-3 text-buzz" /> LOẠI CAMPAIGN
             </label>
             <select
               value={filters.campaignType}
@@ -118,7 +120,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           {/* Keyword Search Input */}
           <div className="space-y-1 col-span-2 sm:col-span-1">
             <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-              <Search className="w-3 h-3 text-buzz" /> Tìm Thương Hiệu / Camp
+              <Search className="w-3 h-3 text-buzz" /> TÌM THƯƠNG HIỆU / CAMP
             </label>
             <div className="relative">
               <input

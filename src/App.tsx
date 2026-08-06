@@ -30,7 +30,7 @@ const DashboardContent: React.FC = () => {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
-  const [isAdvancedChartsExpanded, setIsAdvancedChartsExpanded] = useState(false);
+  const [isAdvancedChartsExpanded, setIsAdvancedChartsExpanded] = useState(true); // Default open for visibility
   const [isCloudSynced, setIsCloudSynced] = useState(false);
 
   const { isAdmin } = useAdmin();
@@ -183,7 +183,7 @@ const DashboardContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 max-w-[1600px] mx-auto">
+    <div className="min-h-screen p-4 md:p-8 max-w-[1600px] mx-auto font-sans">
       {/* Header Bar */}
       <Header
         onResetFilters={resetFilters}
@@ -248,10 +248,10 @@ const DashboardContent: React.FC = () => {
               <Sparkles className="w-4 h-4" />
             </div>
             <div className="text-left">
-              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wide flex items-center gap-2">
-                Biểu Đồ Phân Tích Chuyên Sâu (Ma Trận Vị Thế, QU Ngành & Tỷ Lệ Loại Campaign)
-                <span className="text-[10px] font-black bg-orange-100 dark:bg-orange-950 text-buzz dark:text-orange-300 border border-orange-300 dark:border-orange-800 px-2 py-0.5 rounded-full">
-                  +3 Advanced Charts
+              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wide flex items-center gap-2 flex-wrap">
+                BIỂU ĐỒ PHÂN TÍCH CHUYÊN SÂU (MA TRẬN VỊ THẾ, QU THEO NGÀNH & TỶ LỆ LOẠI CAMPAIGN)
+                <span className="whitespace-nowrap inline-flex items-center justify-center flex-shrink-0 text-[10px] font-black bg-orange-100 dark:bg-orange-950 text-buzz dark:text-orange-300 border border-orange-300 dark:border-orange-800 px-2.5 py-0.5 rounded-full">
+                  +3 ADVANCED CHARTS
                 </span>
               </h3>
               <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
@@ -262,14 +262,14 @@ const DashboardContent: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 font-black text-xs text-buzz">
+          <div className="flex items-center gap-2 font-black text-xs text-buzz whitespace-nowrap">
             <span>{isAdvancedChartsExpanded ? 'Thu gọn' : 'Mở rộng'}</span>
             {isAdvancedChartsExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </div>
         </button>
 
         {isAdvancedChartsExpanded && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-4 animate-fadeIn">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 animate-fadeIn">
             <BrandMatrixChart data={filteredData} />
             <CategoryComparisonChart data={filteredData} />
             <CampaignTypeChart data={filteredData} />
