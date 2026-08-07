@@ -15,11 +15,17 @@ interface CategoryComparisonChartProps {
 export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = ({ data }) => {
   const { theme } = useTheme();
 
-  // Top 10 categories with highest Average Content QU
+  // Top 10 categories with highest Average Content QU (Excluding 'Others' / 'Khác')
   const categoryStats = useMemo(() => {
     const catMap: Record<string, { category: string; count: number; contentQU: number; quUser: number }> = {};
 
     data.forEach(d => {
+      // Exclude 'Others' or 'Khác' category per guideline requirement
+      const normCat = (d.category || '').trim().toUpperCase();
+      if (normCat === 'OTHERS' || normCat === 'KHÁC' || normCat === 'OTHER') {
+        return;
+      }
+
       if (!catMap[d.category]) {
         catMap[d.category] = { category: d.category, count: 0, contentQU: 0, quUser: 0 };
       }
@@ -36,7 +42,7 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
         count: c.count,
       }))
       .sort((a, b) => b.avgContentQU - a.avgContentQU)
-      .slice(0, 10); // TOP 10 CATEGORIES
+      .slice(0, 10); // TOP 10 SPECIFIC CATEGORIES
   }, [data]);
 
   const chartData = useMemo(() => {
@@ -125,12 +131,12 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
             <Users className="w-4 h-4 text-buzz" /> Top 10 Ngành Hàng: Content QU & QU User Trung Bình
           </h3>
           <span className="text-[10px] font-black text-buzz bg-buzz-light dark:bg-orange-950/60 px-2.5 py-0.5 rounded-full border border-buzz-border dark:border-orange-800">
-            Top 10 Ngành QU cao nhất
+            Bỏ ngành Others
           </span>
         </div>
 
         <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mb-3">
-          Tỷ lệ tương tác chất lượng từ Qualified Users (Content QU & QU User) trung bình theo từng ngành.
+          Tỷ lệ tương tác chất lượng từ Qualified Users trung bình theo từng ngành (Đã loại trừ danh mục Others).
         </p>
 
         <div className="h-64">

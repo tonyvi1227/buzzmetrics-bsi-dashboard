@@ -15,7 +15,7 @@ interface BrandMatrixChartProps {
 export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
   const { theme } = useTheme();
 
-  // Aggregate stats per brand using Average Buzz Volume & Average BSI
+  // Aggregate stats for ALL brands using Average Buzz Volume & Average BSI
   const matrixData = useMemo(() => {
     const brandMap: Record<string, { brand: string; bsiTotal: number; buzzTotal: number; count: number; sentimentTotal: number }> = {};
 
@@ -45,8 +45,7 @@ export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
         };
       })
       .filter(b => b.x > 0 || b.y > 0)
-      .sort((a, b) => b.y - a.y)
-      .slice(0, 15); // Top 15 brands for readability
+      .sort((a, b) => b.y - a.y); // ALL BRANDS (no slice)
 
     return brands;
   }, [data]);
@@ -67,9 +66,9 @@ export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
           })),
           backgroundColor: '#e68228', // Buzzmetrics Signature Orange
           borderColor: '#125876', // Buzzmetrics Dark Blue border
-          borderWidth: 2,
-          pointRadius: 8,
-          pointHoverRadius: 11,
+          borderWidth: 1.5,
+          pointRadius: 7,
+          pointHoverRadius: 10,
         },
       ],
     };
@@ -139,7 +138,7 @@ export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
             <Compass className="w-4 h-4 text-buzz" /> Ma Trận Vị Thế Thương Hiệu (Average Buzz Vol vs Average BSI)
           </h3>
           <span className="text-[10px] font-black text-buzz bg-buzz-light dark:bg-orange-950/60 px-2.5 py-0.5 rounded-full border border-buzz-border dark:border-orange-800">
-            Top 15 Brands
+            Tất cả {matrixData.length} Thương Hiệu
           </span>
         </div>
 
