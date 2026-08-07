@@ -15,7 +15,7 @@ interface CategoryComparisonChartProps {
 export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = ({ data }) => {
   const { theme } = useTheme();
 
-  // Top 10 categories with highest Average Content QU (Excluding 'Others' / 'Khác')
+  // Top 10 categories with highest AVG CFQU (Excluding 'Others' / 'Khác')
   const categoryStats = useMemo(() => {
     const catMap: Record<string, { category: string; count: number; contentQU: number; quUser: number }> = {};
 
@@ -50,13 +50,13 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
       labels: categoryStats.map(c => c.category),
       datasets: [
         {
-          label: 'Avg Content QU (CFQU)',
+          label: 'AVG CFQU',
           data: categoryStats.map(c => c.avgContentQU),
           backgroundColor: '#e68228', // Buzzmetrics Signature Orange
           borderRadius: 4,
         },
         {
-          label: 'Avg QU User',
+          label: 'AVG QU User',
           data: categoryStats.map(c => c.avgQUUser),
           backgroundColor: '#125876', // Buzzmetrics Dark Blue
           borderRadius: 4,
@@ -94,9 +94,9 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
               if (!catItem) return `${ctx.dataset.label}: ${formatNum(ctx.raw)}`;
 
               if (ctx.datasetIndex === 0) {
-                return `Avg Content QU: ${formatNum(catItem.avgContentQU)}`;
+                return `AVG CFQU: ${formatNum(catItem.avgContentQU)}`;
               } else {
-                return `Avg QU User: ${formatNum(catItem.avgQUUser)}`;
+                return `AVG QU User: ${formatNum(catItem.avgQUUser)}`;
               }
             },
           },
@@ -108,7 +108,7 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
           position: 'bottom' as const,
           title: {
             display: true,
-            text: 'Số lượng Content QU & QU User Trung Bình',
+            text: 'Số lượng AVG CFQU & AVG QU User',
             font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const },
             color: textColor,
           },
@@ -128,15 +128,12 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
       <div>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-            <Users className="w-4 h-4 text-buzz" /> Top 10 Ngành Hàng: Content QU & QU User Trung Bình
+            <Users className="w-4 h-4 text-buzz" /> Top 10 Ngành Hàng: AVG CFQU & AVG QU User
           </h3>
-          <span className="text-[10px] font-black text-buzz bg-buzz-light dark:bg-orange-950/60 px-2.5 py-0.5 rounded-full border border-buzz-border dark:border-orange-800">
-            Bỏ ngành Others
-          </span>
         </div>
 
         <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mb-3">
-          Tỷ lệ tương tác chất lượng từ Qualified Users trung bình theo từng ngành (Đã loại trừ danh mục Others).
+          Tỷ lệ tương tác chất lượng từ Qualified Users (AVG CFQU & AVG QU User) theo từng ngành.
         </p>
 
         <div className="h-64">

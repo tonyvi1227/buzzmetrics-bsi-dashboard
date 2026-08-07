@@ -1,5 +1,5 @@
 import React from 'react';
-import { Gauge, TrendingUp, ArrowDownRight, ArrowUpRight, Award, Smile, Target, Share2 } from 'lucide-react';
+import { MessageSquare, Trophy, ThumbsUp, Heart, Share2, Target, BarChart2, Sparkles } from 'lucide-react';
 import { BenchmarkMetrics } from '../types/dashboard';
 import { formatNum } from '../utils/brandStandardizer';
 
@@ -9,118 +9,97 @@ interface BenchmarkPanelProps {
 
 export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
   return (
-    <div className="glass-card border border-orange-200 dark:border-orange-900/60 rounded-2xl p-5 mb-6 shadow-sm">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 bg-orange-100 dark:bg-orange-950/80 text-buzz rounded-xl border border-orange-200 dark:border-orange-800">
-            <Gauge className="w-5 h-5" />
-          </div>
-          <div>
-            <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wide">
-              Bảng Chỉ Số Benchmark Trung Bình & Biên Độ Thảo Luận
-            </h2>
-            <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-              Tổng quan sức khỏe thương hiệu thị trường
-            </p>
-          </div>
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-9 gap-3 mb-6">
+      {/* 1. Total Campaigns */}
+      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+        <div className="flex items-center justify-between text-slate-400 mb-1">
+          <span className="text-[10px] font-black uppercase tracking-wider">Tổng Campaign</span>
+          <BarChart2 className="w-3.5 h-3.5 text-buzz" />
         </div>
-        <span className="text-xs bg-orange-100/90 dark:bg-orange-950/90 text-orange-900 dark:text-orange-200 border border-orange-300 dark:border-orange-800 px-3.5 py-1.5 rounded-full font-black flex items-center gap-1.5 self-start sm:self-auto">
-          <span className="w-2 h-2 rounded-full bg-buzz animate-pulse"></span>
-          Tính trên <span className="text-buzz dark:text-orange-400 font-black">{metrics.totalCount}</span> chiến dịch
-        </span>
+        <p className="text-xl font-black text-slate-900 dark:text-white">{metrics.totalCount}</p>
+        <span className="text-[10px] text-slate-400 font-bold mt-1">Tập dữ liệu lọc</span>
       </div>
 
-      {/* 9 Metric Cards Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-3">
-        {/* Card 1: Avg Buzz Vol */}
-        <div className="bg-slate-50 dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 text-center flex flex-col justify-between">
-          <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-            Avg Buzz Vol
-          </p>
-          <p className="text-base font-black text-buzz dark:text-orange-400 mt-1">
-            {formatNum(Math.round(metrics.avgBuzz))}
-          </p>
+      {/* 2. AVG Buzz Volume */}
+      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+        <div className="flex items-center justify-between text-slate-400 mb-1">
+          <span className="text-[10px] font-black uppercase tracking-wider">AVG Buzz Volume</span>
+          <MessageSquare className="w-3.5 h-3.5 text-buzz" />
         </div>
+        <p className="text-xl font-black text-buzz">{formatNum(metrics.avgBuzz)}</p>
+        <span className="text-[10px] text-slate-400 font-bold mt-1">Min: {formatNum(metrics.minBuzz)} | Max: {formatNum(metrics.maxBuzz)}</span>
+      </div>
 
-        {/* Card 2: Min Buzz Vol */}
-        <div className="bg-slate-50 dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 text-center flex flex-col justify-between">
-          <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center justify-center gap-0.5">
-            <ArrowDownRight className="w-3 h-3 text-rose-500" /> Min Buzz Vol
-          </p>
-          <p className="text-base font-black text-rose-600 dark:text-rose-400 mt-1">
-            {formatNum(metrics.minBuzz)}
-          </p>
+      {/* 3. AVG BSI Score */}
+      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+        <div className="flex items-center justify-between text-slate-400 mb-1">
+          <span className="text-[10px] font-black uppercase tracking-wider">AVG BSI Score</span>
+          <Trophy className="w-3.5 h-3.5 text-amber-500" />
         </div>
+        <p className="text-xl font-black text-slate-900 dark:text-white">{formatNum(metrics.avgBSI)}</p>
+        <span className="text-[10px] text-slate-400 font-bold mt-1">Điểm sức khỏe thương hiệu</span>
+      </div>
 
-        {/* Card 3: Max Buzz Vol */}
-        <div className="bg-slate-50 dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 text-center flex flex-col justify-between">
-          <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center justify-center gap-0.5">
-            <ArrowUpRight className="w-3 h-3 text-emerald-500" /> Max Buzz Vol
-          </p>
-          <p className="text-base font-black text-emerald-600 dark:text-emerald-400 mt-1">
-            {formatNum(metrics.maxBuzz)}
-          </p>
+      {/* 4. AVG CFQU */}
+      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+        <div className="flex items-center justify-between text-slate-400 mb-1">
+          <span className="text-[10px] font-black uppercase tracking-wider">AVG CFQU</span>
+          <ThumbsUp className="w-3.5 h-3.5 text-buzz" />
         </div>
+        <p className="text-xl font-black text-slate-900 dark:text-white">{formatNum(metrics.avgContentQU)}</p>
+        <span className="text-[10px] text-slate-400 font-bold mt-1">Content from QU</span>
+      </div>
 
-        {/* Card 4: Avg Content QU */}
-        <div className="bg-slate-50 dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 text-center flex flex-col justify-between">
-          <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-            Avg Content QU
-          </p>
-          <p className="text-base font-black text-slate-900 dark:text-slate-100 mt-1">
-            {formatNum(Math.round(metrics.avgContentQU))}
-          </p>
+      {/* 5. AVG QU User */}
+      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+        <div className="flex items-center justify-between text-slate-400 mb-1">
+          <span className="text-[10px] font-black uppercase tracking-wider">AVG QU User</span>
+          <ThumbsUp className="w-3.5 h-3.5 text-buzz-darkblue" />
         </div>
+        <p className="text-xl font-black text-slate-900 dark:text-white">{formatNum(metrics.avgQUUser)}</p>
+        <span className="text-[10px] text-slate-400 font-bold mt-1">Qualified Users</span>
+      </div>
 
-        {/* Card 5: Avg QU User */}
-        <div className="bg-slate-50 dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 text-center flex flex-col justify-between">
-          <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-            Avg QU User
-          </p>
-          <p className="text-base font-black text-slate-900 dark:text-slate-100 mt-1">
-            {formatNum(Math.round(metrics.avgQUUser))}
-          </p>
+      {/* 6. AVG Sentiment */}
+      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+        <div className="flex items-center justify-between text-slate-400 mb-1">
+          <span className="text-[10px] font-black uppercase tracking-wider">AVG Sentiment</span>
+          <Heart className="w-3.5 h-3.5 text-rose-500" />
         </div>
+        <p className="text-xl font-black text-slate-900 dark:text-white">{metrics.avgSentiment.toFixed(2)}</p>
+        <span className="text-[10px] text-slate-400 font-bold mt-1">Chỉ số hài lòng</span>
+      </div>
 
-        {/* Card 6: Avg BSI Score */}
-        <div className="bg-slate-50 dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 text-center flex flex-col justify-between">
-          <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center justify-center gap-0.5">
-            <Award className="w-3 h-3 text-amber-500" /> Avg BSI Score
-          </p>
-          <p className="text-base font-black text-amber-600 dark:text-amber-400 mt-1">
-            {formatNum(Math.round(metrics.avgBSI))}
-          </p>
+      {/* 7. AVG Relevancy */}
+      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+        <div className="flex items-center justify-between text-slate-400 mb-1">
+          <span className="text-[10px] font-black uppercase tracking-wider">AVG Relevancy</span>
+          <Target className="w-3.5 h-3.5 text-indigo-500" />
         </div>
+        <p className="text-xl font-black text-slate-900 dark:text-white">{metrics.avgRelevancy.toFixed(2)}</p>
+        <span className="text-[10px] text-slate-400 font-bold mt-1">Độ liên quan thương hiệu</span>
+      </div>
 
-        {/* Card 7: Avg Sentiment */}
-        <div className="bg-slate-50 dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 text-center flex flex-col justify-between">
-          <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center justify-center gap-0.5">
-            <Smile className="w-3 h-3 text-buzz" /> Avg Sentiment
-          </p>
-          <p className="text-base font-black text-buzz dark:text-orange-400 mt-1">
-            {formatNum(metrics.avgSentiment, 2)}
-          </p>
+      {/* 8. AVG Earned % */}
+      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+        <div className="flex items-center justify-between text-slate-400 mb-1">
+          <span className="text-[10px] font-black uppercase tracking-wider">% Earned Media</span>
+          <Share2 className="w-3.5 h-3.5 text-sky-500" />
         </div>
+        <p className="text-xl font-black text-slate-900 dark:text-white">{metrics.avgEarnedPct.toFixed(1)}%</p>
+        <span className="text-[10px] text-slate-400 font-bold mt-1">Thảo luận tự nhiên</span>
+      </div>
 
-        {/* Card 8: Avg Relevancy */}
-        <div className="bg-slate-50 dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 text-center flex flex-col justify-between">
-          <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center justify-center gap-0.5">
-            <Target className="w-3 h-3 text-amber-500" /> Avg Relevancy
-          </p>
-          <p className="text-base font-black text-amber-600 dark:text-amber-400 mt-1">
-            {formatNum(metrics.avgRelevancy, 2)}
-          </p>
+      {/* 9. Overall Quality Index */}
+      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between bg-buzz-light/60 dark:bg-orange-950/40 border-buzz-border dark:border-orange-900">
+        <div className="flex items-center justify-between text-buzz mb-1">
+          <span className="text-[10px] font-black uppercase tracking-wider">Quality Index</span>
+          <Sparkles className="w-3.5 h-3.5 text-buzz" />
         </div>
-
-        {/* Card 9: Avg % Earned */}
-        <div className="bg-slate-50 dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 text-center flex flex-col justify-between">
-          <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center justify-center gap-0.5">
-            <Share2 className="w-3 h-3 text-emerald-500" /> Avg % Earned
-          </p>
-          <p className="text-base font-black text-emerald-600 dark:text-emerald-400 mt-1">
-            {formatNum(metrics.avgEarnedPct, 2)}%
-          </p>
-        </div>
+        <p className="text-xl font-black text-buzz">
+          {((metrics.avgContentQU / (metrics.avgBuzz || 1)) * 100).toFixed(1)}%
+        </p>
+        <span className="text-[10px] text-buzz dark:text-orange-300 font-extrabold mt-1">Tỷ lệ CFQU / Buzz</span>
       </div>
     </div>
   );
