@@ -5,6 +5,7 @@ import { Bar } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
 import { formatNum } from '../utils/brandStandardizer';
+import { InfoTooltip } from './common/InfoTooltip';
 
 ChartJS.register(...registerables);
 
@@ -129,6 +130,10 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
             <Users className="w-4 h-4 text-buzz" /> Top 10 Ngành Hàng: AVG CFQU & AVG QU User
+            <InfoTooltip
+              title="Chất Lượng Thảo Luận Theo Ngành"
+              content="So sánh Content from QU (CFQU) và Lượng Qualified User (QU User) trung bình của từng ngành hàng."
+            />
           </h3>
         </div>
 

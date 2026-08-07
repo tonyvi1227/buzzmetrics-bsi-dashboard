@@ -5,6 +5,7 @@ import { Scatter } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
 import { formatNum } from '../utils/brandStandardizer';
+import { InfoTooltip } from './common/InfoTooltip';
 
 ChartJS.register(...registerables);
 
@@ -144,6 +145,10 @@ export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
             <Compass className="w-4 h-4 text-buzz" /> Ma Trận Vị Thế Thương Hiệu (AVG Buzz Vol vs AVG BSI)
+            <InfoTooltip
+              title="Ma Trận Vị Thế Thương Hiệu"
+              content="Phân tích tương quan 4 vùng giữa Quy mô thảo luận trung bình (Trục X - AVG Buzz Volume) và Điểm sức khỏe thương hiệu (Trục Y - AVG BSI Score)."
+            />
           </h3>
           <span className="text-[10px] font-black text-buzz bg-buzz-light dark:bg-orange-950/60 px-2.5 py-0.5 rounded-full border border-buzz-border dark:border-orange-800">
             {matrixData.length} Thương Hiệu

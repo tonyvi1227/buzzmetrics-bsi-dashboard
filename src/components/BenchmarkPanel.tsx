@@ -2,6 +2,7 @@ import React from 'react';
 import { MessageSquare, Trophy, ThumbsUp, Heart, Share2, Target, BarChart2, Sparkles } from 'lucide-react';
 import { BenchmarkMetrics } from '../types/dashboard';
 import { formatNum } from '../utils/brandStandardizer';
+import { InfoTooltip } from './common/InfoTooltip';
 
 interface BenchmarkPanelProps {
   metrics: BenchmarkMetrics;
@@ -13,7 +14,13 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
       {/* 1. Total Campaigns */}
       <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
         <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[10px] font-black uppercase tracking-wider">Tổng Campaign</span>
+          <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+            Tổng Campaign
+            <InfoTooltip
+              title="Tổng số Chiến dịch"
+              content="Số lượng chiến dịch thương hiệu nằm trong tập dữ liệu lọc."
+            />
+          </span>
           <BarChart2 className="w-3.5 h-3.5 text-buzz" />
         </div>
         <p className="text-xl font-black text-slate-900 dark:text-white">{metrics.totalCount}</p>
@@ -23,7 +30,13 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
       {/* 2. AVG Buzz Volume */}
       <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
         <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[10px] font-black uppercase tracking-wider">AVG Buzz Volume</span>
+          <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+            AVG Buzz Volume
+            <InfoTooltip
+              title="Tổng Thảo Luận Trung Bình"
+              content="Lượng thảo luận trung bình tạo ra từ tất cả chiến dịch được chọn."
+            />
+          </span>
           <MessageSquare className="w-3.5 h-3.5 text-buzz" />
         </div>
         <p className="text-xl font-black text-buzz">{formatNum(metrics.avgBuzz)}</p>
@@ -33,7 +46,13 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
       {/* 3. AVG BSI Score */}
       <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
         <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[10px] font-black uppercase tracking-wider">AVG BSI Score</span>
+          <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+            AVG BSI Score
+            <InfoTooltip
+              title="Điểm BSI Trung Bình"
+              content="Chỉ số sức khỏe thương hiệu truyền thông Buzzmetrics Social Index."
+            />
+          </span>
           <Trophy className="w-3.5 h-3.5 text-amber-500" />
         </div>
         <p className="text-xl font-black text-slate-900 dark:text-white">{formatNum(metrics.avgBSI)}</p>
@@ -43,7 +62,13 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
       {/* 4. AVG CFQU */}
       <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
         <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[10px] font-black uppercase tracking-wider">AVG CFQU</span>
+          <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+            AVG Content QU
+            <InfoTooltip
+              title="Content from QU (CFQU)"
+              content="Lượng bài viết và bình luận tạo ra từ tệp khán giả chất lượng."
+            />
+          </span>
           <ThumbsUp className="w-3.5 h-3.5 text-buzz" />
         </div>
         <p className="text-xl font-black text-slate-900 dark:text-white">{formatNum(metrics.avgContentQU)}</p>
@@ -53,7 +78,13 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
       {/* 5. AVG QU User */}
       <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
         <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[10px] font-black uppercase tracking-wider">AVG QU User</span>
+          <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+            Qualified User
+            <InfoTooltip
+              title="Qualified User (QU)"
+              content="Số lượng người dùng thực tế thảo luận chất lượng về chiến dịch."
+            />
+          </span>
           <ThumbsUp className="w-3.5 h-3.5 text-buzz-darkblue" />
         </div>
         <p className="text-xl font-black text-slate-900 dark:text-white">{formatNum(metrics.avgQUUser)}</p>
@@ -63,7 +94,13 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
       {/* 6. AVG Sentiment */}
       <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
         <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[10px] font-black uppercase tracking-wider">AVG Sentiment</span>
+          <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+            AVG Sentiment
+            <InfoTooltip
+              title="Chỉ số Cảm xúc"
+              content="Tỷ lệ cảm xúc tích cực của khán giả dành cho chiến dịch."
+            />
+          </span>
           <Heart className="w-3.5 h-3.5 text-rose-500" />
         </div>
         <p className="text-xl font-black text-slate-900 dark:text-white">{metrics.avgSentiment.toFixed(2)}</p>
@@ -73,7 +110,13 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
       {/* 7. AVG Relevancy */}
       <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
         <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[10px] font-black uppercase tracking-wider">AVG Relevancy</span>
+          <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+            AVG Relevance
+            <InfoTooltip
+              title="Trung bình thảo luận liên quan"
+              content="Mức độ liên quan giữa thảo luận của khán giả và thông điệp của chiến dịch."
+            />
+          </span>
           <Target className="w-3.5 h-3.5 text-indigo-500" />
         </div>
         <p className="text-xl font-black text-slate-900 dark:text-white">{metrics.avgRelevancy.toFixed(2)}</p>
@@ -83,7 +126,13 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
       {/* 8. AVG Earned % */}
       <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
         <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[10px] font-black uppercase tracking-wider">% Earned Media</span>
+          <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+            % Earned Media
+            <InfoTooltip
+              title="Tỷ lệ Earned Media"
+              content="Tỷ lệ thảo luận tự nhiên từ người dùng so với tổng thảo luận."
+            />
+          </span>
           <Share2 className="w-3.5 h-3.5 text-sky-500" />
         </div>
         <p className="text-xl font-black text-slate-900 dark:text-white">{metrics.avgEarnedPct.toFixed(1)}%</p>
@@ -93,7 +142,13 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
       {/* 9. Overall Quality Index */}
       <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between bg-buzz-light/60 dark:bg-orange-950/40 border-buzz-border dark:border-orange-900">
         <div className="flex items-center justify-between text-buzz mb-1">
-          <span className="text-[10px] font-black uppercase tracking-wider">Quality Index</span>
+          <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+            Quality Index
+            <InfoTooltip
+              title="Quality Index"
+              content="Tỷ lệ chất lượng thảo luận = (Content QU / Buzz Volume) * 100%."
+            />
+          </span>
           <Sparkles className="w-3.5 h-3.5 text-buzz" />
         </div>
         <p className="text-xl font-black text-buzz">

@@ -5,6 +5,7 @@ import { Chart } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
 import { formatNum } from '../utils/brandStandardizer';
+import { InfoTooltip } from './common/InfoTooltip';
 
 ChartJS.register(...registerables);
 
@@ -76,7 +77,7 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
           backgroundColor: '#125876',
           borderWidth: 2.5,
           pointRadius: 3.5,
-          tension: 0.4, // Smooth line in charting to express softness & friendliness
+          tension: 0.4,
           yAxisID: 'y1',
         },
       ],
@@ -111,7 +112,7 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
       scales: {
         x: {
           ticks: { color: textColor, font: { family: "'Inter', sans-serif", size: 9, weight: 'bold' as const } },
-          grid: { display: false }, // Flat design - plain background
+          grid: { display: false },
         },
         y: {
           type: 'linear' as const,
@@ -135,6 +136,10 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
     <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
       <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider mb-3 flex items-center gap-2">
         <TrendingUp className="w-4 h-4 text-buzz" /> Buzz Volume (Tr) & Số Campaign Timeline
+        <InfoTooltip
+          title="Diễn Biến Theo Thời Gian"
+          content="Biểu đồ thể hiện tổng lượng thảo luận (Cột cam - Triệu buzz) và số lượng chiến dịch diễn ra (Đường xanh) qua từng tháng."
+        />
       </h3>
       <div className="h-[270px]">
         <Chart type="bar" data={chartData} options={options} />

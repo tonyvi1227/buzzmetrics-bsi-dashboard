@@ -6,6 +6,7 @@ import { Doughnut } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
 import { formatNum } from '../utils/brandStandardizer';
+import { InfoTooltip } from './common/InfoTooltip';
 
 ChartJS.register(...registerables, ChartDataLabels);
 
@@ -107,6 +108,10 @@ export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) =>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
             <Tag className="w-4 h-4 text-buzz" /> Phân Bổ Tỷ Lệ % Theo Loại Hình Chiến Dịch
+            <InfoTooltip
+              title="Phân Bổ Loại Hình Campaign"
+              content="Tỷ lệ % phân bổ số lượng các loại hình chiến dịch Marketing (Product Launch, Sponsor & Event, Promotion, CSR, Thematic)."
+            />
           </h3>
           <span className="text-[10px] font-black text-buzz bg-buzz-light dark:bg-orange-950/60 px-2.5 py-0.5 rounded-full border border-buzz-border dark:border-orange-800">
             N = {formatNum(totalCount)}
