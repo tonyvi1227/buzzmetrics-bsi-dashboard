@@ -75,16 +75,10 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
         <span className="text-[10px] text-slate-400 font-bold mt-1">Content from QU</span>
       </div>
 
-      {/* 5. AVG QU User */}
+      {/* 5. Average QU */}
       <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
         <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
-            Qualified User
-            <InfoTooltip
-              title="Qualified User (QU)"
-              content="Số lượng người dùng thực tế thảo luận chất lượng về chiến dịch."
-            />
-          </span>
+          <span className="text-[10px] font-black uppercase tracking-wider">Average QU</span>
           <ThumbsUp className="w-3.5 h-3.5 text-buzz-darkblue" />
         </div>
         <p className="text-xl font-black text-slate-900 dark:text-white">{formatNum(metrics.avgQUUser)}</p>

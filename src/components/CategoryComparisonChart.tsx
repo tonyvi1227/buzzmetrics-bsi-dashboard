@@ -5,7 +5,6 @@ import { Bar } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
 import { formatNum } from '../utils/brandStandardizer';
-import { InfoTooltip } from './common/InfoTooltip';
 
 ChartJS.register(...registerables);
 
@@ -57,7 +56,7 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
           borderRadius: 4,
         },
         {
-          label: 'AVG QU User',
+          label: 'Average QU',
           data: categoryStats.map(c => c.avgQUUser),
           backgroundColor: '#125876', // Buzzmetrics Dark Blue
           borderRadius: 4,
@@ -97,7 +96,7 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
               if (ctx.datasetIndex === 0) {
                 return `AVG CFQU: ${formatNum(catItem.avgContentQU)}`;
               } else {
-                return `AVG QU User: ${formatNum(catItem.avgQUUser)}`;
+                return `Average QU: ${formatNum(catItem.avgQUUser)}`;
               }
             },
           },
@@ -109,7 +108,7 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
           position: 'bottom' as const,
           title: {
             display: true,
-            text: 'Số lượng AVG CFQU & AVG QU User',
+            text: 'Số lượng AVG CFQU & Average QU',
             font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const },
             color: textColor,
           },
@@ -129,16 +128,12 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
       <div>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-            <Users className="w-4 h-4 text-buzz" /> Top 10 Ngành Hàng: AVG CFQU & AVG QU User
-            <InfoTooltip
-              title="Chất Lượng Thảo Luận Theo Ngành"
-              content="So sánh Content from QU (CFQU) và Lượng Qualified User (QU User) trung bình của từng ngành hàng."
-            />
+            <Users className="w-4 h-4 text-buzz" /> Top 10 Ngành Hàng: AVG CFQU & Average QU
           </h3>
         </div>
 
         <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mb-3">
-          Tỷ lệ tương tác chất lượng từ Qualified Users (AVG CFQU & AVG QU User) theo từng ngành.
+          Tỷ lệ tương tác chất lượng từ Qualified Users (AVG CFQU & Average QU) theo từng ngành.
         </p>
 
         <div className="h-64">
