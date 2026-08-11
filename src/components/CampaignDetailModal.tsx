@@ -1,7 +1,12 @@
-import React, { useMemo } from 'react';
-import { X, Trophy, MessageSquare, Heart, ThumbsUp, Layers, Tag, Share2, Sparkles, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { X, Trophy, MessageSquare, Heart, ThumbsUp, Tag, Share2, Sparkles, TrendingUp, TrendingDown, Minus, Network, Table } from 'lucide-react';
+import { Chart as ChartJS, registerables } from 'chart.js';
+import { Radar } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { formatNum } from '../utils/brandStandardizer';
+import { useTheme } from '../context/ThemeContext';
+
+ChartJS.register(...registerables);
 
 interface CampaignDetailModalProps {
   campaign: CampaignRecord | null;
@@ -10,6 +15,9 @@ interface CampaignDetailModalProps {
 }
 
 export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, allData, onClose }) => {
+  const { theme } = useTheme();
+  const [viewMode, setViewMode] = useState<'radar' | 'table'>('radar');
+
   if (!campaign) return null;
 
   // Compute Category Average Benchmark for Comparison
@@ -31,7 +39,128 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
     };
   }, [campaign, allData]);
 
-  const renderDiffBadge = (val: number, avgVal: number, isPct = false) => {
+  // Compute Radar Chart Data normalized relative to Industry Benchmark (100 pts)
+  const radarChartData = useMemo(() => {
+    if (!categoryBenchmark) return null;
+
+    const benchmarkBase = [100, 100, 100, 100, 100];
+
+    const getRatio = (val: number, avg: number) => {
+      if (!avg || avg === 0) return 100;
+      const ratio = (val / avg) * 100;
+      return Math.min(Math.round(ratio), 220); // Cap at 220 for radar visualization sanity
+    };
+
+    const campaignScores = [
+      getRatio(campaign.buzzVolume, categoryBenchmark.avgBuzz),
+      getRatio(campaign.bsi, categoryBenchmark.avgBSI),
+      getRatio(campaign.contentQU, categoryBenchmark.avgContentQU),
+      getRatio(campaign.quUser, categoryBenchmark.avgQUUser),
+      getRatio(campaign.sentiment, categoryBenchmark.avgSentiment),
+    ];
+
+    const isDark = theme === 'dark';
+
+    return {
+      labels: ['Buzz Volume', 'BSI Score', 'AVG CFQU', 'Average QU', 'Sentiment Index'],
+      datasets: [
+        {
+          label: `Chiến Dịch (${campaign.campaign})`,
+          data: campaignScores,
+          backgroundColor: 'rgba(230, 130, 40, 0.25)',
+          borderColor: '#e68228', // Buzzmetrics Signature Orange
+          borderWidth: 2.5,
+          pointBackgroundColor: '#e68228',
+          pointBorderColor: '#ffffff',
+          pointHoverBackgroundColor: '#ffffff',
+          pointHoverBorderColor: '#e68228',
+          pointRadius: 5,
+        },
+        {
+          label: `TB Ngành ${campaign.category} (100 Benchmark)`,
+          data: benchmarkBase,
+          backgroundColor: 'rgba(18, 88, 118, 0.25)',
+          borderColor: '#125876', // Buzzmetrics Dark Blue
+          borderWidth: 2,
+          borderDash: [4, 4],
+          pointBackgroundColor: '#125876',
+          pointBorderColor: '#ffffff',
+          pointRadius: 4,
+        },
+      ],
+    };
+  }, [campaign, categoryBenchmark, theme]);
+
+  const radarOptions = useMemo(() => {
+    const isDark = theme === 'dark';
+    const textColor = isDark ? '#f8fafc' : '#0f172a';
+
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: textColor,
+            font: { family: "'Inter', sans-serif", size: 11, weight: 'bold' as const },
+            usePointStyle: true,
+          },
+          position: 'top' as const,
+        },
+        datalabels: { display: false },
+        tooltip: {
+          padding: 10,
+          cornerRadius: 8,
+          titleFont: { family: "'Inter', sans-serif", size: 12, weight: 'bold' as const },
+          bodyFont: { family: "'Inter', sans-serif", size: 11, weight: 'bold' as const },
+          callbacks: {
+            label: (ctx: any) => {
+              if (!categoryBenchmark) return '';
+              const idx = ctx.dataIndex;
+              const isCampaign = ctx.datasetIndex === 0;
+
+              const metricsList = [
+                { name: 'Buzz Volume', val: campaign.buzzVolume, avg: categoryBenchmark.avgBuzz, isNum: true },
+                { name: 'BSI Score', val: campaign.bsi, avg: categoryBenchmark.avgBSI, isNum: true },
+                { name: 'AVG CFQU', val: campaign.contentQU, avg: categoryBenchmark.avgContentQU, isNum: true },
+                { name: 'Average QU', val: campaign.quUser, avg: categoryBenchmark.avgQUUser, isNum: true },
+                { name: 'Sentiment Index', val: campaign.sentiment, avg: categoryBenchmark.avgSentiment, isNum: false },
+              ];
+
+              const m = metricsList[idx];
+              if (!m) return '';
+
+              if (isCampaign) {
+                const diffPct = m.avg > 0 ? (((m.val - m.avg) / m.avg) * 100).toFixed(1) : '0';
+                const formattedVal = m.isNum ? formatNum(m.val) : m.val.toFixed(2);
+                return `${m.name} (Chiến dịch): ${formattedVal} (${diffPct >= '0' ? '+' : ''}${diffPct}% vs TB Ngành)`;
+              } else {
+                const formattedAvg = m.isNum ? formatNum(m.avg) : m.avg.toFixed(2);
+                return `${m.name} (TB Ngành ${campaign.category}): ${formattedAvg}`;
+              }
+            },
+          },
+        },
+      },
+      scales: {
+        r: {
+          angleLines: { color: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' },
+          grid: { color: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' },
+          pointLabels: {
+            color: textColor,
+            font: { family: "'Inter', sans-serif", size: 11, weight: 'bold' as const },
+          },
+          ticks: {
+            display: false,
+          },
+          suggestedMin: 0,
+          suggestedMax: 150,
+        },
+      },
+    };
+  }, [campaign, categoryBenchmark, theme]);
+
+  const renderDiffBadge = (val: number, avgVal: number) => {
     if (!avgVal || avgVal === 0) return null;
     const diffPct = ((val - avgVal) / avgVal) * 100;
     const formattedDiff = Math.abs(diffPct).toFixed(1);
@@ -114,7 +243,7 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
 
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition"
+            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition cursor-pointer"
           >
             <X className="w-6 h-6" />
           </button>
@@ -145,7 +274,7 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
             <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60">
               <div className="flex items-center gap-2 text-buzz mb-1">
                 <ThumbsUp className="w-4 h-4" />
-                <span className="text-xs font-extrabold uppercase">Content QU</span>
+                <span className="text-xs font-extrabold uppercase">AVG CFQU</span>
               </div>
               <p className="text-2xl font-black text-slate-900 dark:text-white">{formatNum(campaign.contentQU)}</p>
               {categoryBenchmark && <div className="mt-1.5">{renderDiffBadge(campaign.contentQU, categoryBenchmark.avgContentQU)}</div>}
@@ -161,62 +290,107 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
             </div>
           </div>
 
-          {/* Benchmark Comparison Table */}
+          {/* Benchmark Section with View Mode Switch (Radar Chart vs Table) */}
           {categoryBenchmark && (
-            <div className="p-5 bg-orange-50/50 dark:bg-slate-800/40 rounded-2xl border border-orange-200 dark:border-slate-700 space-y-3">
-              <div className="flex items-center justify-between">
+            <div className="p-5 bg-orange-50/50 dark:bg-slate-800/40 rounded-2xl border border-orange-200 dark:border-slate-700 space-y-4">
+              <div className="flex items-center justify-between flex-wrap gap-2">
                 <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-buzz" /> Bảng So Sánh Chỉ Số Với Trung Bình Ngành {campaign.category}
+                  <Sparkles className="w-4 h-4 text-buzz" /> So Sánh Chỉ Số Với Trung Bình Ngành {campaign.category}
                 </h4>
-                <span className="text-[10px] font-extrabold bg-orange-100 dark:bg-orange-950 text-buzz px-2.5 py-0.5 rounded-full border border-orange-300 dark:border-orange-800">
-                  {categoryBenchmark.count} Chiến dịch trong ngành
-                </span>
+
+                <div className="flex items-center gap-2">
+                  {/* View Mode Switcher Buttons */}
+                  <div className="flex items-center bg-white dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <button
+                      onClick={() => setViewMode('radar')}
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-black transition cursor-pointer ${
+                        viewMode === 'radar'
+                          ? 'bg-buzz text-white shadow-sm'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      <Network className="w-3.5 h-3.5" />
+                      <span>Biểu Đồ Radar Mạng Nhện</span>
+                    </button>
+
+                    <button
+                      onClick={() => setViewMode('table')}
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-black transition cursor-pointer ${
+                        viewMode === 'table'
+                          ? 'bg-buzz text-white shadow-sm'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      <Table className="w-3.5 h-3.5" />
+                      <span>Bảng Chi Tiết</span>
+                    </button>
+                  </div>
+
+                  <span className="text-[10px] font-extrabold bg-orange-100 dark:bg-orange-950 text-buzz px-2.5 py-1 rounded-full border border-orange-300 dark:border-orange-800">
+                    {categoryBenchmark.count} Chiến dịch trong ngành
+                  </span>
+                </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead>
-                    <tr className="border-b border-orange-200 dark:border-slate-700 text-[10px] font-black uppercase text-slate-500 dark:text-slate-400">
-                      <th className="py-2">Chỉ Số Phân Tích</th>
-                      <th className="py-2 text-right">Chiến Dịch Này</th>
-                      <th className="py-2 text-right">TB Ngành {campaign.category}</th>
-                      <th className="py-2 text-center">Chênh Lệch (Diff)</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-orange-100 dark:divide-slate-800 font-bold">
-                    <tr>
-                      <td className="py-2 text-slate-900 dark:text-white">Buzz Volume</td>
-                      <td className="py-2 text-right text-buzz font-black">{formatNum(campaign.buzzVolume)}</td>
-                      <td className="py-2 text-right text-slate-500">{formatNum(categoryBenchmark.avgBuzz)}</td>
-                      <td className="py-2 text-center">{renderDiffBadge(campaign.buzzVolume, categoryBenchmark.avgBuzz)}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2 text-slate-900 dark:text-white">BSI Score</td>
-                      <td className="py-2 text-right text-buzz font-black">{formatNum(campaign.bsi)}</td>
-                      <td className="py-2 text-right text-slate-500">{formatNum(categoryBenchmark.avgBSI)}</td>
-                      <td className="py-2 text-center">{renderDiffBadge(campaign.bsi, categoryBenchmark.avgBSI)}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2 text-slate-900 dark:text-white">Content QU (CFQU)</td>
-                      <td className="py-2 text-right font-black">{formatNum(campaign.contentQU)}</td>
-                      <td className="py-2 text-right text-slate-500">{formatNum(categoryBenchmark.avgContentQU)}</td>
-                      <td className="py-2 text-center">{renderDiffBadge(campaign.contentQU, categoryBenchmark.avgContentQU)}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2 text-slate-900 dark:text-white">QU User</td>
-                      <td className="py-2 text-right font-black">{formatNum(campaign.quUser)}</td>
-                      <td className="py-2 text-right text-slate-500">{formatNum(categoryBenchmark.avgQUUser)}</td>
-                      <td className="py-2 text-center">{renderDiffBadge(campaign.quUser, categoryBenchmark.avgQUUser)}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2 text-slate-900 dark:text-white">Sentiment Index</td>
-                      <td className="py-2 text-right font-black">{campaign.sentiment.toFixed(2)}</td>
-                      <td className="py-2 text-right text-slate-500">{categoryBenchmark.avgSentiment.toFixed(2)}</td>
-                      <td className="py-2 text-center">{renderDiffBadge(campaign.sentiment, categoryBenchmark.avgSentiment)}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              {/* View Option 1: Radar Spider Chart */}
+              {viewMode === 'radar' && radarChartData && (
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 animate-fadeIn">
+                  <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-2 text-center">
+                    Mạng nhện so sánh hiệu suất chiến dịch (Màu Cam) với Mốc Chuẩn 100 Trung Bình Ngành (Màu Xanh Đậm).
+                  </p>
+                  <div className="h-72 flex justify-center items-center">
+                    <Radar data={radarChartData} options={radarOptions} />
+                  </div>
+                </div>
+              )}
+
+              {/* View Option 2: Detail Table */}
+              {viewMode === 'table' && (
+                <div className="overflow-x-auto bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 animate-fadeIn">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-orange-200 dark:border-slate-700 text-[10px] font-black uppercase text-slate-500 dark:text-slate-400">
+                        <th className="py-2">Chỉ Số Phân Tích</th>
+                        <th className="py-2 text-right">Chiến Dịch Này</th>
+                        <th className="py-2 text-right">TB Ngành {campaign.category}</th>
+                        <th className="py-2 text-center">Chênh Lệch (Diff)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-orange-100 dark:divide-slate-800 font-bold">
+                      <tr>
+                        <td className="py-2 text-slate-900 dark:text-white">Buzz Volume</td>
+                        <td className="py-2 text-right text-buzz font-black">{formatNum(campaign.buzzVolume)}</td>
+                        <td className="py-2 text-right text-slate-500">{formatNum(categoryBenchmark.avgBuzz)}</td>
+                        <td className="py-2 text-center">{renderDiffBadge(campaign.buzzVolume, categoryBenchmark.avgBuzz)}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 text-slate-900 dark:text-white">BSI Score</td>
+                        <td className="py-2 text-right text-buzz font-black">{formatNum(campaign.bsi)}</td>
+                        <td className="py-2 text-right text-slate-500">{formatNum(categoryBenchmark.avgBSI)}</td>
+                        <td className="py-2 text-center">{renderDiffBadge(campaign.bsi, categoryBenchmark.avgBSI)}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 text-slate-900 dark:text-white">AVG CFQU</td>
+                        <td className="py-2 text-right font-black">{formatNum(campaign.contentQU)}</td>
+                        <td className="py-2 text-right text-slate-500">{formatNum(categoryBenchmark.avgContentQU)}</td>
+                        <td className="py-2 text-center">{renderDiffBadge(campaign.contentQU, categoryBenchmark.avgContentQU)}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 text-slate-900 dark:text-white">Average QU</td>
+                        <td className="py-2 text-right font-black">{formatNum(campaign.quUser)}</td>
+                        <td className="py-2 text-right text-slate-500">{formatNum(categoryBenchmark.avgQUUser)}</td>
+                        <td className="py-2 text-center">{renderDiffBadge(campaign.quUser, categoryBenchmark.avgQUUser)}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 text-slate-900 dark:text-white">Sentiment Index</td>
+                        <td className="py-2 text-right font-black">{campaign.sentiment.toFixed(2)}</td>
+                        <td className="py-2 text-right text-slate-500">{categoryBenchmark.avgSentiment.toFixed(2)}</td>
+                        <td className="py-2 text-center">{renderDiffBadge(campaign.sentiment, categoryBenchmark.avgSentiment)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           )}
 
