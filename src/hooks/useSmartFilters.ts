@@ -21,7 +21,7 @@ const initialFilters: FilterState = {
   campaignType: ALL_OPTION,
   search: '',
   brandSearch: '',
-  dateRangeMode: false,
+  dateRangeMode: true, // Permanent Date Range Mode
   startYear: '2025',
   startMonth: 'Jan',
   endYear: '2026',
@@ -107,23 +107,14 @@ export function useSmartFilters(allCampaigns: CampaignRecord[]) {
       dataset = filterTop10BsiPerMonth(dataset);
     }
 
-    // 2. Date Filter Logic: Date Range vs Single Year/Month
-    if (filters.dateRangeMode) {
-      const startVal = getMonthValue(filters.startYear, filters.startMonth);
-      const endVal = getMonthValue(filters.endYear, filters.endMonth);
+    // 2. Date Range Filter Logic (Always Active)
+    const startVal = getMonthValue(filters.startYear, filters.startMonth);
+    const endVal = getMonthValue(filters.endYear, filters.endMonth);
 
-      dataset = dataset.filter(c => {
-        const itemVal = getMonthValue(c.year, c.month);
-        return itemVal >= startVal && itemVal <= endVal;
-      });
-    } else {
-      if (filters.year !== ALL_OPTION) {
-        dataset = dataset.filter(c => c.year === filters.year);
-      }
-      if (filters.month !== ALL_OPTION) {
-        dataset = dataset.filter(c => c.month === filters.month);
-      }
-    }
+    dataset = dataset.filter(c => {
+      const itemVal = getMonthValue(c.year, c.month);
+      return itemVal >= startVal && itemVal <= endVal;
+    });
 
     // 3. Category Filter
     if (filters.category !== ALL_OPTION) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Filter, Calendar, Layers, Search, Tag, Trophy, ArrowRight, Clock } from 'lucide-react';
+import { Filter, Calendar, Layers, Search, Tag, Trophy, ArrowRight } from 'lucide-react';
 import { FilterState } from '../types/dashboard';
 import { ALL_OPTION, MONTH_ORDER } from '../hooks/useSmartFilters';
 
@@ -17,16 +17,14 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   filters,
   onUpdateFilter,
   availableYears,
-  availableMonths,
   availableCategories,
-  availableCampaignTypes = [],
   filteredCount,
 }) => {
   return (
     <div className="glass-card p-4 md:p-5 rounded-2xl mb-6 shadow-sm border border-slate-200 dark:border-slate-800">
       <div className="flex flex-col gap-4">
-        {/* Top Header Row: Title, Scope Toggle & Date Mode Toggle */}
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-slate-800/80">
+        {/* Top Header Row: Title, Result Count Badge & All Campaign / Only Top10 Toggle */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-slate-800/80">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-buzz-light dark:bg-orange-950/60 text-buzz border border-buzz-border dark:border-orange-800 flex-shrink-0">
               <Filter className="w-4 h-4" />
@@ -41,139 +39,85 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 </span>
               </div>
               <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
-                Lọc theo Khoảng Thời Gian ➔ Ngành Hàng ➔ Loại Chiến Dịch ➔ Từ Khóa
+                Lọc theo Khoảng Thời Gian (Từ ... Đến ...) ➔ Ngành Hàng ➔ Loại Campaign ➔ Từ Khóa
               </p>
             </div>
           </div>
 
-          {/* Toggle Switches */}
-          <div className="flex items-center gap-2 flex-wrap self-end lg:self-auto">
-            {/* Toggle Date Filter Mode: Single vs Range */}
-            <button
-              onClick={() => onUpdateFilter('dateRangeMode', !filters.dateRangeMode)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 border cursor-pointer ${
-                filters.dateRangeMode
-                  ? 'bg-sky-50 dark:bg-sky-950 text-sky-600 dark:text-sky-400 border-sky-300 dark:border-sky-800 shadow-sm'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              <Clock className="w-3.5 h-3.5" />
-              <span>{filters.dateRangeMode ? 'Đang dùng: Khoảng Thời Gian (Range)' : 'Chuyển sang: Lọc Khoảng Thời Gian'}</span>
-            </button>
-
-            {/* Toggle Scope: All Campaigns vs Top 10 BSI Per Month */}
+          {/* Convenient Scope Toggle Button: All Campaign vs Only Top10 Camp Monthly */}
+          <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-auto">
             <button
               onClick={() => onUpdateFilter('top10BsiOnly', !filters.top10BsiOnly)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 border cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 border cursor-pointer ${
                 filters.top10BsiOnly
-                  ? 'bg-amber-500 text-white border-amber-600 shadow-md animate-pulse'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200'
+                  ? 'bg-amber-500 text-white border-amber-600 shadow-md ring-2 ring-amber-300 dark:ring-amber-800'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               <Trophy className={`w-3.5 h-3.5 ${filters.top10BsiOnly ? 'text-white' : 'text-amber-500'}`} />
-              <span>{filters.top10BsiOnly ? 'Đang bật: Top 10 BSI / Tháng' : 'Tất cả Campaign'}</span>
+              <span>{filters.top10BsiOnly ? 'Only Top10 Camp Monthly' : 'All Campaign'}</span>
             </button>
           </div>
         </div>
 
-        {/* Filter Controls Controls Grid */}
+        {/* Permanent Date Range & Cascading Filters Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 w-full">
-          {/* Time Filter Column (Single vs Range Mode) */}
-          {filters.dateRangeMode ? (
-            /* Range Selector spanning 2 grid columns on large screens */
-            <div className="col-span-1 sm:col-span-2 lg:col-span-2 grid grid-cols-2 gap-2 bg-sky-50/50 dark:bg-sky-950/30 p-2 rounded-xl border border-sky-200 dark:border-sky-900">
-              {/* Start Date */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-wider text-sky-700 dark:text-sky-300 flex items-center gap-1">
-                  <Calendar className="w-3 h-3" /> TỪ (START)
-                </label>
-                <div className="grid grid-cols-2 gap-1">
-                  <select
-                    value={filters.startMonth}
-                    onChange={(e) => onUpdateFilter('startMonth', e.target.value)}
-                    className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-lg text-xs p-1.5 outline-none focus:ring-2 focus:ring-buzz"
-                  >
-                    {MONTH_ORDER.map(m => (
-                      <option key={m} value={m}>{m}</option>
-                    ))}
-                  </select>
-                  <select
-                    value={filters.startYear}
-                    onChange={(e) => onUpdateFilter('startYear', e.target.value)}
-                    className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-lg text-xs p-1.5 outline-none focus:ring-2 focus:ring-buzz"
-                  >
-                    {availableYears.map(y => (
-                      <option key={y} value={y}>{y}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* End Date */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-wider text-sky-700 dark:text-sky-300 flex items-center gap-1">
-                  <ArrowRight className="w-3 h-3" /> ĐẾN (END)
-                </label>
-                <div className="grid grid-cols-2 gap-1">
-                  <select
-                    value={filters.endMonth}
-                    onChange={(e) => onUpdateFilter('endMonth', e.target.value)}
-                    className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-lg text-xs p-1.5 outline-none focus:ring-2 focus:ring-buzz"
-                  >
-                    {MONTH_ORDER.map(m => (
-                      <option key={m} value={m}>{m}</option>
-                    ))}
-                  </select>
-                  <select
-                    value={filters.endYear}
-                    onChange={(e) => onUpdateFilter('endYear', e.target.value)}
-                    className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-lg text-xs p-1.5 outline-none focus:ring-2 focus:ring-buzz"
-                  >
-                    {availableYears.map(y => (
-                      <option key={y} value={y}>{y}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-          ) : (
-            /* Single Year & Month Selectors */
-            <>
-              {/* Year Dropdown */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                  <Calendar className="w-3 h-3 text-buzz" /> NĂM
-                </label>
+          {/* Date Range Selector (Spans 2 columns on large screens) */}
+          <div className="col-span-1 sm:col-span-2 lg:col-span-2 grid grid-cols-2 gap-2 bg-sky-50/60 dark:bg-sky-950/40 p-2 rounded-xl border border-sky-200 dark:border-sky-900">
+            {/* Start Date */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase tracking-wider text-sky-700 dark:text-sky-300 flex items-center gap-1">
+                <Calendar className="w-3 h-3 text-sky-600 dark:text-sky-400" /> TỪ (START)
+              </label>
+              <div className="grid grid-cols-2 gap-1">
                 <select
-                  value={filters.year}
-                  onChange={(e) => onUpdateFilter('year', e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz"
+                  value={filters.startMonth}
+                  onChange={(e) => onUpdateFilter('startMonth', e.target.value)}
+                  className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-lg text-xs p-1.5 outline-none focus:ring-2 focus:ring-buzz"
                 >
-                  <option value={ALL_OPTION}>Tất cả năm</option>
+                  {MONTH_ORDER.map(m => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+                <select
+                  value={filters.startYear}
+                  onChange={(e) => onUpdateFilter('startYear', e.target.value)}
+                  className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-lg text-xs p-1.5 outline-none focus:ring-2 focus:ring-buzz"
+                >
                   {availableYears.map(y => (
                     <option key={y} value={y}>{y}</option>
                   ))}
                 </select>
               </div>
+            </div>
 
-              {/* Month Dropdown */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                  <Calendar className="w-3 h-3 text-buzz" /> THÁNG
-                </label>
+            {/* End Date */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase tracking-wider text-sky-700 dark:text-sky-300 flex items-center gap-1">
+                <ArrowRight className="w-3 h-3 text-sky-600 dark:text-sky-400" /> ĐẾN (END)
+              </label>
+              <div className="grid grid-cols-2 gap-1">
                 <select
-                  value={filters.month}
-                  onChange={(e) => onUpdateFilter('month', e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz"
+                  value={filters.endMonth}
+                  onChange={(e) => onUpdateFilter('endMonth', e.target.value)}
+                  className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-lg text-xs p-1.5 outline-none focus:ring-2 focus:ring-buzz"
                 >
-                  <option value={ALL_OPTION}>Tất cả tháng</option>
-                  {availableMonths.map(m => (
+                  {MONTH_ORDER.map(m => (
                     <option key={m} value={m}>{m}</option>
                   ))}
                 </select>
+                <select
+                  value={filters.endYear}
+                  onChange={(e) => onUpdateFilter('endYear', e.target.value)}
+                  className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-lg text-xs p-1.5 outline-none focus:ring-2 focus:ring-buzz"
+                >
+                  {availableYears.map(y => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
               </div>
-            </>
-          )}
+            </div>
+          </div>
 
           {/* Category Dropdown */}
           <div className="space-y-1">
