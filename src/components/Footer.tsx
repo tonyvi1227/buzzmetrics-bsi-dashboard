@@ -7,10 +7,14 @@ export const Footer: React.FC = () => {
         <span>© {new Date().getFullYear()} Buzzmetrics BSI Campaign Dashboard v3.13</span>
       </div>
 
-      <div className="flex items-center gap-1">
-        <span className="text-slate-400">Credit:</span>
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <span className="text-slate-400 font-bold">Credit:</span>
         <span className="text-buzz font-black bg-orange-50 dark:bg-orange-950/80 px-2.5 py-0.5 rounded-full border border-orange-200 dark:border-orange-900">
-          GiangLe
+          Idea - GiangLHT
+        </span>
+        <span className="text-slate-300 dark:text-slate-700">•</span>
+        <span className="text-buzz font-black bg-orange-50 dark:bg-orange-950/80 px-2.5 py-0.5 rounded-full border border-orange-200 dark:border-orange-900">
+          Develop - TuanVM
         </span>
       </div>
     </footer>
