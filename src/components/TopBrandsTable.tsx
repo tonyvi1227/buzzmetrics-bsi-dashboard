@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Award, Trophy } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { CampaignRecord } from '../types/dashboard';
 import { formatNum } from '../utils/brandStandardizer';
 
@@ -32,9 +32,6 @@ export const TopBrandsTable: React.FC<TopBrandsTableProps> = ({ data }) => {
           <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
             <Trophy className="w-4 h-4 text-amber-500" /> Bảng Xếp Hạng Top 5 Thương Hiệu Hàng Đầu
           </h3>
-          <span className="text-[10px] font-black text-amber-600 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-0.5 rounded-full border border-amber-200 dark:border-amber-900">
-            Top BSI Score
-          </span>
         </div>
 
         <div className="overflow-x-auto">
@@ -63,9 +60,9 @@ export const TopBrandsTable: React.FC<TopBrandsTableProps> = ({ data }) => {
                     )}
                   </td>
                   <td className="py-2.5 font-black text-slate-900 dark:text-white">{b.brand}</td>
-                  <td className="py-2.5 text-right font-black text-buzz">{formatNum(b.totalBSI)}</td>
-                  <td className="py-2.5 text-right text-slate-600 dark:text-slate-300">{formatNum(b.totalBuzz)}</td>
-                  <td className="py-2.5 text-center text-slate-500 dark:text-slate-400">{b.count}</td>
+                  <td className="py-2.5 text-right font-black text-buzz text-xs whitespace-nowrap">{formatNum(b.totalBSI)}</td>
+                  <td className="py-2.5 text-right text-slate-600 dark:text-slate-300 text-xs whitespace-nowrap">{formatNum(b.totalBuzz)}</td>
+                  <td className="py-2.5 text-center text-slate-500 dark:text-slate-400 text-xs whitespace-nowrap">{b.count}</td>
                 </tr>
               ))}
             </tbody>

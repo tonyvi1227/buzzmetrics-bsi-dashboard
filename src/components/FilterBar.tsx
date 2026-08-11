@@ -1,11 +1,12 @@
 import React from 'react';
-import { Filter, Calendar, Layers, Search, Tag, Trophy, ArrowRight } from 'lucide-react';
+import { Filter, Calendar, Layers, Search, Tag, Trophy, ArrowRight, RotateCcw } from 'lucide-react';
 import { FilterState } from '../types/dashboard';
 import { ALL_OPTION, MONTH_ORDER } from '../hooks/useSmartFilters';
 
 interface FilterBarProps {
   filters: FilterState;
   onUpdateFilter: (key: keyof FilterState, value: any) => void;
+  onResetFilters: () => void;
   availableYears: string[];
   availableMonths: string[];
   availableCategories: string[];
@@ -16,6 +17,7 @@ interface FilterBarProps {
 export const FilterBar: React.FC<FilterBarProps> = ({
   filters,
   onUpdateFilter,
+  onResetFilters,
   availableYears,
   availableCategories,
   filteredCount,
@@ -23,7 +25,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   return (
     <div className="glass-card p-4 md:p-5 rounded-2xl mb-6 shadow-sm border border-slate-200 dark:border-slate-800">
       <div className="flex flex-col gap-4">
-        {/* Top Header Row: Title, Result Count Badge & All Campaign / Only Top10 Toggle */}
+        {/* Top Header Row: Title, Result Count Badge, Scope Toggle & Reset Button */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-slate-800/80">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-buzz-light dark:bg-orange-950/60 text-buzz border border-buzz-border dark:border-orange-800 flex-shrink-0">
@@ -44,7 +46,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             </div>
           </div>
 
-          {/* Convenient Scope Toggle Button: All Campaign vs Only Top10 Camp Monthly */}
+          {/* Actions: Scope Toggle Button & Reset Filters Button */}
           <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-auto">
             <button
               onClick={() => onUpdateFilter('top10BsiOnly', !filters.top10BsiOnly)}
@@ -56,6 +58,16 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             >
               <Trophy className={`w-3.5 h-3.5 ${filters.top10BsiOnly ? 'text-white' : 'text-amber-500'}`} />
               <span>{filters.top10BsiOnly ? 'Only Top10 Camp Monthly' : 'All Campaign'}</span>
+            </button>
+
+            {/* Reset Filters Button inside Smart Filter Area */}
+            <button
+              onClick={onResetFilters}
+              className="whitespace-nowrap px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs border border-slate-200 dark:border-slate-700 transition shadow-sm font-black flex items-center gap-1.5 cursor-pointer"
+              title="Đặt lại bộ lọc"
+            >
+              <RotateCcw className="w-3.5 h-3.5 flex-shrink-0" />
+              <span>Đặt lại</span>
             </button>
           </div>
         </div>
