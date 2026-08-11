@@ -19,12 +19,12 @@ export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) =>
 
   // Aggregate stats per campaign type and sort from largest to smallest per guideline
   const typeStats = useMemo(() => {
-    const map: Record<string, { type: string; rawType: string; count: number; buzz: number }> = {
-      'Thematic & Brand Building': { type: '💎 Thematic', rawType: 'Thematic & Brand Building', count: 0, buzz: 0 },
-      'Product Launch & Rebranding': { type: '🚀 Product Launch', rawType: 'Product Launch & Rebranding', count: 0, buzz: 0 },
-      'Sponsor & Event': { type: '🎭 Sponsor & Event', rawType: 'Sponsor & Event', count: 0, buzz: 0 },
-      'Promotion': { type: '🎁 Promotion', rawType: 'Promotion', count: 0, buzz: 0 },
-      'CSR & Sustainability': { type: '🌿 CSR & Sustainability', rawType: 'CSR & Sustainability', count: 0, buzz: 0 },
+    const map: Record<string, { typeName: string; rawType: string; count: number; buzz: number }> = {
+      'Thematic & Brand Building': { typeName: 'Thematic', rawType: 'Thematic & Brand Building', count: 0, buzz: 0 },
+      'Product Launch & Rebranding': { typeName: 'Product Launch', rawType: 'Product Launch & Rebranding', count: 0, buzz: 0 },
+      'Sponsor & Event': { typeName: 'Sponsor & Event', rawType: 'Sponsor & Event', count: 0, buzz: 0 },
+      'Promotion': { typeName: 'Promotion', rawType: 'Promotion', count: 0, buzz: 0 },
+      'CSR & Sustainability': { typeName: 'CSR & Sustainability', rawType: 'CSR & Sustainability', count: 0, buzz: 0 },
     };
 
     data.forEach(d => {
@@ -45,7 +45,7 @@ export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) =>
     const buzzPalette = ['#e68228', '#125876', '#e69650', '#fabe8c', '#969696'];
 
     return {
-      labels: typeStats.map(t => t.type),
+      labels: typeStats.map(t => t.typeName),
       datasets: [
         {
           data: typeStats.map(t => t.count),
@@ -69,6 +69,9 @@ export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) =>
           labels: {
             color: textColor,
             font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const },
+            padding: 12,
+            usePointStyle: true,
+            pointStyle: 'rectRounded',
           },
           position: 'bottom' as const,
         },
@@ -78,8 +81,9 @@ export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) =>
           formatter: (value: number, ctx: any) => {
             const sum = ctx.dataset.data.reduce((a: number, b: number) => a + b, 0);
             if (sum === 0 || value === 0) return '';
-            const pct = ((value * 100) / sum).toFixed(1);
-            return `${pct}%`; // Guideline XX.X% format
+            const pct = (value * 100) / sum;
+            if (pct < 4) return ''; // Hide datalabels for small slices (<4%) to prevent overlapping text bleeding
+            return `${pct.toFixed(1)}%`;
           },
         },
         tooltip: {
@@ -91,7 +95,7 @@ export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) =>
             label: (ctx: any) => {
               const item = typeStats[ctx.dataIndex];
               return [
-                `Loại hình: ${item.type}`,
+                `Loại hình: ${item.rawType}`,
                 `Số lượng: ${item.count} Campaign`,
                 `Tổng Buzz Volume: ${formatNum(item.buzz)}`,
               ];

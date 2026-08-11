@@ -15,7 +15,7 @@ interface BrandMatrixChartProps {
 
 export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
   const { theme } = useTheme();
-  const [excludeTWDoan, setExcludeTWDoan] = useState(false);
+  const [excludeTWDoan, setExcludeTWDoan] = useState(true);
 
   // Aggregate stats for brands using AVG Buzz Volume & AVG BSI
   const matrixData = useMemo(() => {
