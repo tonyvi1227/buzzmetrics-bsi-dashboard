@@ -57,7 +57,7 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
     }
   };
 
-  const renderTypeBadge = (type: string) => {
+  const renderTypeBadge = (type?: string) => {
     switch (type) {
       case 'Product Launch & Rebranding':
         return (

@@ -3,116 +3,151 @@ import { CampaignRecord, FilterState } from '../types/dashboard';
 
 export const ALL_OPTION = 'ALL';
 
+export const MONTH_ORDER = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+];
+
+export const getMonthValue = (yearStr: string, monthStr: string): number => {
+  const y = parseInt(yearStr, 10) || 2025;
+  const mIndex = MONTH_ORDER.indexOf(monthStr);
+  return mIndex !== -1 ? y * 12 + mIndex : y * 12;
+};
+
 const initialFilters: FilterState = {
   year: ALL_OPTION,
   month: ALL_OPTION,
   category: ALL_OPTION,
   campaignType: ALL_OPTION,
+  search: '',
   brandSearch: '',
+  dateRangeMode: false,
+  startYear: '2025',
+  startMonth: 'Jan',
+  endYear: '2026',
+  endMonth: 'Jun',
+  top10BsiOnly: false,
 };
 
-export function useSmartFilters(dataset: CampaignRecord[]) {
+export function useSmartFilters(allCampaigns: CampaignRecord[]) {
   const [filters, setFilters] = useState<FilterState>(initialFilters);
 
-  // Available Years
-  const availableYears = useMemo(() => {
-    const years = new Set<string>();
-    dataset.forEach(d => {
-      if (d.year) years.add(d.year);
-    });
-    return Array.from(years).sort((a, b) => parseInt(b) - parseInt(a));
-  }, [dataset]);
-
-  // Available Months cascading based on selected Year
-  const availableMonths = useMemo(() => {
-    const monthOrder = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const months = new Set<string>();
-
-    dataset.forEach(d => {
-      if (filters.year === ALL_OPTION || d.year === filters.year) {
-        if (d.month) months.add(d.month);
-      }
+  // Helper to extract Top 10 BSI campaigns per month
+  const filterTop10BsiPerMonth = useCallback((records: CampaignRecord[]): CampaignRecord[] => {
+    const grouped: Record<string, CampaignRecord[]> = {};
+    records.forEach(r => {
+      const key = `${r.year}_${r.month}`;
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(r);
     });
 
-    return Array.from(months).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b));
-  }, [dataset, filters.year]);
-
-  // Available Categories cascading based on selected Year & Month
-  const availableCategories = useMemo(() => {
-    const categories = new Set<string>();
-
-    dataset.forEach(d => {
-      const matchYear = filters.year === ALL_OPTION || d.year === filters.year;
-      const matchMonth = filters.month === ALL_OPTION || d.month === filters.month;
-
-      if (matchYear && matchMonth) {
-        if (d.category) categories.add(d.category);
-      }
+    const result: CampaignRecord[] = [];
+    Object.values(grouped).forEach(group => {
+      const sorted = [...group].sort((a, b) => b.bsi - a.bsi);
+      result.push(...sorted.slice(0, 10));
     });
 
-    return Array.from(categories).sort();
-  }, [dataset, filters.year, filters.month]);
-
-  // Available Campaign Types cascading
-  const availableCampaignTypes = useMemo(() => {
-    const types = new Set<string>();
-
-    dataset.forEach(d => {
-      const matchYear = filters.year === ALL_OPTION || d.year === filters.year;
-      const matchMonth = filters.month === ALL_OPTION || d.month === filters.month;
-      const matchCategory = filters.category === ALL_OPTION || d.category === filters.category;
-
-      if (matchYear && matchMonth && matchCategory) {
-        if (d.campaignType) types.add(d.campaignType);
-      }
-    });
-
-    return Array.from(types).sort();
-  }, [dataset, filters.year, filters.month, filters.category]);
-
-  // Smart Cascading Update Function
-  const updateFilter = useCallback((key: keyof FilterState, value: string) => {
-    setFilters(prev => {
-      const next = { ...prev, [key]: value };
-
-      // Reset dependent child filters if parent changes
-      if (key === 'year') {
-        next.month = ALL_OPTION;
-        next.category = ALL_OPTION;
-        next.campaignType = ALL_OPTION;
-      } else if (key === 'month') {
-        next.category = ALL_OPTION;
-        next.campaignType = ALL_OPTION;
-      } else if (key === 'category') {
-        next.campaignType = ALL_OPTION;
-      }
-
-      return next;
-    });
+    return result;
   }, []);
 
+  // Update a single filter field
+  const updateFilter = useCallback((key: keyof FilterState, value: any) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: value,
+    }));
+  }, []);
+
+  // Reset all filters to default
   const resetFilters = useCallback(() => {
     setFilters(initialFilters);
   }, []);
 
-  // Filtered dataset
+  // Get list of available Years in dataset
+  const availableYears = useMemo(() => {
+    const years = Array.from(new Set(allCampaigns.map(c => c.year))).filter(Boolean);
+    return years.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+  }, [allCampaigns]);
+
+  // Get available Months based on selected Year
+  const availableMonths = useMemo(() => {
+    let source = allCampaigns;
+    if (filters.year !== ALL_OPTION) {
+      source = source.filter(c => c.year === filters.year);
+    }
+    const months = Array.from(new Set(source.map(c => c.month))).filter(Boolean);
+    return months.sort((a, b) => MONTH_ORDER.indexOf(a) - MONTH_ORDER.indexOf(b));
+  }, [allCampaigns, filters.year]);
+
+  // Get available Categories based on active filters
+  const availableCategories = useMemo(() => {
+    let source = allCampaigns;
+    if (filters.year !== ALL_OPTION) {
+      source = source.filter(c => c.year === filters.year);
+    }
+    if (filters.month !== ALL_OPTION) {
+      source = source.filter(c => c.month === filters.month);
+    }
+    const categories = Array.from(new Set(source.map(c => c.category))).filter(Boolean);
+    return categories.sort();
+  }, [allCampaigns, filters.year, filters.month]);
+
+  // Available Campaign Types
+  const availableCampaignTypes = useMemo(() => {
+    const types = Array.from(new Set(allCampaigns.map(c => c.campaignType))).filter(Boolean) as string[];
+    return types.sort();
+  }, [allCampaigns]);
+
+  // Filter dataset dynamically based on cascading criteria & date range
   const filteredData = useMemo(() => {
-    return dataset.filter(d => {
-      if (filters.year !== ALL_OPTION && d.year !== filters.year) return false;
-      if (filters.month !== ALL_OPTION && d.month !== filters.month) return false;
-      if (filters.category !== ALL_OPTION && d.category !== filters.category) return false;
-      if (filters.campaignType !== ALL_OPTION && d.campaignType !== filters.campaignType) return false;
+    let dataset = [...allCampaigns];
 
-      const searchTerm = (filters.brandSearch || filters.search || '').trim().toLowerCase();
-      if (searchTerm) {
-        const matchBrand = d.brand.toLowerCase().includes(searchTerm);
-        const matchCampaign = d.campaign.toLowerCase().includes(searchTerm);
-        if (!matchBrand && !matchCampaign) return false;
+    // 1. If Top 10 BSI per month toggle is active, extract top 10 BSI per month first
+    if (filters.top10BsiOnly) {
+      dataset = filterTop10BsiPerMonth(dataset);
+    }
+
+    // 2. Date Filter Logic: Date Range vs Single Year/Month
+    if (filters.dateRangeMode) {
+      const startVal = getMonthValue(filters.startYear, filters.startMonth);
+      const endVal = getMonthValue(filters.endYear, filters.endMonth);
+
+      dataset = dataset.filter(c => {
+        const itemVal = getMonthValue(c.year, c.month);
+        return itemVal >= startVal && itemVal <= endVal;
+      });
+    } else {
+      if (filters.year !== ALL_OPTION) {
+        dataset = dataset.filter(c => c.year === filters.year);
       }
+      if (filters.month !== ALL_OPTION) {
+        dataset = dataset.filter(c => c.month === filters.month);
+      }
+    }
 
-      return true;
-    });
-  }, [dataset, filters]);
+    // 3. Category Filter
+    if (filters.category !== ALL_OPTION) {
+      dataset = dataset.filter(c => c.category === filters.category);
+    }
+
+    // 4. Campaign Type Filter
+    if (filters.campaignType !== ALL_OPTION) {
+      dataset = dataset.filter(c => c.campaignType === filters.campaignType);
+    }
+
+    // 5. Search Keyword Filter (Brand / Campaign Name)
+    const query = (filters.brandSearch || filters.search || '').trim().toLowerCase();
+    if (query) {
+      dataset = dataset.filter(
+        c =>
+          c.brand.toLowerCase().includes(query) ||
+          c.campaign.toLowerCase().includes(query) ||
+          c.category.toLowerCase().includes(query)
+      );
+    }
+
+    return dataset;
+  }, [allCampaigns, filters, filterTop10BsiPerMonth]);
 
   return {
     filters,

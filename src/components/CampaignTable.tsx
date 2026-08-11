@@ -52,7 +52,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
     return sortedData.slice(start, start + itemsPerPage);
   }, [sortedData, currentPage]);
 
-  const renderTypeBadge = (type: string) => {
+  const renderTypeBadge = (type?: string) => {
     switch (type) {
       case 'Product Launch & Rebranding':
         return (

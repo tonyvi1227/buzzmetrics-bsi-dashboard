@@ -9,22 +9,22 @@ export interface CampaignRecord {
   id: string;
   year: string;
   month: string;
-  rawCategory: string;
   category: string;
+  rawCategory?: string;
   brand: string;
   campaign: string;
-  campaignType: CampaignType;
-  bsi: number;
   buzzVolume: number;
   contentQU: number;
-  quBuzzPct: number;
-  sentiment: number;
   quUser: number;
+  bsi: number;
+  sentiment: number;
   relevancy: number;
   earnedPct: number;
-  owned: number;
   paid: number;
+  owned: number;
   earned: number;
+  quBuzzPct?: number;
+  campaignType?: CampaignType;
 }
 
 export interface FilterState {
@@ -32,8 +32,16 @@ export interface FilterState {
   month: string;
   category: string;
   campaignType: string;
-  brandSearch: string;
-  search?: string;
+  search: string;
+  brandSearch?: string;
+  // Date Range Selection
+  dateRangeMode: boolean;
+  startYear: string;
+  startMonth: string;
+  endYear: string;
+  endMonth: string;
+  // Top 10 BSI per month toggle
+  top10BsiOnly: boolean;
 }
 
 export interface BenchmarkMetrics {
@@ -61,14 +69,16 @@ export interface CategoryBenchmark {
   avgEarnedPct: number;
 }
 
+export type SortColumn = keyof CampaignRecord | 'time';
+export type SortDirection = 'asc' | 'desc';
+export type SortOrder = 'asc' | 'desc';
+
 export interface BrandStat {
   brand: string;
   totalBSI: number;
   totalBuzz: number;
   campaignCount: number;
   avgSentiment: number;
+  avgContentQU: number;
+  avgQUUser: number;
 }
-
-export type SortColumn = 'time' | 'year' | 'month' | 'brand' | 'category' | 'campaign' | 'campaignType' | 'buzzVolume' | 'bsi' | 'contentQU' | 'quUser' | 'sentiment' | 'relevancy' | 'earnedPct';
-export type SortOrder = 'asc' | 'desc';
-export type SortDirection = 'asc' | 'desc';
