@@ -4,7 +4,7 @@ export const Footer: React.FC = () => {
   return (
     <footer className="mt-10 py-6 border-t border-slate-200 dark:border-slate-800 text-center text-xs font-bold text-slate-500 dark:text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2 px-2">
       <div className="flex items-center gap-2">
-        <span>© {new Date().getFullYear()} Buzzmetrics BSI Campaign Dashboard v2.0</span>
+        <span>© {new Date().getFullYear()} Buzzmetrics BSI Campaign Dashboard v3.13</span>
       </div>
 
       <div className="flex items-center gap-1">

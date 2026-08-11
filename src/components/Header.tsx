@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Moon, Upload, Download, RotateCcw, Calendar, Lock, Megaphone, Trophy, Sparkles } from 'lucide-react';
+import { Sun, Moon, Upload, Download, RotateCcw, Calendar, Lock, Megaphone, Trophy, Sparkles, Database } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAdmin } from '../context/AdminContext';
 
@@ -43,7 +43,7 @@ export const Header: React.FC<HeaderProps> = ({
                 BUZZMETRICS <span className="text-buzz">BSI DASHBOARD</span>
               </h1>
               <span className="whitespace-nowrap inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black bg-orange-100 dark:bg-orange-950/80 text-buzz dark:text-orange-300 border border-orange-300 dark:border-orange-800 flex-shrink-0">
-                v2.0 PRO
+                v3.13
               </span>
               {isAdmin && (
                 <span className="whitespace-nowrap inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
@@ -51,25 +51,35 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               )}
             </div>
-            <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-0.5">
-              Consumer Insight & Social Index Report ({totalRecordsCount} bản ghi)
-            </p>
+
+            {/* Subtitle & Dataset Info Line */}
+            <div className="flex items-center gap-2 flex-wrap text-xs font-bold text-slate-500 dark:text-slate-400 mt-1">
+              <span>Consumer Insight & Social Index Report</span>
+              <span>•</span>
+              <span className="inline-flex items-center gap-1 text-slate-700 dark:text-slate-300">
+                <Database className="w-3.5 h-3.5 text-buzz" />
+                Dung lượng Dataset: <strong className="text-buzz font-black">{totalRecordsCount} Chiến dịch</strong>
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Right Actions Bar */}
+        {/* Right Actions & Dataset Info Bar */}
         <div className="flex flex-wrap items-center gap-2.5 w-full xl:w-auto justify-start xl:justify-end">
-          {/* Tracking Period Badge */}
-          <div className="whitespace-nowrap px-3.5 py-2 bg-slate-100 dark:bg-slate-800/90 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-extrabold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+          {/* Tracking Dataset Info Card (Dashed Border - Non Clickable Info Display) */}
+          <div className="whitespace-nowrap px-3.5 py-2 bg-slate-50/80 dark:bg-slate-800/40 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2 pointer-events-none select-none">
             <Calendar className="w-4 h-4 text-buzz flex-shrink-0" />
-            <span>Theo dõi: <span className="text-buzz font-black">Tháng 01/2025 – Tháng 06/2026</span></span>
+            <div>
+              <span className="text-[10px] uppercase font-black tracking-wider text-slate-400 block leading-none">Phạm Vi Dataset Ban Đầu</span>
+              <span className="text-slate-800 dark:text-slate-200 font-extrabold text-xs">Tháng 01/2025 – Tháng 06/2026 (18 Tháng)</span>
+            </div>
           </div>
 
           {/* Theme Switcher Button */}
           <button
             onClick={toggleTheme}
             title={theme === 'light' ? 'Chuyển sang Dark Mode' : 'Chuyển sang Light Mode'}
-            className="whitespace-nowrap px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-orange-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs border border-slate-200 dark:border-slate-700 transition font-black flex items-center gap-1.5"
+            className="whitespace-nowrap px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-orange-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs border border-slate-200 dark:border-slate-700 transition font-black flex items-center gap-1.5 cursor-pointer"
           >
             {theme === 'light' ? (
               <>
@@ -87,7 +97,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Import Data Button */}
           <button
             onClick={onOpenImport}
-            className="whitespace-nowrap px-3.5 py-2 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 rounded-xl text-xs border border-emerald-300 dark:border-emerald-700 transition shadow-sm font-black flex items-center gap-1.5"
+            className="whitespace-nowrap px-3.5 py-2 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 rounded-xl text-xs border border-emerald-300 dark:border-emerald-700 transition shadow-sm font-black flex items-center gap-1.5 cursor-pointer"
           >
             <Upload className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
             <span>Cập nhật Data</span>
@@ -96,7 +106,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Export Report Button */}
           <button
             onClick={onOpenExport}
-            className="whitespace-nowrap px-3.5 py-2 bg-buzz-light dark:bg-orange-950/60 hover:bg-orange-100 text-buzz dark:text-orange-300 rounded-xl text-xs border border-buzz-border dark:border-orange-800 transition shadow-sm font-black flex items-center gap-1.5"
+            className="whitespace-nowrap px-3.5 py-2 bg-buzz-light dark:bg-orange-950/60 hover:bg-orange-100 text-buzz dark:text-orange-300 rounded-xl text-xs border border-buzz-border dark:border-orange-800 transition shadow-sm font-black flex items-center gap-1.5 cursor-pointer"
           >
             <Download className="w-3.5 h-3.5 flex-shrink-0" />
             <span>Xuất Báo Cáo</span>
@@ -105,7 +115,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Reset Filters Button */}
           <button
             onClick={onResetFilters}
-            className="whitespace-nowrap px-3 py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs border border-slate-200 dark:border-slate-700 transition shadow-sm font-black flex items-center gap-1.5"
+            className="whitespace-nowrap px-3 py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs border border-slate-200 dark:border-slate-700 transition shadow-sm font-black flex items-center gap-1.5 cursor-pointer"
             title="Đặt lại bộ lọc"
           >
             <RotateCcw className="w-3.5 h-3.5 flex-shrink-0" />
@@ -119,7 +129,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
           <button
             onClick={() => onTabChange('campaigns')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black transition-all cursor-pointer ${
               activeTab === 'campaigns'
                 ? 'bg-buzz text-white shadow-md shadow-orange-500/20'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-slate-800'
@@ -131,7 +141,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onTabChange('celebs')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black transition-all cursor-pointer ${
               activeTab === 'celebs'
                 ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-slate-800'
