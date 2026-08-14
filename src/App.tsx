@@ -280,15 +280,28 @@ const DashboardContent: React.FC = () => {
     }
   };
 
+  const [showDevToolbar, setShowDevToolbar] = useState<boolean>(() => {
+    return import.meta.env.DEV || window.location.search.includes('dev=true');
+  });
+
+  // Global Keyboard Shortcut: Ctrl + Shift + D to toggle Dev Toolbar
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'd') {
+        e.preventDefault();
+        setShowDevToolbar(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const shouldGateSection = !isUnlocked && (assignedVariant !== 'C' || clickCount >= 3);
 
-  // Dev Toolbar Visibility: Show in local dev mode, URL ?dev=true, or when Admin is logged in
-  const isDevMode = import.meta.env.DEV || window.location.search.includes('dev=true') || isAdmin;
-
   return (
-    <div className="min-h-screen p-4 md:p-8 max-w-[1600px] mx-auto font-sans">
+    <div className="min-h-screen p-4 md:p-8 max-w-[1600px] mx-auto font-sans relative">
       {/* Dev A/B Testing Toolbar */}
-      {isDevMode && (
+      {(showDevToolbar || isAdmin) && (
         <DevABToolbar
           currentVariant={assignedVariant}
           isUnlocked={isUnlocked}
