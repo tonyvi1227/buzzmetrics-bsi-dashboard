@@ -282,10 +282,13 @@ const DashboardContent: React.FC = () => {
 
   const shouldGateSection = !isUnlocked && (assignedVariant !== 'C' || clickCount >= 3);
 
+  // Dev Toolbar Visibility: Show in local dev mode, URL ?dev=true, or when Admin is logged in
+  const isDevMode = import.meta.env.DEV || window.location.search.includes('dev=true') || isAdmin;
+
   return (
     <div className="min-h-screen p-4 md:p-8 max-w-[1600px] mx-auto font-sans">
-      {/* Dev A/B Testing Toolbar - ONLY SHOWN AFTER ADMIN PASSWORD LOGIN */}
-      {isAdmin && (
+      {/* Dev A/B Testing Toolbar */}
+      {isDevMode && (
         <DevABToolbar
           currentVariant={assignedVariant}
           isUnlocked={isUnlocked}
