@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { X, Send, Building, User, Mail, Phone, LockKeyhole, Tag, Target, FileText } from 'lucide-react';
 import { saveLeadRecord } from '../utils/abTestingEngine';
 import { ABVariant } from '../types/leadGen';
@@ -16,19 +16,16 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
   onSuccess,
   variant = 'A',
 }) => {
-  const [fullName, setFullName] = useState('');
-  const [workEmail, setWorkEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [company, setCompany] = useState('');
-  
-  // Type-in fields instead of fixed dropdowns
-  const [categoryInterest, setCategoryInterest] = useState('');
-  const [brandInterest, setBrandInterest] = useState('');
-  
-  // Actual Intent / Need fields
-  const [actualNeed, setActualNeed] = useState('Tham khảo Data Benchmark chung');
-  const [customNeedNote, setCustomNeedNote] = useState('');
+  // Use DOM refs for instant 0ms typing with ZERO React re-renders on keystroke
+  const fullNameRef = useRef<HTMLInputElement>(null);
+  const workEmailRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const companyRef = useRef<HTMLInputElement>(null);
+  const categoryInterestRef = useRef<HTMLInputElement>(null);
+  const brandInterestRef = useRef<HTMLInputElement>(null);
+  const customNeedNoteRef = useRef<HTMLTextAreaElement>(null);
 
+  const [actualNeed, setActualNeed] = useState('Tham khảo Data Benchmark chung');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -36,6 +33,14 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const fullName = fullNameRef.current?.value || '';
+    const workEmail = workEmailRef.current?.value || '';
+    const phone = phoneRef.current?.value || '';
+    const company = companyRef.current?.value || '';
+    const categoryInterest = categoryInterestRef.current?.value || '';
+    const brandInterest = brandInterestRef.current?.value || '';
+    const customNeedNote = customNeedNoteRef.current?.value || '';
+
     if (!fullName.trim() || !workEmail.trim() || !phone.trim() || !company.trim()) {
       setError('Vui lòng điền thông tin cá nhân liên hệ để mở khóa.');
       return;
@@ -71,10 +76,17 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/65 flex items-center justify-center p-4 md:p-6 animate-fadeIn">
+    <div
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/65 flex items-center justify-center p-4 md:p-6"
+      style={{
+        willChange: 'transform, opacity',
+        transform: 'translateZ(0)',
+      }}
+    >
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg p-6 md:p-7 relative my-auto">
         <button
           onClick={onClose}
+          type="button"
           className="absolute right-4 top-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
         >
           <X className="w-5 h-5" />
@@ -106,10 +118,9 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                 </label>
                 <div className="relative">
                   <input
+                    ref={fullNameRef}
                     type="text"
                     required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
                     placeholder="Nguyễn Văn A"
                     className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                   />
@@ -123,10 +134,9 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                 </label>
                 <div className="relative">
                   <input
+                    ref={phoneRef}
                     type="tel"
                     required
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
                     placeholder="090x xxx xxx"
                     className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                   />
@@ -142,10 +152,9 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                 </label>
                 <div className="relative">
                   <input
+                    ref={workEmailRef}
                     type="email"
                     required
-                    value={workEmail}
-                    onChange={(e) => setWorkEmail(e.target.value)}
                     placeholder="name@company.com"
                     className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                   />
@@ -159,10 +168,9 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                 </label>
                 <div className="relative">
                   <input
+                    ref={companyRef}
                     type="text"
                     required
-                    value={company}
-                    onChange={(e) => setCompany(e.target.value)}
                     placeholder="Ví dụ: Vinamilk, Samsung..."
                     className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                   />
@@ -184,9 +192,8 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                   NGÀNH HÀNG (NHẬP CHỮ)
                 </label>
                 <input
+                  ref={categoryInterestRef}
                   type="text"
-                  value={categoryInterest}
-                  onChange={(e) => setCategoryInterest(e.target.value)}
                   placeholder="Ví dụ: Handhelds, Bia, Sữa..."
                   className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz"
                 />
@@ -197,9 +204,8 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                   THƯƠNG HIỆU QUAN TÂM (NHẬP CHỮ)
                 </label>
                 <input
+                  ref={brandInterestRef}
                   type="text"
-                  value={brandInterest}
-                  onChange={(e) => setBrandInterest(e.target.value)}
                   placeholder="Ví dụ: Heineken, Samsung, Tiger..."
                   className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz"
                 />
@@ -246,9 +252,8 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                 <FileText className="w-3 h-3" /> GHI CHÚ NHU CẦU CỤ THỂ KHÁC (NẾU CÓ)
               </label>
               <textarea
+                ref={customNeedNoteRef}
                 rows={2}
-                value={customNeedNote}
-                onChange={(e) => setCustomNeedNote(e.target.value)}
                 placeholder="Nhập yêu cầu riêng hoặc ngân sách/kế hoạch chiến dịch sắp tới..."
                 className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2 outline-none focus:ring-2 focus:ring-buzz"
               />
