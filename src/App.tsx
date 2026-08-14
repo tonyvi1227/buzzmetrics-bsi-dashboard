@@ -473,12 +473,25 @@ const DashboardContent: React.FC = () => {
               <GatedOverlay
                 variant={assignedVariant}
                 onOpenGateModal={triggerGateModal}
+                onUnlockNow={() => setIsUnlocked(true)}
                 clickCount={clickCount}
               />
             )}
           </div>
         </div>
       )}
+
+      {/* Floating Dev Tools Toggle Button for Easy Access */}
+      <div className="fixed bottom-4 right-4 z-50">
+        <button
+          onClick={() => setShowDevToolbar(prev => !prev)}
+          className="px-3 py-2 bg-slate-900/90 hover:bg-slate-900 text-amber-400 text-xs font-black rounded-2xl shadow-xl border border-slate-700 backdrop-blur-md transition flex items-center gap-1.5 cursor-pointer hover:scale-105"
+          title="Toggle Dev A/B Testing Toolbar (Ctrl+Shift+D)"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <span>⚡ Dev A/B</span>
+        </button>
+      </div>
 
       {/* Modals & Drawers */}
       <CampaignDetailModal

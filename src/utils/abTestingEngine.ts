@@ -4,6 +4,7 @@ import { sendLeadEmailNotification } from './emailService';
 
 const AB_VARIANT_KEY = 'buzz_ab_variant';
 const UNLOCKED_KEY = 'buzz_is_unlocked';
+const HAS_LEAD_KEY = 'buzz_has_submitted_lead';
 const INTERNAL_UNLOCKED_KEY = 'buzz_internal_unlocked';
 const CLICK_COUNT_KEY = 'buzz_click_count';
 const WINNING_VARIANT_KEY = 'buzz_winning_variant';
@@ -58,10 +59,13 @@ export function getAssignedVariant(): ABVariant {
   return assigned;
 }
 
+export function hasSubmittedLead(): boolean {
+  return localStorage.getItem(HAS_LEAD_KEY) === 'true' || localStorage.getItem(UNLOCKED_KEY) === 'true';
+}
+
 export function isUserUnlocked(): boolean {
-  const isUnlocked = localStorage.getItem(UNLOCKED_KEY) === 'true';
-  const isInternal = localStorage.getItem(INTERNAL_UNLOCKED_KEY) === 'true';
-  return isUnlocked || isInternal;
+  // Session unlock
+  return sessionStorage.getItem(UNLOCKED_KEY) === 'true';
 }
 
 export function isInternalUnlocked(): boolean {
@@ -69,7 +73,8 @@ export function isInternalUnlocked(): boolean {
 }
 
 export function unlockUserPermanently(isInternal = false) {
-  localStorage.setItem(UNLOCKED_KEY, 'true');
+  sessionStorage.setItem(UNLOCKED_KEY, 'true');
+  localStorage.setItem(HAS_LEAD_KEY, 'true');
   if (isInternal) {
     localStorage.setItem(INTERNAL_UNLOCKED_KEY, 'true');
   }
@@ -77,8 +82,10 @@ export function unlockUserPermanently(isInternal = false) {
 
 export function resetLockStateForTesting() {
   localStorage.removeItem(UNLOCKED_KEY);
+  localStorage.removeItem(HAS_LEAD_KEY);
   localStorage.removeItem(INTERNAL_UNLOCKED_KEY);
   localStorage.removeItem(CLICK_COUNT_KEY);
+  sessionStorage.removeItem(UNLOCKED_KEY);
 }
 
 export function getClickCount(): number {

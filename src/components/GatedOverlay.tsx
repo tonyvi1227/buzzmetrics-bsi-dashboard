@@ -1,18 +1,23 @@
 import React from 'react';
-import { LockKeyhole, Sparkles } from 'lucide-react';
+import { LockKeyhole, Sparkles, CheckCircle2 } from 'lucide-react';
 import { ABVariant } from '../types/leadGen';
+import { hasSubmittedLead } from '../utils/abTestingEngine';
 
 interface GatedOverlayProps {
   variant: ABVariant;
   onOpenGateModal: () => void;
+  onUnlockNow?: () => void;
   clickCount?: number;
 }
 
 export const GatedOverlay: React.FC<GatedOverlayProps> = ({
   variant,
   onOpenGateModal,
+  onUnlockNow,
   clickCount = 0,
 }) => {
+  const isAlreadySubmitted = hasSubmittedLead();
+
   return (
     <div
       className="absolute inset-0 z-30 flex flex-col items-center justify-center p-4 rounded-3xl bg-white/40 dark:bg-slate-900/50 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/60 shadow-inner animate-fadeIn"
@@ -31,23 +36,35 @@ export const GatedOverlay: React.FC<GatedOverlayProps> = ({
             UNLOCK BSI CAMPAIGN REPORT
           </h3>
           <p className="text-xs text-slate-600 dark:text-slate-300 font-bold mt-1.5 leading-relaxed">
-            {variant === 'C' && clickCount >= 3
-              ? `You have reached the 3 free filter interaction limit. Register your contact to unlock full 100% access!`
+            {isAlreadySubmitted
+              ? 'Welcome back! You have previously unlocked this report. Click below to view Full Version.'
+              : variant === 'C' && clickCount >= 3
+              ? 'You have reached the 3 free filter interaction limit. Register your contact to unlock full 100% access!'
               : 'Register your contact info to unlock full campaign deep-dive analytics & monthly top BSI benchmark reports.'}
           </p>
         </div>
 
-        <button
-          onClick={onOpenGateModal}
-          className="w-full py-3.5 bg-buzz hover:bg-orange-600 text-white font-black text-xs md:text-sm rounded-xl transition shadow-lg shadow-orange-500/25 cursor-pointer flex items-center justify-center gap-2 transform hover:scale-[1.02]"
-        >
-          <Sparkles className="w-4 h-4 text-amber-300" />
-          <span>
-            {variant === 'B'
-              ? 'CHAT WITH AI CONSULTANT TO UNLOCK'
-              : 'UNLOCK DEEP-DIVE CHARTS NOW'}
-          </span>
-        </button>
+        {isAlreadySubmitted && onUnlockNow ? (
+          <button
+            onClick={onUnlockNow}
+            className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs md:text-sm rounded-xl transition shadow-lg shadow-emerald-500/25 cursor-pointer flex items-center justify-center gap-2 transform hover:scale-[1.02]"
+          >
+            <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+            <span>MỞ FULL VERSION NGAY (Đã Đăng Ký)</span>
+          </button>
+        ) : (
+          <button
+            onClick={onOpenGateModal}
+            className="w-full py-3.5 bg-buzz hover:bg-orange-600 text-white font-black text-xs md:text-sm rounded-xl transition shadow-lg shadow-orange-500/25 cursor-pointer flex items-center justify-center gap-2 transform hover:scale-[1.02]"
+          >
+            <Sparkles className="w-4 h-4 text-amber-300" />
+            <span>
+              {variant === 'B'
+                ? 'CHAT WITH AI CONSULTANT TO UNLOCK'
+                : 'UNLOCK DEEP-DIVE CHARTS NOW'}
+            </span>
+          </button>
+        )}
       </div>
     </div>
   );
