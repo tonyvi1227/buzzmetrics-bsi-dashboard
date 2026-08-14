@@ -52,6 +52,7 @@ import { AIChatbotModal } from './components/AIChatbotModal';
 import { InternalUnlockModal } from './components/InternalUnlockModal';
 import { AdminABTestPanel } from './components/AdminABTestPanel';
 import { DevABToolbar } from './components/DevABToolbar';
+import { DevPasswordModal } from './components/DevPasswordModal';
 
 const DashboardContent: React.FC = () => {
   const [dataset, setDataset] = useState<CampaignRecord[]>(() => getStoredCampaigns());
@@ -280,43 +281,57 @@ const DashboardContent: React.FC = () => {
     }
   };
 
+  const [isDevPasswordOpen, setIsDevPasswordOpen] = useState(false);
+  const [isDevAuthed, setIsDevAuthed] = useState<boolean>(() => {
+    return localStorage.getItem('buzz_dev_authed') === 'true';
+  });
   const [showDevToolbar, setShowDevToolbar] = useState<boolean>(() => {
     return import.meta.env.DEV || window.location.search.includes('dev=true');
   });
 
-  // Global Keyboard Shortcut: Ctrl + Shift + D to toggle Dev Toolbar
+  const handleOpenDevClick = () => {
+    if (isDevAuthed || isAdmin) {
+      setShowDevToolbar(prev => !prev);
+    } else {
+      setIsDevPasswordOpen(true);
+    }
+  };
+
+  const handleDevPasswordSuccess = () => {
+    setIsDevAuthed(true);
+    setIsDevPasswordOpen(false);
+    setShowDevToolbar(true);
+  };
+
+  // Dynamic iFrame Auto-Resizing postMessage to Eliminate Inner Scrollbars & Scroll Lag in Webflow
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'd') {
-        e.preventDefault();
-        setShowDevToolbar(prev => !prev);
+    const sendHeight = () => {
+      const height = Math.max(
+        document.documentElement.scrollHeight,
+        document.body.scrollHeight,
+        document.documentElement.offsetHeight
+      );
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'BSI_DASHBOARD_RESIZE', height }, '*');
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+
+    sendHeight();
+    const observer = new ResizeObserver(sendHeight);
+    observer.observe(document.body);
+
+    const timeout = setTimeout(sendHeight, 500);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(timeout);
+    };
+  }, [activeTab, isAdvancedChartsExpanded, isUnlocked, showDevToolbar]);
 
   const shouldGateSection = !isUnlocked && (assignedVariant !== 'C' || clickCount >= 3);
 
   return (
     <div className="min-h-screen p-4 md:p-8 max-w-[1600px] mx-auto font-sans relative">
-      {/* Dev A/B Testing Toolbar */}
-      {(showDevToolbar || isAdmin) && (
-        <DevABToolbar
-          currentVariant={assignedVariant}
-          isUnlocked={isUnlocked}
-          onUpdateState={(v, u) => {
-            setAssignedVariant(v);
-            setIsUnlocked(u);
-            setClickCount(getClickCount());
-            if (!u && v === 'C') {
-              setIsAdvancedChartsExpanded(false);
-            } else {
-              setIsAdvancedChartsExpanded(true);
-            }
-          }}
-        />
-      )}
 
       {/* Header Bar */}
       <Header
@@ -554,9 +569,36 @@ const DashboardContent: React.FC = () => {
         onSuccess={() => setIsUnlocked(true)}
       />
 
+      <DevPasswordModal
+        isOpen={isDevPasswordOpen}
+        onClose={() => setIsDevPasswordOpen(false)}
+        onSuccess={handleDevPasswordSuccess}
+      />
+
+      {/* Dev A/B Testing Toolbar (Rendered in Footer Area) */}
+      {(showDevToolbar || isAdmin) && (
+        <div className="mt-8">
+          <DevABToolbar
+            currentVariant={assignedVariant}
+            isUnlocked={isUnlocked}
+            onUpdateState={(v, u) => {
+              setAssignedVariant(v);
+              setIsUnlocked(u);
+              setClickCount(getClickCount());
+              if (!u && v === 'C') {
+                setIsAdvancedChartsExpanded(false);
+              } else {
+                setIsAdvancedChartsExpanded(true);
+              }
+            }}
+          />
+        </div>
+      )}
+
       {/* Footer */}
       <Footer
         onOpenInternalUnlock={() => setIsInternalModalOpen(true)}
+        onOpenDevPassword={handleOpenDevClick}
         totalRecordsCount={activeTab === 'campaigns' ? dataset.length : celebDataset.length}
       />
     </div>

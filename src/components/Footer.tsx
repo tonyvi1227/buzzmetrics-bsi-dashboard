@@ -1,12 +1,17 @@
 import React from 'react';
-import { KeyRound, Calendar } from 'lucide-react';
+import { KeyRound, Calendar, Sparkles } from 'lucide-react';
 
 interface FooterProps {
   onOpenInternalUnlock?: () => void;
+  onOpenDevPassword?: () => void;
   totalRecordsCount?: number;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenInternalUnlock, totalRecordsCount = 35 }) => {
+export const Footer: React.FC<FooterProps> = ({
+  onOpenInternalUnlock,
+  onOpenDevPassword,
+  totalRecordsCount = 35,
+}) => {
   return (
     <footer className="mt-10 py-6 border-t border-slate-200 dark:border-slate-800 text-center text-xs font-bold text-slate-500 dark:text-slate-400 flex flex-col md:flex-row items-center justify-between gap-4 px-2">
       {/* Left Copyright */}
@@ -25,7 +30,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenInternalUnlock, totalRecor
         </div>
       </div>
 
-      {/* Right Credits & Internal Button */}
+      {/* Right Credits, Internal Button & Dev A/B Button */}
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-slate-400 font-bold">Credits:</span>
         <span className="text-buzz font-black bg-orange-50 dark:bg-orange-950/80 px-2.5 py-0.5 rounded-full border border-orange-200 dark:border-orange-900">
@@ -36,12 +41,24 @@ export const Footer: React.FC<FooterProps> = ({ onOpenInternalUnlock, totalRecor
           Dev - TuanVM
         </span>
 
-        {/* Small Internal Unlock Button nested right next to Credit */}
+        {/* Dev A/B Button requiring Devonly password */}
+        {onOpenDevPassword && (
+          <button
+            onClick={onOpenDevPassword}
+            title="Dev A/B Toolbar"
+            className="ml-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-700 transition flex items-center gap-1 cursor-pointer shadow-sm"
+          >
+            <Sparkles className="w-3 h-3 text-amber-400" />
+            <span>⚡ Dev A/B</span>
+          </button>
+        )}
+
+        {/* Small Internal Unlock Button */}
         {onOpenInternalUnlock && (
           <button
             onClick={onOpenInternalUnlock}
             title="Internal Team Access"
-            className="ml-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-100 dark:bg-slate-800 hover:bg-orange-100 dark:hover:bg-slate-700 text-slate-500 hover:text-buzz border border-slate-200 dark:border-slate-700 transition flex items-center gap-1 cursor-pointer"
+            className="px-2 py-1 rounded-full text-[10px] font-black bg-slate-100 dark:bg-slate-800 hover:bg-orange-100 dark:hover:bg-slate-700 text-slate-500 hover:text-buzz border border-slate-200 dark:border-slate-700 transition flex items-center gap-1 cursor-pointer"
           >
             <KeyRound className="w-3 h-3 text-buzz" />
             <span>Internal</span>
