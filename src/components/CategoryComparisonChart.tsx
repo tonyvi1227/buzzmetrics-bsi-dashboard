@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
-import { Users } from 'lucide-react';
+import { Users, Download } from 'lucide-react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
 import { formatNum } from '../utils/brandStandardizer';
+import { downloadChartAsImage } from '../utils/chartExporter';
 
 ChartJS.register(...registerables);
 
@@ -53,13 +54,13 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
           label: 'AVG CFQU',
           data: categoryStats.map(c => c.avgContentQU),
           backgroundColor: '#e68228', // Buzzmetrics Signature Orange
-          borderRadius: 4,
+          borderRadius: 6, // Refined rounded bar tops
         },
         {
           label: 'Average QU',
           data: categoryStats.map(c => c.avgQUUser),
           backgroundColor: '#125876', // Buzzmetrics Dark Blue
-          borderRadius: 4,
+          borderRadius: 6,
         },
       ],
     };
@@ -73,11 +74,20 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
       indexAxis: 'y' as const,
       responsive: true,
       maintainAspectRatio: false,
+      layout: {
+        padding: {
+          left: 0,
+          right: 15,
+          top: 0,
+          bottom: 0,
+        },
+      },
       plugins: {
         legend: {
           labels: {
             color: textColor,
             font: { family: "'Inter', sans-serif", size: 11, weight: 'bold' as const },
+            padding: 14,
           },
           position: 'top' as const,
         },
@@ -104,39 +114,40 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
       },
       scales: {
         x: {
-          type: 'linear' as const,
-          position: 'bottom' as const,
-          title: {
-            display: true,
-            text: 'Số lượng AVG CFQU & Average QU',
-            font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const },
-            color: textColor,
-          },
-          ticks: { color: textColor, font: { family: "'Inter', sans-serif", size: 9, weight: 'bold' as const } },
-          grid: { display: false }, // Flat design - plain background
+          ticks: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' as const } },
+          grid: { display: false },
         },
         y: {
-          ticks: { color: textColor, font: { family: "'Inter', sans-serif", size: 9, weight: 'bold' as const } },
-          grid: { display: false }, // Flat design - plain background
+          ticks: { color: textColor, font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const } },
+          grid: { display: false },
         },
       },
     };
   }, [theme, categoryStats]);
 
   return (
-    <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+    <div id="category-comparison-container" className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:shadow-md transition">
       <div>
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-1">
           <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-            <Users className="w-4 h-4 text-buzz" /> Top 10 Ngành Hàng: AVG CFQU & Average QU
+            <Users className="w-4 h-4 text-buzz" /> TOP 10 CATEGORIES: AVG CFQU & AVERAGE QU
           </h3>
+
+          {/* Export PNG Chart Widget Button */}
+          <button
+            onClick={() => downloadChartAsImage('category-comparison-container', 'category-comparison-chart.png')}
+            className="p-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-buzz hover:text-white text-slate-500 transition cursor-pointer"
+            title="Export Chart Image PNG"
+          >
+            <Download className="w-3.5 h-3.5" />
+          </button>
         </div>
 
         <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mb-3">
-          Tỷ lệ tương tác chất lượng từ Qualified Users (AVG CFQU & Average QU) theo từng ngành.
+          Comparing Average Content Quality (CFQU) vs Genuine User Reach (QU) per Category
         </p>
 
-        <div className="h-64">
+        <div className="h-[270px]">
           <Bar data={chartData} options={options} />
         </div>
       </div>

@@ -21,14 +21,14 @@ const InfoTooltip: React.FC<CardTooltipProps> = ({ content }) => {
     >
       <button
         type="button"
-        className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-buzz-light dark:hover:bg-orange-950 text-slate-400 hover:text-buzz font-black text-[10px] inline-flex items-center justify-center transition border border-slate-200 dark:border-slate-700 cursor-pointer"
-        aria-label="Thông tin chỉ số"
+        className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-bold text-[10px] inline-flex items-center justify-center transition cursor-pointer"
+        aria-label="Metric Info"
       >
         i
       </button>
 
       {show && (
-        <div className="absolute right-0 bottom-full mb-2 w-48 p-2 bg-slate-900 text-white text-[10px] font-bold rounded-xl shadow-xl z-50 pointer-events-none animate-fadeIn border border-slate-700 leading-tight">
+        <div className="absolute right-0 bottom-full mb-2 w-52 p-2.5 bg-slate-900 text-white text-[10px] font-bold rounded-xl shadow-xl z-50 pointer-events-none animate-fadeIn border border-slate-700 leading-tight">
           {content}
           <div className="absolute right-1.5 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-slate-900" />
         </div>
@@ -39,88 +39,128 @@ const InfoTooltip: React.FC<CardTooltipProps> = ({ content }) => {
 
 export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-9 gap-3 mb-6">
-      {/* 1. Total Campaigns */}
-      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-[88px]">
-        <div className="flex items-center justify-between text-slate-400">
-          <span className="text-[10px] font-black uppercase tracking-wider truncate">Tổng Campaign</span>
-          <InfoTooltip content="Tổng số lượng chiến dịch trong tập dữ liệu hiện tại." />
-        </div>
-        <p className="text-xl font-black text-slate-900 dark:text-white leading-none">{metrics.totalCount}</p>
+    <div className="space-y-2 mb-6">
+      <div className="flex items-center justify-between px-1">
+        <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          AVERAGE BENCHMARK METRICS (Tính trung bình theo phạm vi bộ lọc đang chọn)
+        </span>
+        <span className="text-[11px] font-bold text-buzz">
+          Scope: {metrics.totalCount} Campaigns
+        </span>
       </div>
 
-      {/* 2. AVG Buzz Volume */}
-      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-[88px]">
-        <div className="flex items-center justify-between text-slate-400">
-          <span className="text-[10px] font-black uppercase tracking-wider truncate">AVG Buzz Volume</span>
-          <InfoTooltip content={`Tổng thảo luận trung bình mỗi chiến dịch. Min: ${formatNum(metrics.minBuzz)} | Max: ${formatNum(metrics.maxBuzz)}`} />
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-9 gap-3">
+        {/* 1. Total Campaigns */}
+        <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition flex flex-col justify-between h-[96px]">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">Total Campaigns</span>
+            <InfoTooltip content="Tổng số lượng chiến dịch đáp ứng phạm vi bộ lọc hiện tại." />
+          </div>
+          <div>
+            <p className="text-2xl font-black text-slate-900 dark:text-white leading-tight">{metrics.totalCount}</p>
+            <span className="text-[10px] font-bold text-slate-400">Filtered Dataset</span>
+          </div>
         </div>
-        <p className="text-xl font-black text-buzz leading-none">{formatNum(metrics.avgBuzz)}</p>
-      </div>
 
-      {/* 3. AVG BSI Score */}
-      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-[88px]">
-        <div className="flex items-center justify-between text-slate-400">
-          <span className="text-[10px] font-black uppercase tracking-wider truncate">AVG BSI Score</span>
-          <InfoTooltip content="Điểm số sức khỏe thương hiệu tổng hợp (Buzzmetrics Social Index) trung bình." />
+        {/* 2. AVG Buzz Volume */}
+        <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition flex flex-col justify-between h-[96px]">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">AVG Buzz Vol</span>
+            <InfoTooltip content={`Tổng thảo luận trung bình mỗi chiến dịch trong tập dữ liệu. Min: ${formatNum(metrics.minBuzz)} | Max: ${formatNum(metrics.maxBuzz)}`} />
+          </div>
+          <div>
+            <p className="text-2xl font-black text-buzz leading-tight">{formatNum(metrics.avgBuzz)}</p>
+            <span className="text-[10px] font-bold text-slate-400">Campaign Mean</span>
+          </div>
         </div>
-        <p className="text-xl font-black text-slate-900 dark:text-white leading-none">{formatNum(metrics.avgBSI)}</p>
-      </div>
 
-      {/* 4. AVG CFQU */}
-      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-[88px]">
-        <div className="flex items-center justify-between text-slate-400">
-          <span className="text-[10px] font-black uppercase tracking-wider truncate">AVG CFQU</span>
-          <InfoTooltip content="Content from Qualified Users - Số lượng bài viết/thảo luận tạo ra từ người dùng thực tế chất lượng." />
+        {/* 3. AVG BSI Score */}
+        <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition flex flex-col justify-between h-[96px]">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">AVG BSI Score</span>
+            <InfoTooltip content="Điểm số sức khỏe thương hiệu tổng hợp (Buzzmetrics Social Index) trung bình của các chiến dịch đang chọn." />
+          </div>
+          <div>
+            <p className="text-2xl font-black text-slate-900 dark:text-white leading-tight">{formatNum(metrics.avgBSI)}</p>
+            <span className="text-[10px] font-bold text-slate-400">Campaign Mean</span>
+          </div>
         </div>
-        <p className="text-xl font-black text-slate-900 dark:text-white leading-none">{formatNum(metrics.avgContentQU)}</p>
-      </div>
 
-      {/* 5. Average QU */}
-      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-[88px]">
-        <div className="flex items-center justify-between text-slate-400">
-          <span className="text-[10px] font-black uppercase tracking-wider truncate">Average QU</span>
-          <InfoTooltip content="Qualified Users - Số lượng người dùng chất lượng thực tế tạo thảo luận." />
+        {/* 4. AVG CFQU */}
+        <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition flex flex-col justify-between h-[96px]">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">AVG CFQU</span>
+            <InfoTooltip content="Content from Qualified Users - Trung bình số thảo luận/bài viết từ người dùng thật chất lượng." />
+          </div>
+          <div>
+            <p className="text-2xl font-black text-slate-900 dark:text-white leading-tight">{formatNum(metrics.avgContentQU)}</p>
+            <span className="text-[10px] font-bold text-slate-400">Campaign Mean</span>
+          </div>
         </div>
-        <p className="text-xl font-black text-slate-900 dark:text-white leading-none">{formatNum(metrics.avgQUUser)}</p>
-      </div>
 
-      {/* 6. AVG Sentiment */}
-      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-[88px]">
-        <div className="flex items-center justify-between text-slate-400">
-          <span className="text-[10px] font-black uppercase tracking-wider truncate">AVG Sentiment</span>
-          <InfoTooltip content="Chỉ số yêu thích trung bình (Tỷ lệ Thảo luận Tích cực / Tiêu cực)." />
+        {/* 5. Average QU */}
+        <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition flex flex-col justify-between h-[96px]">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">Average QU</span>
+            <InfoTooltip content="Qualified Users - Trung bình số người dùng chất lượng thực tế tạo ra thảo luận." />
+          </div>
+          <div>
+            <p className="text-2xl font-black text-slate-900 dark:text-white leading-tight">{formatNum(metrics.avgQUUser)}</p>
+            <span className="text-[10px] font-bold text-slate-400">Campaign Mean</span>
+          </div>
         </div>
-        <p className="text-xl font-black text-slate-900 dark:text-white leading-none">{metrics.avgSentiment.toFixed(2)}</p>
-      </div>
 
-      {/* 7. AVG Relevancy */}
-      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-[88px]">
-        <div className="flex items-center justify-between text-slate-400">
-          <span className="text-[10px] font-black uppercase tracking-wider truncate">AVG Relevancy</span>
-          <InfoTooltip content="Độ liên quan giữa nội dung thảo luận và thông điệp thương hiệu." />
+        {/* 6. AVG Sentiment */}
+        <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition flex flex-col justify-between h-[96px]">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">AVG Sentiment</span>
+            <InfoTooltip content="Chỉ số yêu thích trung bình (Tỷ lệ Thảo luận Tích cực vs Tiêu cực) của các chiến dịch đang chọn." />
+          </div>
+          <div>
+            <p className="text-2xl font-black text-slate-900 dark:text-white leading-tight">{metrics.avgSentiment.toFixed(2)}</p>
+            <span className="text-[10px] font-bold text-slate-400">Campaign Mean</span>
+          </div>
         </div>
-        <p className="text-xl font-black text-slate-900 dark:text-white leading-none">{metrics.avgRelevancy.toFixed(2)}</p>
-      </div>
 
-      {/* 8. AVG Earned % */}
-      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-[88px]">
-        <div className="flex items-center justify-between text-slate-400">
-          <span className="text-[10px] font-black uppercase tracking-wider truncate">% Earned Media</span>
-          <InfoTooltip content="Tỷ lệ % thảo luận lan truyền tự nhiên thu được từ cộng đồng." />
+        {/* 7. AVG Relevancy */}
+        <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition flex flex-col justify-between h-[96px]">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">AVG Relevancy</span>
+            <InfoTooltip content="Điểm số phù hợp trung bình (Tỷ lệ thảo luận trực tiếp nhắc đến thương hiệu/thông điệp chiến dịch)." />
+          </div>
+          <div>
+            <p className="text-2xl font-black text-slate-900 dark:text-white leading-tight">{metrics.avgRelevancy.toFixed(2)}</p>
+            <span className="text-[10px] font-bold text-slate-400">Campaign Mean</span>
+          </div>
         </div>
-        <p className="text-xl font-black text-slate-900 dark:text-white leading-none">{metrics.avgEarnedPct.toFixed(1)}%</p>
-      </div>
 
-      {/* 9. Quality Index */}
-      <div className="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-[88px] bg-buzz-light/60 dark:bg-orange-950/40 border-buzz-border dark:border-orange-900">
-        <div className="flex items-center justify-between text-buzz">
-          <span className="text-[10px] font-black uppercase tracking-wider truncate">Quality Index</span>
-          <InfoTooltip content="Chỉ số chất lượng nội dung thảo luận = Tỷ lệ % AVG CFQU / AVG Buzz Volume." />
+        {/* 8. AVG Earned Media % */}
+        <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition flex flex-col justify-between h-[96px]">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">AVG Earned %</span>
+            <InfoTooltip content="Tỷ lệ % thảo luận tự nhiên do cộng đồng tạo ra trung bình giữa các chiến dịch." />
+          </div>
+          <div>
+            <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 leading-tight">{metrics.avgEarnedPct.toFixed(1)}%</p>
+            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Organic Share</span>
+          </div>
         </div>
-        <p className="text-xl font-black text-buzz leading-none">
-          {((metrics.avgContentQU / (metrics.avgBuzz || 1)) * 100).toFixed(1)}%
-        </p>
+
+        {/* 9. Overall Dataset Score */}
+        <div className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-orange-200 dark:border-orange-900/60 shadow-sm hover:shadow-md transition flex flex-col justify-between h-[96px]">
+          <div className="flex items-center justify-between text-buzz">
+            <span className="text-[11px] font-black uppercase tracking-wider truncate">AVG DATASET SCORE</span>
+            <InfoTooltip content="Điểm chất lượng tổng hợp trung bình gia quyền của tập chiến dịch đang được lọc (Sentiment x 0.4 + Earned% x 0.6)." />
+          </div>
+          <div>
+            <p className="text-2xl font-black text-buzz leading-tight">
+              {((metrics.avgSentiment * 0.4) + (metrics.avgEarnedPct / 100 * 0.6)).toFixed(2)}
+            </p>
+            <span className="text-[10px] font-bold text-buzz">
+              Weighted Index
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );

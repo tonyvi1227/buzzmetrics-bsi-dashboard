@@ -1,21 +1,52 @@
 import React from 'react';
+import { KeyRound, Calendar } from 'lucide-react';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  onOpenInternalUnlock?: () => void;
+  totalRecordsCount?: number;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onOpenInternalUnlock, totalRecordsCount = 35 }) => {
   return (
-    <footer className="mt-10 py-6 border-t border-slate-200 dark:border-slate-800 text-center text-xs font-bold text-slate-500 dark:text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2 px-2">
+    <footer className="mt-10 py-6 border-t border-slate-200 dark:border-slate-800 text-center text-xs font-bold text-slate-500 dark:text-slate-400 flex flex-col md:flex-row items-center justify-between gap-4 px-2">
+      {/* Left Copyright */}
       <div className="flex items-center gap-2">
-        <span>© {new Date().getFullYear()} Buzzmetrics BSI Campaign Dashboard v3.13</span>
+        <span>© {new Date().getFullYear()} Buzzmetrics BSI Dashboard v1.42</span>
       </div>
 
-      <div className="flex items-center gap-1.5 flex-wrap">
-        <span className="text-slate-400 font-bold">Credit:</span>
+      {/* Center Dataset Scope Card moved to Footer */}
+      <div className="whitespace-nowrap px-3 py-1.5 bg-slate-50/90 dark:bg-slate-800/60 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2 pointer-events-none select-none">
+        <Calendar className="w-4 h-4 text-buzz flex-shrink-0" />
+        <div className="text-left">
+          <span className="text-[9px] uppercase font-black tracking-wider text-slate-400 block leading-none">Dataset Scope</span>
+          <span className="text-slate-800 dark:text-slate-200 font-extrabold text-[11px]">
+            Jan 2025 – Jun 2026 (18 Months) • <strong className="text-buzz font-black">Total Records: {totalRecordsCount}</strong>
+          </span>
+        </div>
+      </div>
+
+      {/* Right Credits & Internal Button */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-slate-400 font-bold">Credits:</span>
         <span className="text-buzz font-black bg-orange-50 dark:bg-orange-950/80 px-2.5 py-0.5 rounded-full border border-orange-200 dark:border-orange-900">
           Idea - GiangLHT
         </span>
         <span className="text-slate-300 dark:text-slate-700">•</span>
         <span className="text-buzz font-black bg-orange-50 dark:bg-orange-950/80 px-2.5 py-0.5 rounded-full border border-orange-200 dark:border-orange-900">
-          Develop - TuanVM
+          Dev - TuanVM
         </span>
+
+        {/* Small Internal Unlock Button nested right next to Credit */}
+        {onOpenInternalUnlock && (
+          <button
+            onClick={onOpenInternalUnlock}
+            title="Internal Team Access"
+            className="ml-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-100 dark:bg-slate-800 hover:bg-orange-100 dark:hover:bg-slate-700 text-slate-500 hover:text-buzz border border-slate-200 dark:border-slate-700 transition flex items-center gap-1 cursor-pointer"
+          >
+            <KeyRound className="w-3 h-3 text-buzz" />
+            <span>Internal</span>
+          </button>
+        )}
       </div>
     </footer>
   );

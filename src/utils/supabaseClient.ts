@@ -8,6 +8,10 @@ const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_DRM2reRGhDnyNBlFPI1grw_KugMnmn
 const SUPABASE_URL_KEY = 'buzz_supabase_url';
 const SUPABASE_KEY_KEY = 'buzz_supabase_anon_key';
 
+let cachedClient: SupabaseClient | null = null;
+let cachedUrl = '';
+let cachedKey = '';
+
 export function getSupabaseCredentials() {
   const url = import.meta.env.VITE_SUPABASE_URL || localStorage.getItem(SUPABASE_URL_KEY) || DEFAULT_SUPABASE_URL;
   const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || localStorage.getItem(SUPABASE_KEY_KEY) || DEFAULT_SUPABASE_ANON_KEY;
@@ -17,13 +21,24 @@ export function getSupabaseCredentials() {
 export function saveSupabaseCredentials(url: string, anonKey: string) {
   localStorage.setItem(SUPABASE_URL_KEY, url.trim());
   localStorage.setItem(SUPABASE_KEY_KEY, anonKey.trim());
+  cachedClient = null; // Invalidate cached client when credentials change
 }
 
 export function getSupabaseClient(): SupabaseClient | null {
   const { url, anonKey } = getSupabaseCredentials();
   if (!url || !anonKey) return null;
+
+  if (cachedClient && cachedUrl === url && cachedKey === anonKey) {
+    return cachedClient;
+  }
+
   try {
-    return createClient(url, anonKey);
+    cachedClient = createClient(url, anonKey, {
+      auth: { persistSession: false, autoRefreshToken: false }
+    });
+    cachedUrl = url;
+    cachedKey = anonKey;
+    return cachedClient;
   } catch (err) {
     console.error('Failed to create Supabase client:', err);
     return null;

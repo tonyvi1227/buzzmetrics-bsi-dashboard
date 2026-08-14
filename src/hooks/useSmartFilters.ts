@@ -26,7 +26,7 @@ const initialFilters: FilterState = {
   startMonth: 'Jan',
   endYear: '2026',
   endMonth: 'Jun',
-  top10BsiOnly: false,
+  top10BsiOnly: true, // Default to Top 10 BSI Campaigns per Month for Customers
 };
 
 export function useSmartFilters(allCampaigns: CampaignRecord[]) {

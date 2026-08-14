@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { CelebRecord, MonthlyCelebRankRecord, AggregatedCelebRecord, CelebFilterState } from '../types/celeb';
+import { CelebRecord, MonthlyCelebRankRecord, AggregatedCelebRecord, CelebFilterState, CelebBenchmarkMetrics } from '../types/celeb';
 
 export const ALL_OPTION = 'Tất cả';
 
@@ -46,112 +46,115 @@ export function useCelebSmartFilters(rawDataset: CelebRecord[]) {
     if (filters.year !== ALL_OPTION) {
       filtered = filtered.filter(d => d.year === filters.year);
     }
-    
-    const monthOrder: Record<string, number> = {
-      'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
-      'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12
-    };
-
-    const months = Array.from(new Set(filtered.map(d => d.month))).sort(
-      (a, b) => (monthOrder[a] || 99) - (monthOrder[b] || 99)
-    );
-    return [ALL_OPTION, ...months];
+    const monthOrder = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = Array.from(new Set(filtered.map(d => d.month)));
+    return [ALL_OPTION, ...months.sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b))];
   }, [rawDataset, filters.year]);
 
   const availableCategories = useMemo(() => {
-    let filtered = rawDataset;
-    if (filters.year !== ALL_OPTION) {
-      filtered = filtered.filter(d => d.year === filters.year);
-    }
-    if (filters.month !== ALL_OPTION) {
-      filtered = filtered.filter(d => d.month === filters.month);
-    }
-    const categories = Array.from(new Set(filtered.map(d => d.category))).sort();
-    return [ALL_OPTION, ...categories];
-  }, [rawDataset, filters.year, filters.month]);
+    const cats = Array.from(new Set(rawDataset.map(d => d.category))).filter(Boolean).sort();
+    return [ALL_OPTION, ...cats];
+  }, [rawDataset]);
 
-  // Filter raw monthly rank records based on selected filter state
+  // Step 2: Filter monthly rank records based on selected Year, Month, Category
   const filteredMonthlyRecords = useMemo(() => {
     return datasetWithRanks.filter(item => {
       if (filters.year !== ALL_OPTION && item.year !== filters.year) return false;
       if (filters.month !== ALL_OPTION && item.month !== filters.month) return false;
       if (filters.category !== ALL_OPTION && item.category !== filters.category) return false;
-      if (filters.search.trim() !== '') {
-        const query = filters.search.toLowerCase().trim();
-        const nameMatch = item.celebName.toLowerCase().includes(query);
-        const categoryMatch = item.category.toLowerCase().includes(query);
-        if (!nameMatch && !categoryMatch) return false;
-      }
       return true;
     });
   }, [datasetWithRanks, filters]);
 
-  // Step 2: Aggregate by Celeb Name
+  // Step 3: Aggregate records by celebName for multi-month views
   const aggregatedCelebs = useMemo<AggregatedCelebRecord[]>(() => {
-    const celebGroupMap: Record<string, MonthlyCelebRankRecord[]> = {};
+    const groups: Record<string, MonthlyCelebRankRecord[]> = {};
 
-    filteredMonthlyRecords.forEach(record => {
-      const name = record.celebName;
-      if (!celebGroupMap[name]) {
-        celebGroupMap[name] = [];
-      }
-      celebGroupMap[name].push(record);
+    filteredMonthlyRecords.forEach(item => {
+      const name = item.celebName.trim();
+      if (!groups[name]) groups[name] = [];
+      groups[name].push(item);
     });
 
-    const aggregatedList: AggregatedCelebRecord[] = Object.entries(celebGroupMap).map(([celebName, records]) => {
+    const aggregatedList: AggregatedCelebRecord[] = Object.entries(groups).map(([name, records]) => {
       const count = records.length;
-      const category = records[0].category;
+      const totalBsi = records.reduce((sum, r) => sum + r.bsi, 0);
+      const totalBuzz = records.reduce((sum, r) => sum + r.buzzVolume, 0);
+      const totalContentQU = records.reduce((sum, r) => sum + r.contentQU, 0);
+      const totalQuUser = records.reduce((sum, r) => sum + r.quUser, 0);
+      const totalSentiment = records.reduce((sum, r) => sum + r.sentiment, 0);
+      const totalRelevancy = records.reduce((sum, r) => sum + (r.relevancy || 0), 0);
 
-      const sumRank = records.reduce((a, b) => a + b.monthRank, 0);
-      const avgRank = Number((sumRank / count).toFixed(1));
+      const avgRank = records.reduce((sum, r) => sum + r.monthRank, 0) / count;
       const bestRank = Math.min(...records.map(r => r.monthRank));
 
-      const sumBsi = records.reduce((a, b) => a + b.bsi, 0);
-      const avgBsi = Math.round(sumBsi / count);
-
-      const sumBuzz = records.reduce((a, b) => a + b.buzzVolume, 0);
-      const avgBuzz = Math.round(sumBuzz / count);
-
-      const sumContentQU = records.reduce((a, b) => a + b.contentQU, 0);
-      const avgContentQU = Math.round(sumContentQU / count);
-
-      const sumQuUser = records.reduce((a, b) => a + b.quUser, 0);
-      const avgQuUser = Math.round(sumQuUser / count);
-
-      const sumSentiment = records.reduce((a, b) => a + b.sentiment, 0);
-      const avgSentiment = Number((sumSentiment / count).toFixed(2));
-
-      const sumRelevancy = records.reduce((a, b) => a + b.relevancy, 0);
-      const avgRelevancy = Number((sumRelevancy / count).toFixed(4));
-
       return {
-        celebName,
-        category,
+        celebName: name,
+        category: records[0].category || 'Khác',
         totalAppearances: count,
-        avgRank,
+        avgRank: Number(avgRank.toFixed(1)),
         bestRank,
-        avgBsi,
-        totalBsi: sumBsi,
-        avgBuzz,
-        avgContentQU,
-        avgQuUser,
-        avgSentiment,
-        avgRelevancy,
+        avgBsi: Math.round(totalBsi / count),
+        totalBsi,
+        avgBuzz: Math.round(totalBuzz / count),
+        avgContentQU: Math.round(totalContentQU / count),
+        avgQuUser: Math.round(totalQuUser / count),
+        avgSentiment: Number((totalSentiment / count).toFixed(2)),
+        avgRelevancy: Math.round(totalRelevancy / count),
         monthlyRecords: records.sort((a, b) => b.year.localeCompare(a.year) || a.month.localeCompare(b.month)),
       };
     });
 
-    // Default sorting: Order by totalAppearances descending, then avgRank ascending (lower rank number = better)
-    return aggregatedList.sort((a, b) => {
-      if (b.totalAppearances !== a.totalAppearances) {
-        return b.totalAppearances - a.totalAppearances;
-      }
-      if (a.avgRank !== b.avgRank) {
-        return a.avgRank - b.avgRank;
-      }
-      return b.avgBsi - a.avgBsi;
+    // Apply Search Filter
+    let result = aggregatedList;
+    if (filters.search && filters.search.trim()) {
+      const query = filters.search.toLowerCase().trim();
+      result = result.filter(c => c.celebName.toLowerCase().includes(query) || c.category.toLowerCase().includes(query));
+    }
+
+    return result.sort((a, b) => {
+      if (b.totalAppearances !== a.totalAppearances) return b.totalAppearances - a.totalAppearances;
+      return a.avgRank - b.avgRank;
     });
-  }, [filteredMonthlyRecords]);
+  }, [filteredMonthlyRecords, filters.search]);
+
+  // Step 4: Compute Benchmark Metrics
+  const benchmarkMetrics = useMemo<CelebBenchmarkMetrics>(() => {
+    const totalCount = aggregatedCelebs.length;
+    if (totalCount === 0) {
+      return {
+        totalCount: 0,
+        topCeleb: 'N/A',
+        topBsi: 0,
+        avgBsi: 0,
+        avgBuzz: 0,
+        avgContentQU: 0,
+        avgQuUser: 0,
+        avgSentiment: 0,
+        avgRelevancy: 0,
+      };
+    }
+
+    const topCelebObj = [...aggregatedCelebs].sort((a, b) => b.avgBsi - a.avgBsi)[0];
+    const avgBsi = Math.round(aggregatedCelebs.reduce((sum, c) => sum + c.avgBsi, 0) / totalCount);
+    const avgBuzz = Math.round(aggregatedCelebs.reduce((sum, c) => sum + c.avgBuzz, 0) / totalCount);
+    const avgContentQU = Math.round(aggregatedCelebs.reduce((sum, c) => sum + c.avgContentQU, 0) / totalCount);
+    const avgQuUser = Math.round(aggregatedCelebs.reduce((sum, c) => sum + c.avgQuUser, 0) / totalCount);
+    const avgSentiment = Number((aggregatedCelebs.reduce((sum, c) => sum + c.avgSentiment, 0) / totalCount).toFixed(2));
+    const avgRelevancy = Math.round(aggregatedCelebs.reduce((sum, c) => sum + c.avgRelevancy, 0) / totalCount);
+
+    return {
+      totalCount,
+      topCeleb: topCelebObj ? topCelebObj.celebName : 'N/A',
+      topBsi: topCelebObj ? topCelebObj.avgBsi : 0,
+      avgBsi,
+      avgBuzz,
+      avgContentQU,
+      avgQuUser,
+      avgSentiment,
+      avgRelevancy,
+    };
+  }, [aggregatedCelebs]);
 
   const updateFilter = (key: keyof CelebFilterState, value: string) => {
     setFilters(prev => {
@@ -181,5 +184,6 @@ export function useCelebSmartFilters(rawDataset: CelebRecord[]) {
     availableCategories,
     filteredMonthlyRecords,
     aggregatedCelebs,
+    benchmarkMetrics,
   };
 }

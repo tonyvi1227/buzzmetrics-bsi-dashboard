@@ -18,10 +18,9 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
   const { theme } = useTheme();
   const [viewMode, setViewMode] = useState<'radar' | 'table'>('radar');
 
-  if (!campaign) return null;
-
-  // Compute Category Average Benchmark for Comparison
+  // Compute Category Average Benchmark for Comparison - Call Hooks unconditionally at top level
   const categoryBenchmark = useMemo(() => {
+    if (!campaign) return null;
     const categoryRecords = allData.filter(d => d.category === campaign.category);
     const count = categoryRecords.length;
     if (count === 0) return null;
@@ -40,8 +39,9 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
   }, [campaign, allData]);
 
   // Compute Radar Chart Data normalized relative to Industry Benchmark (100 pts)
+  // Replaced Buzz Volume & BSI Score with % Earned Media and Relevancy Score per user request
   const radarChartData = useMemo(() => {
-    if (!categoryBenchmark) return null;
+    if (!campaign || !categoryBenchmark) return null;
 
     const benchmarkBase = [100, 100, 100, 100, 100];
 
@@ -52,17 +52,15 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
     };
 
     const campaignScores = [
-      getRatio(campaign.buzzVolume, categoryBenchmark.avgBuzz),
-      getRatio(campaign.bsi, categoryBenchmark.avgBSI),
+      getRatio(campaign.earnedPct, categoryBenchmark.avgEarnedPct),
+      getRatio(campaign.relevancy, categoryBenchmark.avgRelevancy),
       getRatio(campaign.contentQU, categoryBenchmark.avgContentQU),
       getRatio(campaign.quUser, categoryBenchmark.avgQUUser),
       getRatio(campaign.sentiment, categoryBenchmark.avgSentiment),
     ];
 
-    const isDark = theme === 'dark';
-
     return {
-      labels: ['Buzz Volume', 'BSI Score', 'AVG CFQU', 'Average QU', 'Sentiment Index'],
+      labels: ['% Earned Media', 'Relevancy Score', 'AVG CFQU', 'Average QU', 'Sentiment Index'],
       datasets: [
         {
           label: `Chiến Dịch (${campaign.campaign})`,
@@ -89,7 +87,7 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
         },
       ],
     };
-  }, [campaign, categoryBenchmark, theme]);
+  }, [campaign, categoryBenchmark]);
 
   const radarOptions = useMemo(() => {
     const isDark = theme === 'dark';
@@ -115,16 +113,16 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
           bodyFont: { family: "'Inter', sans-serif", size: 11, weight: 'bold' as const },
           callbacks: {
             label: (ctx: any) => {
-              if (!categoryBenchmark) return '';
+              if (!campaign || !categoryBenchmark) return '';
               const idx = ctx.dataIndex;
               const isCampaign = ctx.datasetIndex === 0;
 
               const metricsList = [
-                { name: 'Buzz Volume', val: campaign.buzzVolume, avg: categoryBenchmark.avgBuzz, isNum: true },
-                { name: 'BSI Score', val: campaign.bsi, avg: categoryBenchmark.avgBSI, isNum: true },
+                { name: '% Earned Media', val: campaign.earnedPct, avg: categoryBenchmark.avgEarnedPct, isPct: true },
+                { name: 'Relevancy Score', val: campaign.relevancy, avg: categoryBenchmark.avgRelevancy, isDecimal: true },
                 { name: 'AVG CFQU', val: campaign.contentQU, avg: categoryBenchmark.avgContentQU, isNum: true },
                 { name: 'Average QU', val: campaign.quUser, avg: categoryBenchmark.avgQUUser, isNum: true },
-                { name: 'Sentiment Index', val: campaign.sentiment, avg: categoryBenchmark.avgSentiment, isNum: false },
+                { name: 'Sentiment Index', val: campaign.sentiment, avg: categoryBenchmark.avgSentiment, isDecimal: true },
               ];
 
               const m = metricsList[idx];
@@ -132,10 +130,18 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
 
               if (isCampaign) {
                 const diffPct = m.avg > 0 ? (((m.val - m.avg) / m.avg) * 100).toFixed(1) : '0';
-                const formattedVal = m.isNum ? formatNum(m.val) : m.val.toFixed(2);
+                let formattedVal = '';
+                if (m.isPct) formattedVal = `${m.val.toFixed(1)}%`;
+                else if (m.isDecimal) formattedVal = m.val.toFixed(2);
+                else formattedVal = formatNum(m.val);
+
                 return `${m.name} (Chiến dịch): ${formattedVal} (${diffPct >= '0' ? '+' : ''}${diffPct}% vs TB Ngành)`;
               } else {
-                const formattedAvg = m.isNum ? formatNum(m.avg) : m.avg.toFixed(2);
+                let formattedAvg = '';
+                if (m.isPct) formattedAvg = `${m.avg.toFixed(1)}%`;
+                else if (m.isDecimal) formattedAvg = m.avg.toFixed(2);
+                else formattedAvg = formatNum(m.avg);
+
                 return `${m.name} (TB Ngành ${campaign.category}): ${formattedAvg}`;
               }
             },
@@ -159,6 +165,9 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
       },
     };
   }, [campaign, categoryBenchmark, theme]);
+
+  // Safe early return ONLY AFTER all hooks are called
+  if (!campaign) return null;
 
   const renderDiffBadge = (val: number, avgVal: number) => {
     if (!avgVal || avgVal === 0) return null;
@@ -336,7 +345,7 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
               {viewMode === 'radar' && radarChartData && (
                 <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 animate-fadeIn">
                   <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-2 text-center">
-                    Mạng nhện so sánh hiệu suất chiến dịch (Màu Cam) với Mốc Chuẩn 100 Trung Bình Ngành (Màu Xanh Đậm).
+                    Mạng nhện so sánh % Earned, Relevancy, CFQU, QU & Sentiment (Màu Cam) với Mốc Chuẩn 100 TB Ngành (Màu Xanh Đậm).
                   </p>
                   <div className="h-72 flex justify-center items-center">
                     <Radar data={radarChartData} options={radarOptions} />
@@ -344,7 +353,7 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
                 </div>
               )}
 
-              {/* View Option 2: Detail Table */}
+              {/* View Option 2: Detail Table (Full 7 Metrics) */}
               {viewMode === 'table' && (
                 <div className="overflow-x-auto bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 animate-fadeIn">
                   <table className="w-full text-left text-xs">
@@ -357,17 +366,17 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-orange-100 dark:divide-slate-800 font-bold">
-                      <tr>
-                        <td className="py-2 text-slate-900 dark:text-white">Buzz Volume</td>
-                        <td className="py-2 text-right text-buzz font-black">{formatNum(campaign.buzzVolume)}</td>
-                        <td className="py-2 text-right text-slate-500">{formatNum(categoryBenchmark.avgBuzz)}</td>
-                        <td className="py-2 text-center">{renderDiffBadge(campaign.buzzVolume, categoryBenchmark.avgBuzz)}</td>
+                      <tr className="bg-orange-50/30 dark:bg-orange-950/20">
+                        <td className="py-2 text-slate-900 dark:text-white">% Earned Media</td>
+                        <td className="py-2 text-right text-buzz font-black">{campaign.earnedPct.toFixed(1)}%</td>
+                        <td className="py-2 text-right text-slate-500">{categoryBenchmark.avgEarnedPct.toFixed(1)}%</td>
+                        <td className="py-2 text-center">{renderDiffBadge(campaign.earnedPct, categoryBenchmark.avgEarnedPct)}</td>
                       </tr>
-                      <tr>
-                        <td className="py-2 text-slate-900 dark:text-white">BSI Score</td>
-                        <td className="py-2 text-right text-buzz font-black">{formatNum(campaign.bsi)}</td>
-                        <td className="py-2 text-right text-slate-500">{formatNum(categoryBenchmark.avgBSI)}</td>
-                        <td className="py-2 text-center">{renderDiffBadge(campaign.bsi, categoryBenchmark.avgBSI)}</td>
+                      <tr className="bg-orange-50/30 dark:bg-orange-950/20">
+                        <td className="py-2 text-slate-900 dark:text-white">Relevancy Score</td>
+                        <td className="py-2 text-right text-buzz font-black">{campaign.relevancy.toFixed(2)}</td>
+                        <td className="py-2 text-right text-slate-500">{categoryBenchmark.avgRelevancy.toFixed(2)}</td>
+                        <td className="py-2 text-center">{renderDiffBadge(campaign.relevancy, categoryBenchmark.avgRelevancy)}</td>
                       </tr>
                       <tr>
                         <td className="py-2 text-slate-900 dark:text-white">AVG CFQU</td>
@@ -386,6 +395,18 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
                         <td className="py-2 text-right font-black">{campaign.sentiment.toFixed(2)}</td>
                         <td className="py-2 text-right text-slate-500">{categoryBenchmark.avgSentiment.toFixed(2)}</td>
                         <td className="py-2 text-center">{renderDiffBadge(campaign.sentiment, categoryBenchmark.avgSentiment)}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 text-slate-900 dark:text-white">Buzz Volume</td>
+                        <td className="py-2 text-right text-buzz font-black">{formatNum(campaign.buzzVolume)}</td>
+                        <td className="py-2 text-right text-slate-500">{formatNum(categoryBenchmark.avgBuzz)}</td>
+                        <td className="py-2 text-center">{renderDiffBadge(campaign.buzzVolume, categoryBenchmark.avgBuzz)}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 text-slate-900 dark:text-white">BSI Score</td>
+                        <td className="py-2 text-right text-buzz font-black">{formatNum(campaign.bsi)}</td>
+                        <td className="py-2 text-right text-slate-500">{formatNum(categoryBenchmark.avgBSI)}</td>
+                        <td className="py-2 text-center">{renderDiffBadge(campaign.bsi, categoryBenchmark.avgBSI)}</td>
                       </tr>
                     </tbody>
                   </table>

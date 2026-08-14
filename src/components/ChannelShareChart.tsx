@@ -1,10 +1,11 @@
 import React from 'react';
-import { PieChart } from 'lucide-react';
+import { PieChart, Download } from 'lucide-react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Doughnut } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
+import { downloadChartAsImage } from '../utils/chartExporter';
 
 ChartJS.register(...registerables, ChartDataLabels);
 
@@ -28,6 +29,7 @@ export const ChannelShareChart: React.FC<ChannelShareChartProps> = ({ data }) =>
           backgroundColor: ['#125876', '#e68228', '#e69650'], // Buzzmetrics Palette: Dark Blue, Orange, Light Orange
           borderWidth: 2,
           borderColor: theme === 'dark' ? '#0f172a' : '#ffffff',
+          cutout: '60%',
         },
       ],
     };
@@ -54,7 +56,7 @@ export const ChannelShareChart: React.FC<ChannelShareChartProps> = ({ data }) =>
           formatter: (value: number, ctx: any) => {
             const sum = ctx.dataset.data.reduce((a: number, b: number) => a + b, 0);
             if (sum === 0) return '0.0%';
-            return ((value * 100) / sum).toFixed(1) + '%'; // Format XX.X% per guideline
+            return ((value * 100) / sum).toFixed(1) + '%';
           },
         },
       },
@@ -62,10 +64,22 @@ export const ChannelShareChart: React.FC<ChannelShareChartProps> = ({ data }) =>
   }, [theme]);
 
   return (
-    <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-      <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider mb-3 flex items-center gap-2">
-        <PieChart className="w-4 h-4 text-buzz" /> Tỷ Lệ % Paid - Owned - Earned
-      </h3>
+    <div id="channel-share-container" className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+          <PieChart className="w-4 h-4 text-buzz" /> PAID - OWNED - EARNED MEDIA SHARE
+        </h3>
+
+        {/* Export PNG Chart Widget Button */}
+        <button
+          onClick={() => downloadChartAsImage('channel-share-container', 'channel-share-chart.png')}
+          className="p-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-buzz hover:text-white text-slate-500 transition cursor-pointer"
+          title="Export Chart Image PNG"
+        >
+          <Download className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
       <div className="h-64 flex justify-center items-center">
         <Doughnut data={chartData} options={options} />
       </div>

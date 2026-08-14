@@ -1,11 +1,11 @@
 import React from 'react';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, Download } from 'lucide-react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
-import { formatNum } from '../utils/brandStandardizer';
 import { InfoTooltip } from './common/InfoTooltip';
+import { downloadChartAsImage } from '../utils/chartExporter';
 
 ChartJS.register(...registerables);
 
@@ -15,6 +15,21 @@ interface TimelineComboChartProps {
 
 export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) => {
   const { theme } = useTheme();
+
+  // Shorten month format from "Jan 2025" -> "01/25" for clean horizontal display without tilting
+  const formatMonthShort = (monthYearStr: string) => {
+    const monthMap: Record<string, string> = {
+      Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
+      Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12',
+    };
+    const parts = monthYearStr.split(' ');
+    if (parts.length === 2) {
+      const m = monthMap[parts[0]] || parts[0];
+      const y = parts[1].slice(-2);
+      return `${m}/${y}`;
+    }
+    return monthYearStr;
+  };
 
   const timelineMonths = React.useMemo(() => {
     const monthOrder = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -41,6 +56,10 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
     });
   }, [data]);
 
+  const formattedLabels = React.useMemo(() => {
+    return timelineMonths.map(m => formatMonthShort(m));
+  }, [timelineMonths]);
+
   const chartData = React.useMemo(() => {
     const map: Record<string, { buzz: number; count: number }> = {};
     timelineMonths.forEach(m => {
@@ -59,19 +78,19 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
     const campaignCounts = timelineMonths.map(k => map[k].count);
 
     return {
-      labels: timelineMonths,
+      labels: formattedLabels,
       datasets: [
         {
           type: 'bar' as const,
-          label: 'Buzz Vol (Tr)',
+          label: 'Buzz Vol (M)',
           data: buzzVolMillions,
           backgroundColor: '#e68228', // Signature Buzzmetrics Orange
-          borderRadius: 4,
+          borderRadius: 6, // Refined rounded bar tops
           yAxisID: 'y',
         },
         {
           type: 'line' as const,
-          label: 'Số Campaign',
+          label: 'Campaign Count',
           data: campaignCounts,
           borderColor: '#125876', // Buzzmetrics Dark Blue
           backgroundColor: '#125876',
@@ -82,7 +101,7 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
         },
       ],
     };
-  }, [data, timelineMonths]);
+  }, [data, timelineMonths, formattedLabels]);
 
   const options = React.useMemo(() => {
     const isDark = theme === 'dark';
@@ -111,20 +130,25 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
       },
       scales: {
         x: {
-          ticks: { color: textColor, font: { family: "'Inter', sans-serif", size: 9, weight: 'bold' as const } },
+          ticks: {
+            color: textColor,
+            font: { family: "'Inter', sans-serif", size: 9, weight: 'bold' as const },
+            maxRotation: 0, // Force horizontal display without tilting!
+            minRotation: 0,
+          },
           grid: { display: false },
         },
         y: {
           type: 'linear' as const,
           position: 'left' as const,
-          title: { display: true, text: 'Buzz Vol (Tr)', font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const }, color: textColor },
+          title: { display: true, text: 'Buzz Vol (M)', font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const }, color: textColor },
           ticks: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' as const } },
           grid: { display: false },
         },
         y1: {
           type: 'linear' as const,
           position: 'right' as const,
-          title: { display: true, text: 'Số Campaign', font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const }, color: textColor },
+          title: { display: true, text: 'Campaign Count', font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const }, color: textColor },
           ticks: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' as const } },
           grid: { display: false },
         },
@@ -133,14 +157,26 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
   }, [theme]);
 
   return (
-    <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-      <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider mb-3 flex items-center gap-2">
-        <TrendingUp className="w-4 h-4 text-buzz" /> Buzz Volume (Tr) & Số Campaign Timeline
-        <InfoTooltip
-          title="Diễn Biến Theo Thời Gian"
-          content="Biểu đồ thể hiện tổng lượng thảo luận (Cột cam - Triệu buzz) và số lượng chiến dịch diễn ra (Đường xanh) qua từng tháng."
-        />
-      </h3>
+    <div id="timeline-combo-container" className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+          <TrendingUp className="w-4 h-4 text-buzz" /> BUZZ VOLUME (M) & CAMPAIGN COUNT TIMELINE
+          <InfoTooltip
+            title="Timeline Evolution"
+            content="Monthly evolution of total discussion volume (Orange bar - Millions) and total campaign count (Blue line)."
+          />
+        </h3>
+
+        {/* Export PNG Chart Widget Button */}
+        <button
+          onClick={() => downloadChartAsImage('timeline-combo-container', 'timeline-combo-chart.png')}
+          className="p-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-buzz hover:text-white text-slate-500 transition cursor-pointer"
+          title="Export Chart Image PNG"
+        >
+          <Download className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
       <div className="h-[270px]">
         <Chart type="bar" data={chartData} options={options} />
       </div>
