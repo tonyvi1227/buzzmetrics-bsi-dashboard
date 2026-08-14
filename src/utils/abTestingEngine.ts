@@ -40,6 +40,14 @@ export function forceAssignedVariant(variant: ABVariant) {
 }
 
 export function getAssignedVariant(): ABVariant {
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    const urlVar = params.get('variant')?.toUpperCase();
+    if (urlVar && ['A', 'B', 'C'].includes(urlVar)) {
+      return urlVar as ABVariant;
+    }
+  }
+
   const winner = getWinningVariant();
   if (winner) return winner;
 
