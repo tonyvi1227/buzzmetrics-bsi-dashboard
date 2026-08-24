@@ -24,7 +24,7 @@ export const DevABToolbar: React.FC<DevABToolbarProps> = ({
       resetLockStateForTesting();
       onUpdateState(currentVariant, false);
     } else {
-      unlockUserPermanently(false);
+      unlockUserPermanently(true);
       onUpdateState(currentVariant, true);
     }
   };
@@ -40,29 +40,20 @@ export const DevABToolbar: React.FC<DevABToolbarProps> = ({
         <div className="flex items-center gap-1 bg-slate-800 p-1 rounded-xl">
           <button
             onClick={() => handleSelectVariant('A')}
-            className={`px-2.5 py-1 rounded-lg font-black transition cursor-pointer ${
+            className={`px-3 py-1 rounded-lg font-black transition cursor-pointer ${
               currentVariant === 'A' ? 'bg-buzz text-white shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
-            Variant A (Form Gate)
-          </button>
-
-          <button
-            onClick={() => handleSelectVariant('B')}
-            className={`px-2.5 py-1 rounded-lg font-black transition cursor-pointer ${
-              currentVariant === 'B' ? 'bg-buzz text-white shadow-sm' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Variant B (AI Chatbot)
+            Variant A (Form Gate Ngay)
           </button>
 
           <button
             onClick={() => handleSelectVariant('C')}
-            className={`px-2.5 py-1 rounded-lg font-black transition cursor-pointer ${
+            className={`px-3 py-1 rounded-lg font-black transition cursor-pointer ${
               currentVariant === 'C' ? 'bg-buzz text-white shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
-            Variant C (3-Click Freemium)
+            Variant C (Freemium 3 Clicks)
           </button>
         </div>
       </div>

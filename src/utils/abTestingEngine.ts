@@ -10,8 +10,8 @@ const CLICK_COUNT_KEY = 'buzz_click_count';
 const WINNING_VARIANT_KEY = 'buzz_winning_variant';
 const LOCAL_LEADS_KEY = 'buzz_local_leads';
 
-// Passwords for Internal & Admin Unlock
-export const INTERNAL_PASSWORDS = ['CIMKT', 'BUZZINTERNAL'];
+// Passwords for Internal Team & Manual Verification Unlock
+export const INTERNAL_PASSWORDS = ['CIMKT', 'BUZZINTERNAL', 'BUZZQUALIFIED', 'BUZZ2026'];
 
 export function verifyInternalPassword(password: string): boolean {
   if (!password) return false;
@@ -21,7 +21,7 @@ export function verifyInternalPassword(password: string): boolean {
 
 export function getWinningVariant(): ABVariant | null {
   const stored = localStorage.getItem(WINNING_VARIANT_KEY);
-  if (stored && ['A', 'B', 'C'].includes(stored)) {
+  if (stored && ['A', 'C'].includes(stored)) {
     return stored as ABVariant;
   }
   return null;
@@ -43,7 +43,7 @@ export function getAssignedVariant(): ABVariant {
   if (typeof window !== 'undefined') {
     const params = new URLSearchParams(window.location.search);
     const urlVar = params.get('variant')?.toUpperCase();
-    if (urlVar && ['A', 'B', 'C'].includes(urlVar)) {
+    if (urlVar && ['A', 'C'].includes(urlVar)) {
       return urlVar as ABVariant;
     }
   }
@@ -52,28 +52,24 @@ export function getAssignedVariant(): ABVariant {
   if (winner) return winner;
 
   const stored = localStorage.getItem(AB_VARIANT_KEY);
-  if (stored && ['A', 'B', 'C'].includes(stored)) {
+  if (stored && ['A', 'C'].includes(stored)) {
     return stored as ABVariant;
   }
 
-  // Random 33.3% assignment
+  // 50% Variant A (Form Gate) / 50% Variant C (3-Click Freemium)
   const rand = Math.random();
-  let assigned: ABVariant = 'A';
-  if (rand < 0.333) assigned = 'A';
-  else if (rand < 0.666) assigned = 'B';
-  else assigned = 'C';
+  const assigned: ABVariant = rand < 0.5 ? 'A' : 'C';
 
   localStorage.setItem(AB_VARIANT_KEY, assigned);
   return assigned;
 }
 
 export function hasSubmittedLead(): boolean {
-  return localStorage.getItem(HAS_LEAD_KEY) === 'true' || localStorage.getItem(UNLOCKED_KEY) === 'true';
+  return localStorage.getItem(HAS_LEAD_KEY) === 'true';
 }
 
 export function isUserUnlocked(): boolean {
-  // Session unlock
-  return sessionStorage.getItem(UNLOCKED_KEY) === 'true';
+  return sessionStorage.getItem(UNLOCKED_KEY) === 'true' || localStorage.getItem(INTERNAL_UNLOCKED_KEY) === 'true';
 }
 
 export function isInternalUnlocked(): boolean {
@@ -82,7 +78,6 @@ export function isInternalUnlocked(): boolean {
 
 export function unlockUserPermanently(isInternal = false) {
   sessionStorage.setItem(UNLOCKED_KEY, 'true');
-  localStorage.setItem(HAS_LEAD_KEY, 'true');
   if (isInternal) {
     localStorage.setItem(INTERNAL_UNLOCKED_KEY, 'true');
   }
@@ -123,13 +118,13 @@ export async function saveLeadRecord(lead: Omit<LeadRecord, 'id' | 'createdAt' |
     status: 'NEW',
   };
 
-  // 1. Save to LocalStorage Backup
+  // 1. Save to LocalStorage Lead Records Backup
   const existing = getStoredLeads();
   const updated = [newLead, ...existing];
   localStorage.setItem(LOCAL_LEADS_KEY, JSON.stringify(updated));
 
-  // 2. Unlock User Session
-  unlockUserPermanently(false);
+  // 2. Mark that Lead Form was submitted (Requires Buzzmetrics Team Manual Qualification Call to Unlock)
+  localStorage.setItem(HAS_LEAD_KEY, 'true');
 
   // 3. Send Email Notification to tuan.vi@buzzmetrics.com
   await sendLeadEmailNotification(newLead);
