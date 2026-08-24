@@ -119,18 +119,26 @@ export function hasSubmittedLead(): boolean {
   return localStorage.getItem(HAS_LEAD_KEY) === 'true';
 }
 
+// Clear stale persistent unlocks from previous versions on script load
+if (typeof window !== 'undefined') {
+  try {
+    localStorage.removeItem(INTERNAL_UNLOCKED_KEY);
+    localStorage.removeItem(UNLOCKED_KEY);
+  } catch (e) {}
+}
+
 export function isUserUnlocked(): boolean {
-  return sessionStorage.getItem(UNLOCKED_KEY) === 'true' || localStorage.getItem(INTERNAL_UNLOCKED_KEY) === 'true';
+  return sessionStorage.getItem(UNLOCKED_KEY) === 'true';
 }
 
 export function isInternalUnlocked(): boolean {
-  return localStorage.getItem(INTERNAL_UNLOCKED_KEY) === 'true';
+  return sessionStorage.getItem(INTERNAL_UNLOCKED_KEY) === 'true';
 }
 
 export function unlockUserPermanently(isInternal = false) {
   sessionStorage.setItem(UNLOCKED_KEY, 'true');
   if (isInternal) {
-    localStorage.setItem(INTERNAL_UNLOCKED_KEY, 'true');
+    sessionStorage.setItem(INTERNAL_UNLOCKED_KEY, 'true');
   }
 }
 
@@ -140,7 +148,10 @@ export function resetLockStateForTesting() {
   localStorage.removeItem(INTERNAL_UNLOCKED_KEY);
   localStorage.removeItem(CLICK_COUNT_KEY);
   sessionStorage.removeItem(UNLOCKED_KEY);
+  sessionStorage.removeItem(INTERNAL_UNLOCKED_KEY);
 }
+
+export const MAX_FREE_CLICKS = 5;
 
 export function getClickCount(): number {
   return parseInt(localStorage.getItem(CLICK_COUNT_KEY) || '0', 10);

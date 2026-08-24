@@ -1,15 +1,21 @@
-import { useState, useMemo } from 'react';
-import { CelebRecord, MonthlyCelebRankRecord, AggregatedCelebRecord, CelebFilterState, CelebBenchmarkMetrics } from '../types/celeb';
+import { useState, useMemo, useCallback } from 'react';
+import { CelebRecord, MonthlyCelebRankRecord, AggregatedCelebRecord, CelebFilterState, CelebBenchmarkMetrics, TopCelebHighlights } from '../types/celeb';
+import { MONTH_ORDER, getMonthValue } from './useSmartFilters';
 
-export const ALL_OPTION = 'Tất cả';
+export const ALL_OPTION = 'ALL';
+
+const initialCelebFilters: CelebFilterState = {
+  category: ALL_OPTION,
+  search: '',
+  startYear: '2025',
+  startMonth: 'Jan',
+  endYear: '2026',
+  endMonth: 'Jun',
+  top10BsiOnly: true,
+};
 
 export function useCelebSmartFilters(rawDataset: CelebRecord[]) {
-  const [filters, setFilters] = useState<CelebFilterState>({
-    year: ALL_OPTION,
-    month: ALL_OPTION,
-    category: ALL_OPTION,
-    search: '',
-  });
+  const [filters, setFilters] = useState<CelebFilterState>(initialCelebFilters);
 
   // Step 1: Pre-calculate monthly rankings for each year-month in the dataset
   const datasetWithRanks = useMemo<MonthlyCelebRankRecord[]>(() => {
@@ -37,34 +43,33 @@ export function useCelebSmartFilters(rawDataset: CelebRecord[]) {
   }, [rawDataset]);
 
   const availableYears = useMemo(() => {
-    const years = Array.from(new Set(rawDataset.map(d => d.year))).sort((a, b) => b.localeCompare(a));
-    return [ALL_OPTION, ...years];
+    const years = Array.from(new Set(rawDataset.map(d => d.year))).filter(Boolean);
+    return years.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
   }, [rawDataset]);
 
   const availableMonths = useMemo(() => {
-    let filtered = rawDataset;
-    if (filters.year !== ALL_OPTION) {
-      filtered = filtered.filter(d => d.year === filters.year);
-    }
-    const monthOrder = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const months = Array.from(new Set(filtered.map(d => d.month)));
-    return [ALL_OPTION, ...months.sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b))];
-  }, [rawDataset, filters.year]);
+    const months = Array.from(new Set(rawDataset.map(d => d.month))).filter(Boolean);
+    return months.sort((a, b) => MONTH_ORDER.indexOf(a) - MONTH_ORDER.indexOf(b));
+  }, [rawDataset]);
 
   const availableCategories = useMemo(() => {
     const cats = Array.from(new Set(rawDataset.map(d => d.category))).filter(Boolean).sort();
-    return [ALL_OPTION, ...cats];
+    return cats;
   }, [rawDataset]);
 
-  // Step 2: Filter monthly rank records based on selected Year, Month, Category
+  // Step 2: Filter monthly rank records based on Date Range & Category & top10BsiOnly
   const filteredMonthlyRecords = useMemo(() => {
+    const startVal = getMonthValue(filters.startYear, filters.startMonth);
+    const endVal = getMonthValue(filters.endYear, filters.endMonth);
+
     return datasetWithRanks.filter(item => {
-      if (filters.year !== ALL_OPTION && item.year !== filters.year) return false;
-      if (filters.month !== ALL_OPTION && item.month !== filters.month) return false;
+      const itemVal = getMonthValue(item.year, item.month);
+      if (itemVal < startVal || itemVal > endVal) return false;
       if (filters.category !== ALL_OPTION && item.category !== filters.category) return false;
+      if (filters.top10BsiOnly && item.monthRank > 10) return false;
       return true;
     });
-  }, [datasetWithRanks, filters]);
+  }, [datasetWithRanks, filters.startYear, filters.startMonth, filters.endYear, filters.endMonth, filters.category, filters.top10BsiOnly]);
 
   // Step 3: Aggregate records by celebName for multi-month views
   const aggregatedCelebs = useMemo<AggregatedCelebRecord[]>(() => {
@@ -90,7 +95,7 @@ export function useCelebSmartFilters(rawDataset: CelebRecord[]) {
 
       return {
         celebName: name,
-        category: records[0].category || 'Khác',
+        category: records[0].category || 'Other',
         totalAppearances: count,
         avgRank: Number(avgRank.toFixed(1)),
         bestRank,
@@ -100,7 +105,7 @@ export function useCelebSmartFilters(rawDataset: CelebRecord[]) {
         avgContentQU: Math.round(totalContentQU / count),
         avgQuUser: Math.round(totalQuUser / count),
         avgSentiment: Number((totalSentiment / count).toFixed(2)),
-        avgRelevancy: Math.round(totalRelevancy / count),
+        avgRelevancy: totalRelevancy / count,
         monthlyRecords: records.sort((a, b) => b.year.localeCompare(a.year) || a.month.localeCompare(b.month)),
       };
     });
@@ -141,7 +146,7 @@ export function useCelebSmartFilters(rawDataset: CelebRecord[]) {
     const avgContentQU = Math.round(aggregatedCelebs.reduce((sum, c) => sum + c.avgContentQU, 0) / totalCount);
     const avgQuUser = Math.round(aggregatedCelebs.reduce((sum, c) => sum + c.avgQuUser, 0) / totalCount);
     const avgSentiment = Number((aggregatedCelebs.reduce((sum, c) => sum + c.avgSentiment, 0) / totalCount).toFixed(2));
-    const avgRelevancy = Math.round(aggregatedCelebs.reduce((sum, c) => sum + c.avgRelevancy, 0) / totalCount);
+    const avgRelevancy = aggregatedCelebs.reduce((sum, c) => sum + c.avgRelevancy, 0) / totalCount;
 
     return {
       totalCount,
@@ -156,24 +161,61 @@ export function useCelebSmartFilters(rawDataset: CelebRecord[]) {
     };
   }, [aggregatedCelebs]);
 
-  const updateFilter = (key: keyof CelebFilterState, value: string) => {
-    setFilters(prev => {
-      const updated = { ...prev, [key]: value };
-      if (key === 'year') {
-        updated.month = ALL_OPTION;
-      }
-      return updated;
-    });
-  };
+  // Step 5: Compute 4 Top Highlight Leaders under the filter
+  const topCelebHighlights = useMemo<TopCelebHighlights>(() => {
+    if (filteredMonthlyRecords.length === 0 || aggregatedCelebs.length === 0) {
+      return {
+        peakBsiCeleb: null,
+        mostConsistentCeleb: null,
+        highestAvgBsiCeleb: null,
+        highestQuCeleb: null,
+      };
+    }
 
-  const resetFilters = () => {
-    setFilters({
-      year: ALL_OPTION,
-      month: ALL_OPTION,
-      category: ALL_OPTION,
-      search: '',
-    });
-  };
+    // 1. Peak Single Monthly BSI Score
+    const peakRecord = [...filteredMonthlyRecords].sort((a, b) => b.bsi - a.bsi)[0];
+    const peakBsiCeleb = peakRecord
+      ? { name: peakRecord.celebName, bsi: peakRecord.bsi, month: peakRecord.month, year: peakRecord.year, category: peakRecord.category }
+      : null;
+
+    // 2. Most Consistent Leader (Most Appearances in Top 10)
+    const mostConsistentRecord = [...aggregatedCelebs].sort(
+      (a, b) => b.totalAppearances - a.totalAppearances || a.avgRank - b.avgRank
+    )[0];
+    const mostConsistentCeleb = mostConsistentRecord
+      ? { name: mostConsistentRecord.celebName, appearances: mostConsistentRecord.totalAppearances, avgRank: mostConsistentRecord.avgRank, category: mostConsistentRecord.category }
+      : null;
+
+    // 3. Highest Average BSI Score
+    const highestAvgBsiRecord = [...aggregatedCelebs].sort((a, b) => b.avgBsi - a.avgBsi)[0];
+    const highestAvgBsiCeleb = highestAvgBsiRecord
+      ? { name: highestAvgBsiRecord.celebName, avgBsi: highestAvgBsiRecord.avgBsi, totalBsi: highestAvgBsiRecord.totalBsi, category: highestAvgBsiRecord.category }
+      : null;
+
+    // 4. Highest Qualified Users (QU)
+    const highestQuRecord = [...aggregatedCelebs].sort((a, b) => b.avgQuUser - a.avgQuUser)[0];
+    const highestQuCeleb = highestQuRecord
+      ? { name: highestQuRecord.celebName, avgQuUser: highestQuRecord.avgQuUser, totalQuUser: highestQuRecord.totalBsi, category: highestQuRecord.category }
+      : null;
+
+    return {
+      peakBsiCeleb,
+      mostConsistentCeleb,
+      highestAvgBsiCeleb,
+      highestQuCeleb,
+    };
+  }, [filteredMonthlyRecords, aggregatedCelebs]);
+
+  const updateFilter = useCallback((key: keyof CelebFilterState, value: any) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: value,
+    }));
+  }, []);
+
+  const resetFilters = useCallback(() => {
+    setFilters(initialCelebFilters);
+  }, []);
 
   return {
     filters,
@@ -185,5 +227,6 @@ export function useCelebSmartFilters(rawDataset: CelebRecord[]) {
     filteredMonthlyRecords,
     aggregatedCelebs,
     benchmarkMetrics,
+    topCelebHighlights,
   };
 }

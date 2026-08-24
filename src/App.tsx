@@ -12,6 +12,7 @@ import {
   getAssignedVariant,
   getClickCount,
   incrementClickCount,
+  MAX_FREE_CLICKS,
 } from './utils/abTestingEngine';
 
 // Campaign Components
@@ -43,6 +44,7 @@ import { CelebMatrixChart } from './components/celeb/CelebMatrixChart';
 import { CelebConsistencyChart } from './components/celeb/CelebConsistencyChart';
 import { CelebCategoryChart } from './components/celeb/CelebCategoryChart';
 import { CelebDetailModal } from './components/celeb/CelebDetailModal';
+import { TopCelebHighlightCards } from './components/celeb/TopCelebHighlightCards';
 import { AggregatedCelebRecord } from './types/celeb';
 
 // A/B Testing & Lead Gen Components
@@ -53,14 +55,14 @@ import { InternalUnlockModal } from './components/InternalUnlockModal';
 import { AdminABTestPanel } from './components/AdminABTestPanel';
 import { DevABToolbar } from './components/DevABToolbar';
 import { DevPasswordModal } from './components/DevPasswordModal';
+import { FloatingPreviewBox } from './components/FloatingPreviewBox';
 
 const DashboardContent: React.FC = () => {
   const [dataset, setDataset] = useState<CampaignRecord[]>(() => getStoredCampaigns());
   const [selectedCampaign, setSelectedCampaign] = useState<CampaignRecord | null>(null);
   const [selectedCeleb, setSelectedCeleb] = useState<AggregatedCelebRecord | null>(null);
-
-  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
 
@@ -69,13 +71,8 @@ const DashboardContent: React.FC = () => {
   const [assignedVariant, setAssignedVariant] = useState<ABVariant>(() => getAssignedVariant());
   const [clickCount, setClickCount] = useState(() => getClickCount());
 
-  // Advanced Charts state: Auto-hidden for Variant C when locked
-  const [isAdvancedChartsExpanded, setIsAdvancedChartsExpanded] = useState<boolean>(() => {
-    if (!isUserUnlocked() && getAssignedVariant() === 'C') {
-      return false;
-    }
-    return true;
-  });
+  // Advanced Charts state: Defaults to collapsed (hidden) for all users
+  const [isAdvancedChartsExpanded, setIsAdvancedChartsExpanded] = useState<boolean>(false);
 
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
   const [isAIChatModalOpen, setIsAIChatModalOpen] = useState(false);
@@ -89,32 +86,22 @@ const DashboardContent: React.FC = () => {
     setActiveTab(tab);
   };
 
-  // Trigger Gate Modal depending on assigned Variant
+  // Trigger Gate Modal
   const triggerGateModal = () => {
-    if (isUnlocked) return;
-    if (assignedVariant === 'B') {
-      setIsAIChatModalOpen(true);
-    } else {
-      setIsLeadModalOpen(true);
-    }
+    setIsLeadModalOpen(true);
   };
 
-  // Generic Interaction Handler per Variant UX Rules:
-  // - Variant A & B: Any interaction (filter change, details click) pops up Gate Modal immediately!
-  // - Variant C: Allows exactly 3 interactions (filter change or details click). On 3rd interaction, pops up Gate Modal!
-  const handleInteraction = (actionCallback: () => void) => {
-    if (isUnlocked) {
+  // Filter interaction handler:
+  // - Variant A: Free filtering, modal only opens when clicking buttons or locked items.
+  // - Variant C: Counts down 5 free actions. On 5th action, opens Gate Modal.
+  const handleFilterChange = (actionCallback: () => void) => {
+    if (isUnlocked || assignedVariant === 'A') {
       actionCallback();
       return;
     }
 
-    if (assignedVariant === 'A' || assignedVariant === 'B') {
-      triggerGateModal();
-      return;
-    }
-
     if (assignedVariant === 'C') {
-      if (clickCount >= 3) {
+      if (clickCount >= MAX_FREE_CLICKS) {
         triggerGateModal();
         return;
       }
@@ -123,19 +110,68 @@ const DashboardContent: React.FC = () => {
       setClickCount(c);
       actionCallback();
 
-      if (c >= 3) {
+      if (c >= MAX_FREE_CLICKS) {
         triggerGateModal();
       }
     }
   };
 
-  // Advanced Charts Bar Click: Clicking to view advanced charts when locked pops up Gate Modal immediately!
-  const handleAdvancedChartsClick = () => {
-    if (!isUnlocked) {
+  // Details / locked row click handler:
+  const handleDetailsClick = (actionCallback: () => void) => {
+    if (isUnlocked) {
+      actionCallback();
+      return;
+    }
+
+    if (assignedVariant === 'A') {
       triggerGateModal();
       return;
     }
-    setIsAdvancedChartsExpanded(prev => !prev);
+
+    if (assignedVariant === 'C') {
+      if (clickCount >= MAX_FREE_CLICKS) {
+        triggerGateModal();
+        return;
+      }
+
+      const c = incrementClickCount();
+      setClickCount(c);
+      actionCallback();
+
+      if (c >= MAX_FREE_CLICKS) {
+        triggerGateModal();
+      }
+    }
+  };
+
+  // Advanced Charts Bar Click: Expanding charts in Variant C uses 1 free preview action!
+  const handleAdvancedChartsClick = () => {
+    if (isUnlocked) {
+      setIsAdvancedChartsExpanded(prev => !prev);
+      return;
+    }
+
+    if (assignedVariant === 'A') {
+      triggerGateModal();
+      return;
+    }
+
+    if (assignedVariant === 'C') {
+      if (!isAdvancedChartsExpanded) {
+        if (clickCount >= MAX_FREE_CLICKS) {
+          triggerGateModal();
+          return;
+        }
+        const c = incrementClickCount();
+        setClickCount(c);
+        setIsAdvancedChartsExpanded(true);
+        if (c >= MAX_FREE_CLICKS) {
+          triggerGateModal();
+        }
+      } else {
+        setIsAdvancedChartsExpanded(false);
+      }
+    }
   };
 
   // Fetch Supabase data on mount if credentials exist
@@ -169,10 +205,10 @@ const DashboardContent: React.FC = () => {
     updateFilter: updateCelebFilter,
     resetFilters: resetCelebFilters,
     availableYears: availableCelebYears,
-    availableMonths: availableCelebMonths,
     availableCategories: availableCelebCategories,
     aggregatedCelebs: filteredCelebData,
     benchmarkMetrics: celebBenchmark,
+    topCelebHighlights,
   } = useCelebSmartFilters(celebDataset);
 
   // Compute Overall Benchmark Metrics for Campaigns
@@ -266,21 +302,12 @@ const DashboardContent: React.FC = () => {
     }
   };
 
-  const handleResetToDefault = () => {
-    const defaults = resetStoredCampaigns();
-    setDataset(defaults);
-    resetCampaignFilters();
-    setIsImportModalOpen(false);
+  const handleResetData = () => {
+    const initial = resetStoredCampaigns();
+    setDataset(initial);
   };
 
-  const handleSupabaseConnected = async () => {
-    const cloudData = await fetchCampaignsFromSupabase();
-    if (cloudData && cloudData.length > 0) {
-      setDataset(cloudData);
-      saveStoredCampaigns(cloudData);
-    }
-  };
-
+  // Dev Hidden Password & Auth State
   const [isDevPasswordOpen, setIsDevPasswordOpen] = useState(false);
   const [isDevAuthed, setIsDevAuthed] = useState<boolean>(() => {
     return localStorage.getItem('buzz_dev_authed') === 'true';
@@ -328,10 +355,13 @@ const DashboardContent: React.FC = () => {
     };
   }, [activeTab, isAdvancedChartsExpanded, isUnlocked, showDevToolbar]);
 
-  const shouldGateSection = !isUnlocked && (assignedVariant !== 'C' || clickCount >= 3);
+  // Gating evaluation:
+  // - Variant A: Always blurred & gated when locked (!isUnlocked).
+  // - Variant C: Explorable for first 5 actions, blurred & gated on 5th action.
+  const shouldGateSection = !isUnlocked && (assignedVariant !== 'C' || clickCount >= MAX_FREE_CLICKS);
 
   return (
-    <div className="min-h-screen p-4 md:p-8 max-w-[1600px] mx-auto font-sans relative">
+    <div className="min-h-screen p-2.5 sm:p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto font-sans relative">
 
       {/* Header Bar */}
       <Header
@@ -342,6 +372,8 @@ const DashboardContent: React.FC = () => {
         onOpenContactModal={triggerGateModal}
         onOpenUnlockModal={() => setIsInternalModalOpen(true)}
         isUnlocked={isUnlocked}
+        variant={assignedVariant}
+        clickCount={clickCount}
       />
 
       {/* Admin Panel for A/B Testing & Leads Management */}
@@ -359,10 +391,10 @@ const DashboardContent: React.FC = () => {
           <FilterBar
             filters={campaignFilters}
             onUpdateFilter={(key, val) => {
-              handleInteraction(() => updateCampaignFilter(key, val));
+              handleFilterChange(() => updateCampaignFilter(key, val));
             }}
             onResetFilters={() => {
-              handleInteraction(() => resetCampaignFilters());
+              handleFilterChange(() => resetCampaignFilters());
             }}
             availableYears={availableCampaignYears}
             availableMonths={availableCampaignMonths}
@@ -379,7 +411,7 @@ const DashboardContent: React.FC = () => {
 
           {/* FREE TEASER LAYER 2: Top Brands Table, Timeline Chart & Channel Share */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <TopBrandsTable data={filteredCampaignData} />
+            <TopBrandsTable data={filteredCampaignData} isUnlocked={isUnlocked || isAdmin} />
             <div className="md:col-span-2 xl:col-span-1">
               <TimelineComboChart data={filteredCampaignData} />
             </div>
@@ -401,13 +433,13 @@ const DashboardContent: React.FC = () => {
                     </div>
                     <div className="text-left">
                       <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wide">
-                        BIỂU ĐỒ PHÂN TÍCH CHUYÊN SÂU
+                        ADVANCED DEEP-DIVE ANALYTICS CHARTS
                       </h3>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 font-black text-xs text-buzz whitespace-nowrap">
-                    <span>{isAdvancedChartsExpanded ? 'Thu gọn' : 'Mở rộng'}</span>
+                    <span>{isAdvancedChartsExpanded ? 'Collapse' : 'Expand'}</span>
                     {isAdvancedChartsExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </div>
                 </button>
@@ -425,7 +457,7 @@ const DashboardContent: React.FC = () => {
               <CampaignTable
                 data={filteredCampaignData}
                 onSelectCampaign={(campaign) => {
-                  handleInteraction(() => setSelectedCampaign(campaign));
+                  handleDetailsClick(() => setSelectedCampaign(campaign));
                 }}
               />
             </div>
@@ -435,6 +467,8 @@ const DashboardContent: React.FC = () => {
               <GatedOverlay
                 variant={assignedVariant}
                 onOpenGateModal={triggerGateModal}
+                onUnlockNow={() => setIsUnlocked(true)}
+                onOpenPasscodeModal={() => setIsInternalModalOpen(true)}
                 clickCount={clickCount}
               />
             )}
@@ -450,22 +484,33 @@ const DashboardContent: React.FC = () => {
           {/* FREE TEASER LAYER 1: Celeb Benchmark Panel */}
           <CelebBenchmarkPanel metrics={celebBenchmark} />
 
-          {/* CELEB FILTER BAR WITH VARIANT UX RULES */}
+          {/* CELEB FILTER BAR WITH DATE RANGE */}
           <CelebFilterBar
             filters={celebFilters}
             updateFilter={(key, val) => {
-              handleInteraction(() => updateCelebFilter(key, val));
+              handleFilterChange(() => updateCelebFilter(key, val));
             }}
             resetFilters={() => {
-              handleInteraction(() => resetCelebFilters());
+              handleFilterChange(() => resetCelebFilters());
             }}
             availableYears={availableCelebYears}
-            availableMonths={availableCelebMonths}
             availableCategories={availableCelebCategories}
             totalResults={filteredCelebData.length}
+            isUnlocked={isUnlocked}
           />
 
-          {/* GATED CONTINUOUS CONTAINER FOR CELEB CHARTS & TABLE */}
+          {/* FREE TEASER LAYER 2: 4 Top Celeb Highlight Cards */}
+          <TopCelebHighlightCards
+            highlights={topCelebHighlights}
+            onSelectCelebName={(name) => {
+              const matched = filteredCelebData.find(c => c.celebName.toLowerCase() === name.toLowerCase());
+              if (matched) {
+                handleDetailsClick(() => setSelectedCeleb(matched));
+              }
+            }}
+          />
+
+          {/* GATED SECTION: CELEB CHARTS & CELEB TABLE (LOCKED UNTIL PASSCODE / REGISTRATION) */}
           <div className="relative rounded-3xl overflow-hidden min-h-[350px]">
             <div className={shouldGateSection ? 'space-y-6 pointer-events-none select-none filter blur-md opacity-50' : 'space-y-6'}>
               {/* Celeb Charts Row */}
@@ -479,7 +524,7 @@ const DashboardContent: React.FC = () => {
               <CelebTable
                 data={filteredCelebData}
                 onSelectCeleb={(celeb) => {
-                  handleInteraction(() => setSelectedCeleb(celeb));
+                  handleDetailsClick(() => setSelectedCeleb(celeb));
                 }}
                 onExport={() => setIsExportModalOpen(true)}
               />
@@ -511,20 +556,11 @@ const DashboardContent: React.FC = () => {
         onClose={() => setSelectedCeleb(null)}
       />
 
-      <AdminLoginModal
-        isOpen={isAdminModalOpen}
-        onClose={() => setIsAdminModalOpen(false)}
-        onSuccess={() => {
-          setIsAdminModalOpen(false);
-          setIsImportModalOpen(true);
-        }}
-      />
-
       <DataImportModal
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
         onImport={handleImportData}
-        onResetToDefault={handleResetToDefault}
+        onResetToDefault={handleResetData}
         existingDataset={dataset}
       />
 
@@ -534,24 +570,43 @@ const DashboardContent: React.FC = () => {
         data={filteredCampaignData}
       />
 
+      <AdminLoginModal
+        isOpen={isAdminModalOpen}
+        onClose={() => setIsAdminModalOpen(false)}
+        onSuccess={() => setIsImportModalOpen(true)}
+      />
+
       <SupabaseConfigModal
         isOpen={isSupabaseModalOpen}
         onClose={() => setIsSupabaseModalOpen(false)}
-        onConnected={handleSupabaseConnected}
+        onConnected={() => {
+          fetchCampaignsFromSupabase().then(cloudData => {
+            if (cloudData && cloudData.length > 0) {
+              setDataset(cloudData);
+              saveStoredCampaigns(cloudData);
+            }
+          });
+        }}
       />
 
-      {/* A/B Testing & Lead Capture Modals */}
+      {/* A/B Testing Lead Capture Modals */}
       <LeadFormModal
         isOpen={isLeadModalOpen}
         onClose={() => setIsLeadModalOpen(false)}
-        onSuccess={() => setIsUnlocked(true)}
         variant={assignedVariant}
+        onSuccess={() => {
+          setIsUnlocked(true);
+          setIsLeadModalOpen(false);
+        }}
       />
 
       <AIChatbotModal
         isOpen={isAIChatModalOpen}
         onClose={() => setIsAIChatModalOpen(false)}
-        onSuccess={() => setIsUnlocked(true)}
+        onSuccess={() => {
+          setIsUnlocked(true);
+          setIsAIChatModalOpen(false);
+        }}
       />
 
       <InternalUnlockModal
@@ -572,32 +627,37 @@ const DashboardContent: React.FC = () => {
         onSuccess={handleDevPasswordSuccess}
       />
 
-      {/* Dev A/B Testing Toolbar (Rendered in Footer Area) */}
-      {(isDevAuthed && showDevToolbar) && (
-        <div className="mt-8">
+      {/* Footer Section with Hidden Dev Trigger */}
+      <Footer
+        onOpenDevPassword={handleOpenDevClick}
+        isDevAuthed={isDevAuthed || isAdmin}
+        totalRecordsCount={dataset.length}
+      />
+
+      {/* Variant C Floating Live 5-Action Preview Box (Floating Bottom-Right Widget) */}
+      {!isUnlocked && assignedVariant === 'C' && !showDevToolbar && (
+        <FloatingPreviewBox
+          clickCount={clickCount}
+          onOpenContactModal={triggerGateModal}
+          onOpenUnlockModal={() => setIsInternalModalOpen(true)}
+        />
+      )}
+
+      {/* Dev Floating Toolbar - Revealed only with Dev Password */}
+      {showDevToolbar && (
+        <div className="fixed bottom-3 right-3 z-50 animate-bounce-subtle max-w-[95vw]">
           <DevABToolbar
             currentVariant={assignedVariant}
             isUnlocked={isUnlocked}
-            onUpdateState={(v, u) => {
-              setAssignedVariant(v);
-              setIsUnlocked(u);
-              setClickCount(getClickCount());
-              if (!u && v === 'C') {
-                setIsAdvancedChartsExpanded(false);
-              } else {
-                setIsAdvancedChartsExpanded(true);
-              }
+            onUpdateState={(newVariant, newUnlocked) => {
+              setAssignedVariant(newVariant);
+              setIsUnlocked(newUnlocked);
+              setClickCount(0);
             }}
+            onOpenImport={() => setIsImportModalOpen(true)}
           />
         </div>
       )}
-
-      {/* Footer */}
-      <Footer
-        onOpenDevPassword={handleOpenDevClick}
-        isDevAuthed={isDevAuthed}
-        totalRecordsCount={activeTab === 'campaigns' ? dataset.length : celebDataset.length}
-      />
     </div>
   );
 };

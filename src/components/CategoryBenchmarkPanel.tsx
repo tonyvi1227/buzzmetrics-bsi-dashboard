@@ -26,17 +26,17 @@ export const CategoryBenchmarkPanel: React.FC<CategoryBenchmarkPanelProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wide">
-                Bảng Benchmark Trung Bình Riêng Cho Ngành: <span className="text-buzz uppercase">{selectedCategoryName}</span>
+                Dedicated Industry Benchmark: <span className="text-buzz uppercase">{selectedCategoryName}</span>
               </h3>
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold">
-              Chỉ số sức khỏe & hiệu suất riêng của ngành hàng đã chọn
+              Category-specific benchmark metrics & performance baseline
             </p>
           </div>
         </div>
         <span className="text-xs font-black bg-buzz text-white px-3 py-1 rounded-full shadow-sm">
-          {categoryBenchmark.totalCampaigns} Chiến dịch trong ngành
+          {categoryBenchmark.totalCampaigns} Campaigns in Category
         </span>
       </div>
 
@@ -44,12 +44,12 @@ export const CategoryBenchmarkPanel: React.FC<CategoryBenchmarkPanelProps> = ({
         <table className="w-full text-xs text-left">
           <thead className="bg-orange-100/70 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-black uppercase">
             <tr>
-              <th className="p-3 rounded-l-xl">Ngành Hàng</th>
-              <th className="p-3 text-right">Số Campaign</th>
+              <th className="p-3 rounded-l-xl">Category</th>
+              <th className="p-3 text-right">Campaigns</th>
               <th className="p-3 text-right">Avg Buzz Vol</th>
               <th className="p-3 text-right">Avg BSI Score</th>
-              <th className="p-3 text-right">Avg Content QU</th>
-              <th className="p-3 text-right">Avg QU User</th>
+              <th className="p-3 text-right">Avg CFQU</th>
+              <th className="p-3 text-right">Avg QU</th>
               <th className="p-3 text-right">Avg Sentiment</th>
               <th className="p-3 text-right">Avg Relevancy</th>
               <th className="p-3 text-right rounded-r-xl">Avg % Earned</th>

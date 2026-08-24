@@ -27,6 +27,7 @@ const initialFilters: FilterState = {
   endYear: '2026',
   endMonth: 'Jun',
   top10BsiOnly: true, // Default to Top 10 BSI Campaigns per Month for Customers
+  includeExtraBrands: false, // Default to Hide TW Đoàn from all charts & tables
 };
 
 export function useSmartFilters(allCampaigns: CampaignRecord[]) {
@@ -101,6 +102,13 @@ export function useSmartFilters(allCampaigns: CampaignRecord[]) {
   // Filter dataset dynamically based on cascading criteria & date range
   const filteredData = useMemo(() => {
     let dataset = [...allCampaigns];
+
+    // 0. Exclude Extra Brands (TW Đoàn) by default unless includeExtraBrands is true
+    if (!filters.includeExtraBrands) {
+      dataset = dataset.filter(
+        c => !c.brand.toUpperCase().includes('TW ĐOÀN') && !c.brand.toUpperCase().includes('TW DOAN')
+      );
+    }
 
     // 1. If Top 10 BSI per month toggle is active, extract top 10 BSI per month first
     if (filters.top10BsiOnly) {

@@ -35,10 +35,13 @@ export interface AggregatedCelebRecord {
 }
 
 export interface CelebFilterState {
-  year: string;
-  month: string;
   category: string;
   search: string;
+  startYear: string;
+  startMonth: string;
+  endYear: string;
+  endMonth: string;
+  top10BsiOnly?: boolean;
 }
 
 export interface CelebBenchmarkMetrics {
@@ -51,6 +54,13 @@ export interface CelebBenchmarkMetrics {
   avgQuUser: number;         // Qualified User (QU) trung bình
   avgSentiment: number;      // Sentiment Index trung bình
   avgRelevancy: number;      // AVG Relevance (Trung bình thảo luận liên quan)
+}
+
+export interface TopCelebHighlights {
+  peakBsiCeleb: { name: string; bsi: number; month: string; year: string; category: string } | null;
+  mostConsistentCeleb: { name: string; appearances: number; avgRank: number; category: string } | null;
+  highestAvgBsiCeleb: { name: string; avgBsi: number; totalBsi: number; category: string } | null;
+  highestQuCeleb: { name: string; avgQuUser: number; totalQuUser: number; category: string } | null;
 }
 
 export type CelebSortColumn = 

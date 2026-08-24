@@ -160,10 +160,10 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
     <div id="timeline-combo-container" className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-buzz" /> BUZZ VOLUME (M) & CAMPAIGN COUNT TIMELINE
+          <TrendingUp className="w-4 h-4 text-buzz" /> MONTHLY BUZZ & CAMPAIGN TIMELINE
           <InfoTooltip
-            title="Timeline Evolution"
-            content="Monthly evolution of total discussion volume (Orange bar - Millions) and total campaign count (Blue line)."
+            title="Monthly Buzz & Campaign Timeline"
+            content="Monthly evolution of total discussion volume (Orange bars in millions) and active campaign count (Blue trendline)."
           />
         </h3>
 

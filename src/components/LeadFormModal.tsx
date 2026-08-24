@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { X, Send, Building, User, Mail, Phone, LockKeyhole, Tag, Target, FileText, CheckCircle2 } from 'lucide-react';
 import { saveLeadRecord } from '../utils/abTestingEngine';
 import { ABVariant } from '../types/leadGen';
@@ -25,10 +25,21 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
   const brandInterestRef = useRef<HTMLInputElement>(null);
   const customNeedNoteRef = useRef<HTMLTextAreaElement>(null);
 
-  const [actualNeed, setActualNeed] = useState('Tham khảo Data Benchmark chung');
+  const [actualNeed, setActualNeed] = useState('General Data Benchmark Reference');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmittedSuccess, setIsSubmittedSuccess] = useState(false);
   const [error, setError] = useState('');
+
+  // Lock background scroll when modal is open to ensure only internal box scrolls
+  useEffect(() => {
+    if (isOpen) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = original;
+      };
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -43,12 +54,12 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
     const customNeedNote = customNeedNoteRef.current?.value || '';
 
     if (!fullName.trim() || !workEmail.trim() || !phone.trim() || !company.trim()) {
-      setError('Vui lòng điền thông tin cá nhân liên hệ để đăng ký.');
+      setError('Please fill in all required contact information.');
       return;
     }
 
     if (!workEmail.includes('@')) {
-      setError('Vui lòng nhập đúng định dạng Email công ty/doanh nghiệp.');
+      setError('Please enter a valid work email address.');
       return;
     }
 
@@ -82,7 +93,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex justify-center items-center p-3 sm:p-6">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-3xl lg:max-w-4xl p-5 md:p-7 relative max-h-[90vh] overflow-y-auto overscroll-contain my-auto">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-3xl lg:max-w-4xl max-h-[85vh] md:max-h-[640px] flex flex-col my-auto overscroll-contain overflow-hidden relative">
         {/* Sticky Header Close Button */}
         <button
           onClick={handleCloseModal}
@@ -94,17 +105,17 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
         </button>
 
         {isSubmittedSuccess ? (
-          <div className="text-center py-8 space-y-4 max-w-md mx-auto">
+          <div className="text-center py-8 px-6 space-y-4 max-w-md mx-auto my-auto">
             <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center border border-emerald-200 dark:border-emerald-800 shadow-sm">
               <CheckCircle2 className="w-8 h-8" />
             </div>
 
             <div>
               <h3 className="text-base md:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">
-                ĐÃ GỬI THÔNG TIN DỰ ÁN THÀNH CÔNG!
+                REGISTRATION SUBMITTED SUCCESSFULLY!
               </h3>
               <p className="text-xs text-slate-700 dark:text-slate-300 font-bold mt-2 leading-relaxed">
-                Đội ngũ Buzzmetrics đã tiếp nhận yêu cầu và sẽ liên hệ xác minh thông tin, và cấp quyền mở khóa Full Version cho bạn sớm nhất.
+                The Buzzmetrics team has received your request and will contact you via Phone/Email to verify and provide your Access Passcode shortly.
               </p>
             </div>
 
@@ -117,24 +128,26 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
               }}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs md:text-sm rounded-xl transition shadow cursor-pointer"
             >
-              ✓ ĐÃ NẮM RÕ THÔNG TIN
+              ✓ GOT IT
             </button>
           </div>
         ) : (
           <>
-            <div className="text-center mb-5">
-              <div className="w-10 h-10 rounded-2xl bg-orange-50 dark:bg-orange-950/80 text-buzz mx-auto flex items-center justify-center mb-2 border border-orange-200 dark:border-orange-800 shadow-sm">
-                <LockKeyhole className="w-5 h-5" />
+            {/* Fixed Header */}
+            <div className="text-center p-5 pb-3 border-b border-slate-100 dark:border-slate-800/80 flex-shrink-0 bg-white dark:bg-slate-900">
+              <div className="w-9 h-9 rounded-xl bg-orange-50 dark:bg-orange-950/80 text-buzz mx-auto flex items-center justify-center mb-1.5 border border-orange-200 dark:border-orange-800 shadow-sm">
+                <LockKeyhole className="w-4 h-4" />
               </div>
-              <h3 className="text-base md:text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
-                ĐĂNG KÝ MỞ KHÓA BÁO CÁO BSI CAMPAIGN
+              <h3 className="text-base md:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                Register to unlock BSI Campaign Insights
               </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 font-semibold mt-0.5 leading-relaxed">
-                Đăng ký thông tin để đội ngũ Buzzmetrics xác minh dự án & hỗ trợ mở khóa toàn bộ biểu đồ phân tích chuyên sâu.
+              <p className="text-xs text-slate-600 dark:text-slate-300 font-semibold leading-relaxed mt-1">
+                Submit your project details for the Buzzmetrics team to verify and grant access to full analytics.
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Scrollable Form Body */}
+            <form onSubmit={handleSubmit} className="p-5 overflow-y-auto overscroll-contain flex-1 space-y-4">
               {/* Responsive 2-Column Layout on PC / Desktop screens */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 
@@ -143,20 +156,20 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                   {/* SECTION 1: PERSONAL CONTACT INFO */}
                   <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-3">
                     <span className="text-[10px] font-black uppercase tracking-wider text-buzz flex items-center gap-1">
-                      <User className="w-3 h-3" /> 1. THÔNG TIN LIÊN HỆ CÁ NHÂN (*)
+                      <User className="w-3 h-3" /> 1. CONTACT INFORMATION (*)
                     </span>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
-                          HỌ VÀ TÊN (*)
+                          FULL NAME (*)
                         </label>
                         <div className="relative">
                           <input
                             ref={fullNameRef}
                             type="text"
                             required
-                            placeholder="Nguyễn Văn A"
+                            placeholder="John Doe"
                             className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                           />
                           <User className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3" />
@@ -165,14 +178,14 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
 
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
-                          SĐT / ZALO (*)
+                          PHONE / MOBILE (*)
                         </label>
                         <div className="relative">
                           <input
                             ref={phoneRef}
                             type="tel"
                             required
-                            placeholder="090x xxx xxx"
+                            placeholder="+84 90x xxx xxx"
                             className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                           />
                           <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3" />
@@ -183,7 +196,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
-                          EMAIL CÔNG TY (*)
+                          WORK EMAIL (*)
                         </label>
                         <div className="relative">
                           <input
@@ -199,14 +212,14 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
 
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
-                          CÔNG TY / THƯƠNG HIỆU (*)
+                          COMPANY / BRAND (*)
                         </label>
                         <div className="relative">
                           <input
                             ref={companyRef}
                             type="text"
                             required
-                            placeholder="Ví dụ: Vinamilk, Samsung..."
+                            placeholder="e.g. Vinamilk, Samsung..."
                             className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                           />
                           <Building className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3" />
@@ -215,33 +228,33 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                     </div>
                   </div>
 
-                  {/* SECTION 2: CATEGORY & BRAND TYPE-IN */}
+                  {/* SECTION 2: CATEGORY & BRAND */}
                   <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2.5">
                     <span className="text-[10px] font-black uppercase tracking-wider text-buzz flex items-center gap-1">
-                      <Tag className="w-3 h-3" /> 2. NGÀNH HÀNG & THƯƠNG HIỆU QUAN TÂM
+                      <Tag className="w-3 h-3" /> 2. CATEGORY & BRAND OF INTEREST (*)
                     </span>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
-                          NGÀNH HÀNG (NHẬP CHỮ)
+                          CATEGORY
                         </label>
                         <input
                           ref={categoryInterestRef}
                           type="text"
-                          placeholder="Ví dụ: Handhelds, Bia, Sữa..."
+                          placeholder="e.g. Handhelds, Beer, Dairy..."
                           className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz"
                         />
                       </div>
 
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
-                          THƯƠNG HIỆU QUAN TÂM (NHẬP CHỮ)
+                          TARGET BRAND
                         </label>
                         <input
                           ref={brandInterestRef}
                           type="text"
-                          placeholder="Ví dụ: Heineken, Samsung, Tiger..."
+                          placeholder="e.g. Heineken, Samsung, Tiger..."
                           className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz"
                         />
                       </div>
@@ -254,15 +267,15 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                   {/* SECTION 3: ACTUAL INTENT & NEED */}
                   <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2.5">
                     <span className="text-[10px] font-black uppercase tracking-wider text-buzz flex items-center gap-1">
-                      <Target className="w-3 h-3" /> 3. NHU CẦU THỰC TẾ CỦA BẠN
+                      <Target className="w-3 h-3" /> 3. PROJECT OBJECTIVE (*)
                     </span>
 
                     <div className="space-y-1.5">
                       {[
-                        'Tham khảo Data Benchmark chung',
-                        'Chuẩn bị chạy Campaign / Product Launch mới',
-                        'So sánh BSI & Sentiment đối thủ cùng ngành',
-                        'Cần Báo cáo / Report Đánh giá sau chiến dịch',
+                        'General Data Benchmark Reference',
+                        'Upcoming Campaign / Product Launch Planning',
+                        'Competitor BSI & Sentiment Benchmarking',
+                        'Post-Campaign Performance & ROI Evaluation Report',
                       ].map((needOption) => (
                         <label
                           key={needOption}
@@ -287,12 +300,12 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
 
                     <div>
                       <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5 flex items-center gap-1">
-                        <FileText className="w-3 h-3" /> GHI CHÚ NHU CẦU CỤ THỂ KHÁC (NẾU CÓ)
+                        <FileText className="w-3 h-3" /> ADDITIONAL REQUIREMENT
                       </label>
                       <textarea
                         ref={customNeedNoteRef}
                         rows={2}
-                        placeholder="Nhập yêu cầu riêng hoặc ngân sách/kế hoạch chiến dịch sắp tới..."
+                        placeholder="Enter specific campaign objectives, scope, or timeline..."
                         className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2 outline-none focus:ring-2 focus:ring-buzz"
                       />
                     </div>
@@ -306,11 +319,11 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                     className="w-full py-3.5 bg-buzz hover:bg-orange-600 text-white font-black text-xs md:text-sm rounded-xl transition shadow cursor-pointer flex items-center justify-center gap-2 mt-auto"
                   >
                     {isSubmitting ? (
-                      <span>Đang gửi thông tin đăng ký...</span>
+                      <span>Submitting Registration...</span>
                     ) : (
                       <>
                         <Send className="w-4 h-4" />
-                        <span>GỬI ĐĂNG KÝ XÁC MINH MỞ KHÓA</span>
+                        <span>SUBMIT REGISTRATION FOR ACCESS</span>
                       </>
                     )}
                   </button>

@@ -89,7 +89,7 @@ export const CelebCategoryChart: React.FC<CelebCategoryChartProps> = ({ celebs }
               const count = context.raw || 0;
               const total = categoryStats.reduce((a, b) => a + b.count, 0);
               const pct = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
-              return ` ${count} nghệ sĩ (${pct}%)`;
+              return ` ${count} celebrities (${pct}%)`;
             },
           },
         },
@@ -102,10 +102,10 @@ export const CelebCategoryChart: React.FC<CelebCategoryChartProps> = ({ celebs }
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
           <PieChart className="w-4 h-4 text-buzz" />
-          TỶ LỆ NGHỆ SĨ THEO LĨNH VỰC
+          CELEBRITY SHARE BY PROFESSION
           <InfoTooltip
-            title="Tỷ lệ phân bổ Lĩnh vực"
-            content="Tỷ lệ % và số lượng nghệ sĩ lọt Top 10 BSI được phân bổ theo từng Lĩnh vực hoạt động chính."
+            title="Profession Distribution"
+            content="Percentage share and count of celebrities entering the Top 10 BSI across professions."
           />
         </h3>
         <span className="whitespace-nowrap inline-flex items-center justify-center text-[10px] font-black bg-orange-100 dark:bg-orange-950 text-buzz dark:text-orange-300 border border-orange-300 dark:border-orange-800 px-2.5 py-0.5 rounded-full">
@@ -117,7 +117,7 @@ export const CelebCategoryChart: React.FC<CelebCategoryChartProps> = ({ celebs }
         {categoryStats.length > 0 ? (
           <Pie data={chartData} options={options} />
         ) : (
-          <div className="text-xs font-bold text-slate-400">Không có dữ liệu cho bộ lọc này</div>
+          <div className="text-xs font-bold text-slate-400">No data available for this filter</div>
         )}
       </div>
     </div>

@@ -146,12 +146,12 @@ export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) =>
   return (
     <div id="campaign-type-container" className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:shadow-md transition">
       <div>
-        <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center justify-between mb-3">
           <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
             <Tag className="w-4 h-4 text-buzz" /> CAMPAIGN TYPE DISTRIBUTION
             <InfoTooltip
-              title="Campaign Type Distribution"
-              content="Breakdown of Top 10 Campaigns categorized by marketing objective."
+              title="Campaign Objective Distribution"
+              content="Share of marketing objectives across tracked campaigns: Product Launch & Rebranding, Sponsor & Event, Promotion, CSR & Sustainability, and Thematic."
             />
           </h3>
 
@@ -164,10 +164,6 @@ export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) =>
             <Download className="w-3.5 h-3.5" />
           </button>
         </div>
-
-        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mb-3">
-          Share of Marketing Objectives (Product Launch, Sponsor, Promotion, CSR, Thematic)
-        </p>
 
         <div className="h-[270px] relative">
           <Doughnut data={chartData} options={options} plugins={[donutCenterLabelPlugin]} />

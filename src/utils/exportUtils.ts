@@ -65,3 +65,54 @@ export function exportToCSV(data: CampaignRecord[], fileName = 'Buzzmetrics_Camp
   link.click();
   document.body.removeChild(link);
 }
+
+export function exportTemplateCSV(fileName = 'Buzzmetrics_Campaign_Data_Template.csv') {
+  const sampleTemplateRows = [
+    {
+      'Year': '2026',
+      'Month': 'Jul',
+      'Brand': 'SAMSUNG',
+      'Category': 'Handhelds',
+      'Campaign': 'Galaxy Z Fold8 | Z Flip8 Launch',
+      'Campaign Type': 'Product Launch & Rebranding',
+      'BSI': 25000,
+      'Buzz Volume': 850000,
+      'Content QU': 50000,
+      'QU User': 35000,
+      'Sentiment': 0.95,
+      'Relevancy': 0.45,
+      '% Earned': 65.5,
+      'Earned': 550000,
+      'Paid': 200000,
+      'Owned': 100000,
+    },
+    {
+      'Year': '2026',
+      'Month': 'Jul',
+      'Brand': 'OMO',
+      'Category': 'Home Care',
+      'Campaign': 'OMO - Sac Mau Tuoi Tho',
+      'Campaign Type': 'Thematic & Brand Building',
+      'BSI': 18000,
+      'Buzz Volume': 600000,
+      'Content QU': 32000,
+      'QU User': 21000,
+      'Sentiment': 0.98,
+      'Relevancy': 0.50,
+      '% Earned': 82.0,
+      'Earned': 492000,
+      'Paid': 80000,
+      'Owned': 28000,
+    }
+  ];
+
+  const csv = Papa.unparse(sampleTemplateRows);
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', fileName);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}

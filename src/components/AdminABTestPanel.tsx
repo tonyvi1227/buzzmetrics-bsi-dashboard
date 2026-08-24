@@ -90,6 +90,7 @@ export const AdminABTestPanel: React.FC = () => {
     link.href = url;
     link.download = `Buzzmetrics_BSI_Leads_${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -106,7 +107,7 @@ export const AdminABTestPanel: React.FC = () => {
               <span className="text-[10px] font-black bg-emerald-500 text-white px-2 py-0.5 rounded-full">LIVE</span>
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-0.5">
-              Quản lý thí nghiệm A/B/C Test conversion & Xem toàn bộ Leads thu thập được về Email tuan.vi@buzzmetrics.com.
+              Manage A/B/C conversion experiments & view leads routed to tuan.vi@buzzmetrics.com.
             </p>
           </div>
         </div>
@@ -122,7 +123,7 @@ export const AdminABTestPanel: React.FC = () => {
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Thống Kê A/B Test</span>
+            <span>A/B Analytics</span>
           </button>
 
           <button
@@ -134,7 +135,7 @@ export const AdminABTestPanel: React.FC = () => {
             }`}
           >
             <Users className="w-3.5 h-3.5" />
-            <span>Danh Sách Leads ({leads.length})</span>
+            <span>Leads Database ({leads.length})</span>
           </button>
         </div>
       </div>
@@ -145,13 +146,13 @@ export const AdminABTestPanel: React.FC = () => {
           {/* Active Status Banner */}
           <div className="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between flex-wrap gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
             <div>
-              <span>Biến thể ngẫu nhiên hiện tại của bạn: </span>
+              <span>Your current random variant: </span>
               <strong className="text-buzz font-black text-sm">Variant {currentAssignedVariant}</strong>
             </div>
             <div>
-              <span>Biến thể chiến thắng được chọn cố định: </span>
+              <span>Permanent winning variant: </span>
               <strong className="text-emerald-600 dark:text-emerald-400 font-black text-sm">
-                {winningVariant === 'NONE' ? 'Chưa chọn (Đang phân bổ 33% ngẫu nhiên)' : `Variant ${winningVariant} (100%)`}
+                {winningVariant === 'NONE' ? 'Not chosen (Random split distribution)' : `Variant ${winningVariant} (100%)`}
               </strong>
             </div>
           </div>
@@ -166,13 +167,13 @@ export const AdminABTestPanel: React.FC = () => {
             }`}>
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <span className="text-[10px] font-black text-buzz uppercase tracking-wider block">VARIAN A</span>
-                  <h4 className="text-sm font-black text-slate-900 dark:text-white">Form Mở Khóa Nhanh</h4>
+                  <span className="text-[10px] font-black text-buzz uppercase tracking-wider block">VARIANT A</span>
+                  <h4 className="text-sm font-black text-slate-900 dark:text-white">Instant Modal Gate</h4>
                 </div>
                 <span className="text-xl font-black text-buzz">{variantCounts.A} Leads</span>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mb-3">
-                Khóa bộ lọc ➔ Hiện Pop-up Form 4 trường (Tên, Email công ty, SĐT, Công ty).
+                Locked section ➔ Shows 4-field Lead Form (Name, Work Email, Phone, Company).
               </p>
               <button
                 onClick={() => handleSetWinner(winningVariant === 'A' ? 'NONE' : 'A')}
@@ -182,7 +183,7 @@ export const AdminABTestPanel: React.FC = () => {
                     : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                 }`}
               >
-                {winningVariant === 'A' ? '✓ Đang Chọn Làm Winner' : '🏆 Chọn Làm Winner (100%)'}
+                {winningVariant === 'A' ? '✓ Selected Winner' : '🏆 Set as Winner (100%)'}
               </button>
             </div>
 
@@ -194,13 +195,13 @@ export const AdminABTestPanel: React.FC = () => {
             }`}>
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <span className="text-[10px] font-black text-buzz uppercase tracking-wider block">VARIAN B ⭐</span>
+                  <span className="text-[10px] font-black text-buzz uppercase tracking-wider block">VARIANT B ⭐</span>
                   <h4 className="text-sm font-black text-slate-900 dark:text-white">AI Qualification Chatbot</h4>
                 </div>
                 <span className="text-xl font-black text-buzz">{variantCounts.B} Leads</span>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mb-3">
-                Chatbot AI tương tác 3 câu hỏi nhu cầu ➔ Tự động phân tích Lead Score & mở khóa.
+                Interactive AI Assistant with 3 intent questions ➔ Computes Lead Score & unlocks.
               </p>
               <button
                 onClick={() => handleSetWinner(winningVariant === 'B' ? 'NONE' : 'B')}
@@ -210,7 +211,7 @@ export const AdminABTestPanel: React.FC = () => {
                     : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                 }`}
               >
-                {winningVariant === 'B' ? '✓ Đang Chọn Làm Winner' : '🏆 Chọn Làm Winner (100%)'}
+                {winningVariant === 'B' ? '✓ Selected Winner' : '🏆 Set as Winner (100%)'}
               </button>
             </div>
 
@@ -222,13 +223,13 @@ export const AdminABTestPanel: React.FC = () => {
             }`}>
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <span className="text-[10px] font-black text-buzz uppercase tracking-wider block">VARIAN C</span>
-                  <h4 className="text-sm font-black text-slate-900 dark:text-white">Progressive Freemium (3-Click)</h4>
+                  <span className="text-[10px] font-black text-buzz uppercase tracking-wider block">VARIANT C</span>
+                  <h4 className="text-sm font-black text-slate-900 dark:text-white">Progressive Freemium (3 Clicks)</h4>
                 </div>
                 <span className="text-xl font-black text-buzz">{variantCounts.C} Leads</span>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mb-3">
-                Cho dùng thử 3 lượt click miễn phí ➔ Lượt thứ 4 mới khóa & yêu cầu nhập contact.
+                Allows 3 free interactive clicks ➔ 4th click requires registration.
               </p>
               <button
                 onClick={() => handleSetWinner(winningVariant === 'C' ? 'NONE' : 'C')}
@@ -238,7 +239,7 @@ export const AdminABTestPanel: React.FC = () => {
                     : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                 }`}
               >
-                {winningVariant === 'C' ? '✓ Đang Chọn Làm Winner' : '🏆 Chọn Làm Winner (100%)'}
+                {winningVariant === 'C' ? '✓ Selected Winner' : '🏆 Set as Winner (100%)'}
               </button>
             </div>
           </div>
@@ -251,16 +252,16 @@ export const AdminABTestPanel: React.FC = () => {
           {/* Controls Bar */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase">Lọc theo status:</span>
+              <span className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase">Filter by status:</span>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white rounded-lg p-1.5 outline-none"
               >
-                <option value="ALL">Tất cả ({leads.length})</option>
-                <option value="NEW">Lead mới (NEW)</option>
-                <option value="CONTACTED">Đã liên hệ (CONTACTED)</option>
-                <option value="QUALIFIED">Chất lượng (QUALIFIED)</option>
+                <option value="ALL">All ({leads.length})</option>
+                <option value="NEW">New Leads (NEW)</option>
+                <option value="CONTACTED">Contacted (CONTACTED)</option>
+                <option value="QUALIFIED">Qualified (QUALIFIED)</option>
               </select>
             </div>
 
@@ -270,7 +271,7 @@ export const AdminABTestPanel: React.FC = () => {
                 className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-black transition flex items-center gap-1 cursor-pointer"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
-                <span>Làm Mới</span>
+                <span>Refresh</span>
               </button>
 
               <button
@@ -278,7 +279,7 @@ export const AdminABTestPanel: React.FC = () => {
                 className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-black transition flex items-center gap-1 shadow-sm cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Xuất File Excel Leads ({leads.length})</span>
+                <span>Export Leads CSV ({leads.length})</span>
               </button>
             </div>
           </div>
@@ -288,20 +289,20 @@ export const AdminABTestPanel: React.FC = () => {
             <table className="w-full text-left text-xs">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 text-[10px] uppercase font-black tracking-wider text-slate-400">
-                  <th className="py-2.5 pl-3">Khách Hàng</th>
-                  <th className="py-2.5">Doanh Nghiệp / SĐT</th>
-                  <th className="py-2.5">Email Công Ty</th>
-                  <th className="py-2.5">Ngành Quan Tâm</th>
-                  <th className="py-2.5 text-center">Biến Thể</th>
+                  <th className="py-2.5 pl-3">Contact</th>
+                  <th className="py-2.5">Company / Phone</th>
+                  <th className="py-2.5">Work Email</th>
+                  <th className="py-2.5">Category Interest</th>
+                  <th className="py-2.5 text-center">Variant</th>
                   <th className="py-2.5 text-center">Score</th>
-                  <th className="py-2.5 text-right pr-3">Thời Gian</th>
+                  <th className="py-2.5 text-right pr-3">Timestamp</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-bold">
                 {filteredLeads.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="py-8 text-center text-slate-400 font-bold">
-                      Chưa có Lead nào thu nhập được.
+                      No leads recorded yet.
                     </td>
                   </tr>
                 ) : (

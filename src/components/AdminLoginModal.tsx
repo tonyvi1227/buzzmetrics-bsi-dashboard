@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Lock, KeyRound, AlertCircle } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 
@@ -15,6 +15,16 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
   const [isChangingPass, setIsChangingPass] = useState(false);
   const [newPin, setNewPin] = useState('');
 
+  useEffect(() => {
+    if (isOpen) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = original;
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleLogin = (e: React.FormEvent) => {
@@ -25,7 +35,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
       setPinInput('');
       onSuccess();
     } else {
-      setError('Mật khẩu Admin không chính xác. Vui lòng thử lại.');
+      setError('Incorrect Admin password. Please try again.');
     }
   };
 
@@ -39,17 +49,17 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-md overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 overflow-y-auto">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-md overflow-hidden my-auto overscroll-contain">
         {/* Header */}
         <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
           <div className="flex items-center gap-2">
             <Lock className="w-5 h-5 text-buzz" />
             <h3 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-wide">
-              {isChangingPass ? 'Đổi Mật Khẩu Admin' : 'Xác Thực Mật Khẩu Admin'}
+              {isChangingPass ? 'Change Admin Password' : 'Admin Authentication'}
             </h3>
           </div>
-          <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg">
+          <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -58,19 +68,19 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
         {!isChangingPass ? (
           <form onSubmit={handleLogin} className="p-6 space-y-4">
             <p className="text-xs font-bold text-slate-600 dark:text-slate-300">
-              Vui lòng nhập mật khẩu Admin để truy cập quyền Quản lý Data & Import dữ liệu.
+              Please enter the Admin password to manage datasets and configuration.
             </p>
 
             <div className="space-y-1.5">
               <label className="block text-xs font-black text-slate-700 dark:text-slate-200">
-                Mật khẩu Admin
+                Admin Password
               </label>
               <div className="relative">
                 <input
                   type="password"
                   value={pinInput}
                   onChange={(e) => setPinInput(e.target.value)}
-                  placeholder="Nhập mật khẩu Admin..."
+                  placeholder="Enter Admin password..."
                   className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl p-3 pl-10 text-sm focus:ring-2 focus:ring-buzz outline-none"
                   autoFocus
                 />
@@ -89,9 +99,9 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
               <button
                 type="button"
                 onClick={() => setIsChangingPass(true)}
-                className="font-black text-buzz hover:underline"
+                className="font-black text-buzz hover:underline cursor-pointer"
               >
-                Đổi mật khẩu?
+                Change password?
               </button>
             </div>
 
@@ -99,27 +109,27 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl hover:bg-slate-300 transition"
+                className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl hover:bg-slate-300 transition cursor-pointer"
               >
-                Hủy
+                Cancel
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 bg-buzz text-white text-xs font-black rounded-xl hover:bg-buzz-hover transition shadow-sm"
+                className="px-5 py-2 bg-buzz text-white text-xs font-black rounded-xl hover:bg-buzz-hover transition shadow-sm cursor-pointer"
               >
-                Xác Nhận Admin
+                Verify Admin
               </button>
             </div>
           </form>
         ) : (
           <form onSubmit={handleChangePassword} className="p-6 space-y-4">
             <p className="text-xs font-bold text-slate-600 dark:text-slate-300">
-              Nhập mật khẩu Admin mới để thay thế cho mật khẩu hiện tại.
+              Enter a new Admin password to replace the current one.
             </p>
 
             <div className="space-y-1.5">
               <label className="block text-xs font-black text-slate-700 dark:text-slate-200">
-                Mật khẩu mới
+                New Password
               </label>
 
               <div className="relative">
@@ -127,7 +137,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
                   type="password"
                   value={newPin}
                   onChange={(e) => setNewPin(e.target.value)}
-                  placeholder="Nhập mật khẩu mới..."
+                  placeholder="Enter new password..."
                   className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl p-3 pl-10 text-sm focus:ring-2 focus:ring-buzz outline-none"
                   autoFocus
                 />
@@ -139,16 +149,16 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
               <button
                 type="button"
                 onClick={() => setIsChangingPass(false)}
-                className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl hover:bg-slate-300 transition"
+                className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl hover:bg-slate-300 transition cursor-pointer"
               >
-                Quay lại
+                Back
               </button>
               <button
                 type="submit"
                 disabled={!newPin.trim()}
-                className="px-5 py-2 bg-buzz text-white text-xs font-black rounded-xl hover:bg-buzz-hover transition shadow-sm disabled:opacity-50"
+                className="px-5 py-2 bg-buzz text-white text-xs font-black rounded-xl hover:bg-buzz-hover transition shadow-sm disabled:opacity-50 cursor-pointer"
               >
-                Lưu Mật Khẩu Mới
+                Save New Password
               </button>
             </div>
           </form>

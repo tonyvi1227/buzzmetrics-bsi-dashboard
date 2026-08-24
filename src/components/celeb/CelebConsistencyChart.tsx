@@ -36,7 +36,7 @@ export const CelebConsistencyChart: React.FC<CelebConsistencyChartProps> = ({ ce
     labels,
     datasets: [
       {
-        label: 'Số tháng lọt Top 10 BSI',
+        label: 'Top 10 BSI Appearances (Months)',
         data: appearancesData,
         backgroundColor: '#e68228', // Signature Buzzmetrics Orange
         borderRadius: 4,
@@ -72,8 +72,8 @@ export const CelebConsistencyChart: React.FC<CelebConsistencyChartProps> = ({ ce
               if (celeb) {
                 return [
                   ` • Average BSI Top 10 Rank: #${celeb.avgRank}`,
-                  ` • Điểm BSI Trung bình: ${Math.round(celeb.avgBsi).toLocaleString('vi-VN')}`,
-                  ` • Qualified User (QU): ${Math.round(celeb.avgQuUser).toLocaleString('vi-VN')}`,
+                  ` • Average BSI Score: ${Math.round(celeb.avgBsi).toLocaleString('en-US')}`,
+                  ` • Qualified User (QU): ${Math.round(celeb.avgQuUser).toLocaleString('en-US')}`,
                 ];
               }
               return '';
@@ -91,7 +91,7 @@ export const CelebConsistencyChart: React.FC<CelebConsistencyChartProps> = ({ ce
           ticks: { stepSize: 1, color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' as const } },
           title: {
             display: true,
-            text: 'Số tháng lọt Top 10 BSI',
+            text: 'Top 10 Appearances (Months)',
             color: textColor,
             font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const },
           },
@@ -105,10 +105,10 @@ export const CelebConsistencyChart: React.FC<CelebConsistencyChartProps> = ({ ce
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
           <Flame className="w-4 h-4 text-buzz" />
-          TOP 10 NGHỆ SĨ THƯỜNG XUYÊN ON TOP (SỐ THÁNG LỌT TOP 10 BSI)
+          MOST CONSISTENT CELEBRITIES
           <InfoTooltip
-            title="Độ Duy Trì Phong Độ"
-            content="Thống kê Top 10 nghệ sĩ có số tháng duy trì vị thế lọt vào BSI Top 10 nhiều nhất trong khoảng thời gian chọn."
+            title="Ranking Consistency"
+            content="Top celebrities with the highest consistency maintaining their positions in the BSI Top 10 rankings across the filtered period."
           />
         </h3>
         <span className="whitespace-nowrap inline-flex items-center justify-center text-[10px] font-black bg-orange-100 dark:bg-orange-950 text-buzz dark:text-orange-300 border border-orange-300 dark:border-orange-800 px-2.5 py-0.5 rounded-full">
@@ -121,7 +121,7 @@ export const CelebConsistencyChart: React.FC<CelebConsistencyChartProps> = ({ ce
           <Bar data={chartData} options={options} />
         ) : (
           <div className="h-full flex items-center justify-center text-xs font-bold text-slate-400">
-            Không có dữ liệu cho bộ lọc này
+            No data available for this filter
           </div>
         )}
       </div>

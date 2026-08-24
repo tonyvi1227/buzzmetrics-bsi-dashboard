@@ -1,5 +1,5 @@
 import React from 'react';
-import { Filter, Calendar, Search, ArrowRight, RotateCcw, Trophy } from 'lucide-react';
+import { Filter, Calendar, Search, ArrowRight, RotateCcw, Trophy, Building2 } from 'lucide-react';
 import { FilterState } from '../types/dashboard';
 import { ALL_OPTION, MONTH_ORDER } from '../hooks/useSmartFilters';
 import { useAdmin } from '../context/AdminContext';
@@ -42,9 +42,6 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white leading-snug">
                   SMART CASCADING FILTERS
                 </h2>
-                <span className="whitespace-nowrap inline-flex items-center justify-center flex-shrink-0 text-[10px] font-black bg-buzz text-white px-2.5 py-0.5 rounded-full shadow-sm">
-                  {filteredCount} RESULTS
-                </span>
               </div>
               <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
                 Filter by Date Range (From ... To ...) ➔ Category ➔ Campaign Type ➔ Brand Keyword
@@ -52,8 +49,22 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             </div>
           </div>
 
-          {/* Actions: Scope Toggle Button (Top 10 Monthly vs All Campaigns) & Reset Filters Button */}
-          <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-auto">
+          {/* Actions: Extra Brands Toggle, Scope Toggle & Reset Filters Button */}
+          <div className="flex items-center gap-2 flex-wrap self-end sm:self-auto">
+            {/* Extra Brands (TW Đoàn) Toggle Button */}
+            <button
+              onClick={() => onUpdateFilter('includeExtraBrands', !filters.includeExtraBrands)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 border cursor-pointer shadow-sm ${
+                filters.includeExtraBrands
+                  ? 'bg-purple-600 text-white border-purple-700 ring-2 ring-purple-300 dark:ring-purple-800'
+                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
+              }`}
+              title={filters.includeExtraBrands ? 'Hide Extra Brands (TW Đoàn)' : 'Show Extra Brands (TW Đoàn)'}
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              <span>{filters.includeExtraBrands ? 'TW Đoàn: Shown' : 'Show TW Đoàn'}</span>
+            </button>
+
             {showScopeToggle && (
               <button
                 onClick={() => onUpdateFilter('top10BsiOnly', !filters.top10BsiOnly)}
@@ -62,10 +73,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                     ? 'bg-amber-500 text-white border-amber-600 ring-2 ring-amber-300 dark:ring-amber-800'
                     : 'bg-emerald-600 text-white border-emerald-700 ring-2 ring-emerald-300 dark:ring-emerald-800'
                 }`}
-                title={filters.top10BsiOnly ? 'Switch to All 318 Campaigns' : 'Switch to Top 10 Monthly (180 Campaigns)'}
+                title={filters.top10BsiOnly ? 'Switch to All Campaigns' : 'Switch to Top 10 Monthly Campaigns'}
               >
                 <Trophy className="w-3.5 h-3.5 text-white" />
-                <span>{filters.top10BsiOnly ? 'Top 10 Monthly (180)' : 'All 318 Campaigns'}</span>
+                <span>{filters.top10BsiOnly ? `Top 10 Monthly (${filteredCount} Campaigns)` : `All ${filteredCount} Campaigns`}</span>
               </button>
             )}
 

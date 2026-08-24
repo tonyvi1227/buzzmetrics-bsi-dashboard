@@ -6,6 +6,7 @@ import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
 import { formatNum } from '../utils/brandStandardizer';
 import { downloadChartAsImage } from '../utils/chartExporter';
+import { InfoTooltip } from './common/InfoTooltip';
 
 ChartJS.register(...registerables);
 
@@ -128,9 +129,13 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
   return (
     <div id="category-comparison-container" className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:shadow-md transition">
       <div>
-        <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center justify-between mb-3">
           <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-            <Users className="w-4 h-4 text-buzz" /> TOP 10 CATEGORIES: AVG CFQU & AVERAGE QU
+            <Users className="w-4 h-4 text-buzz" /> TOP CATEGORIES PERFORMANCE
+            <InfoTooltip
+              title="Category Performance Comparison"
+              content="Comparison of Average Content Quality (CFQU) vs Genuine User Reach (QU) across top industries."
+            />
           </h3>
 
           {/* Export PNG Chart Widget Button */}
@@ -142,10 +147,6 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
             <Download className="w-3.5 h-3.5" />
           </button>
         </div>
-
-        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mb-3">
-          Comparing Average Content Quality (CFQU) vs Genuine User Reach (QU) per Category
-        </p>
 
         <div className="h-[270px]">
           <Bar data={chartData} options={options} />

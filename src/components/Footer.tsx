@@ -49,7 +49,7 @@ export const Footer: React.FC<FooterProps> = ({
             className="ml-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-700 transition flex items-center gap-1 cursor-pointer shadow-sm"
           >
             <Sparkles className="w-3 h-3 text-amber-400" />
-            <span>⚡ Dev A/B</span>
+            <span>🛠️ Dev Tool</span>
           </button>
         )}
       </div>

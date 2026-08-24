@@ -22,7 +22,7 @@ export const CelebComparisonChart: React.FC<CelebComparisonChartProps> = ({ filt
     datasets: [
       {
         type: 'bar' as const,
-        label: 'Điểm BSI',
+        label: 'BSI Score',
         data: bsiData,
         backgroundColor: 'rgba(99, 102, 241, 0.85)',
         borderRadius: 6,
@@ -30,7 +30,7 @@ export const CelebComparisonChart: React.FC<CelebComparisonChartProps> = ({ filt
       },
       {
         type: 'line' as const,
-        label: 'Tỷ lệ Relevance (%)',
+        label: 'Relevance Ratio (%)',
         data: relevanceData,
         borderColor: '#f43f5e',
         backgroundColor: '#f43f5e',
@@ -57,7 +57,7 @@ export const CelebComparisonChart: React.FC<CelebComparisonChartProps> = ({ filt
         callbacks: {
           label: (context: any) => {
             if (context.dataset.yAxisID === 'yBsi') {
-              return ` BSI: ${Math.round(context.raw).toLocaleString('vi-VN')}`;
+              return ` BSI: ${Math.round(context.raw).toLocaleString('en-US')}`;
             }
             return ` Relevance: ${context.raw}%`;
           },
@@ -76,7 +76,7 @@ export const CelebComparisonChart: React.FC<CelebComparisonChartProps> = ({ filt
         ticks: { color: '#64748b' },
         title: {
           display: true,
-          text: 'Điểm BSI',
+          text: 'BSI Score',
           color: '#6366f1',
           font: { size: 11 },
         },
@@ -93,7 +93,7 @@ export const CelebComparisonChart: React.FC<CelebComparisonChartProps> = ({ filt
         },
         title: {
           display: true,
-          text: 'Tỷ lệ Relevance (%)',
+          text: 'Relevance Ratio (%)',
           color: '#f43f5e',
           font: { size: 11 },
         },
@@ -107,10 +107,10 @@ export const CelebComparisonChart: React.FC<CelebComparisonChartProps> = ({ filt
         <div>
           <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-indigo-500" />
-            So Sánh BSI & Chỉ Số Relevance (Top 10)
+            BSI & Relevance Metric Comparison (Top 10)
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Đánh giá mối quan hệ giữa quy mô BSI và Mức độ liên quan nội dung
+            Evaluating the relationship between overall BSI score and content relevance
           </p>
         </div>
         <div className="flex items-center gap-1 text-xs text-rose-600 bg-rose-50 dark:bg-rose-950/40 px-2 py-1 rounded font-medium border border-rose-200 dark:border-rose-800">
@@ -124,7 +124,7 @@ export const CelebComparisonChart: React.FC<CelebComparisonChartProps> = ({ filt
           <Chart type="bar" data={chartData} options={chartOptions} />
         ) : (
           <div className="h-full flex items-center justify-center text-sm text-slate-400">
-            Không có dữ liệu cho bộ lọc này
+            No data available for this filter
           </div>
         )}
       </div>

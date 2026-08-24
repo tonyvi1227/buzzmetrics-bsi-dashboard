@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Compass, EyeOff, Eye, Download } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { Compass, Download } from 'lucide-react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
@@ -55,7 +55,6 @@ interface BrandMatrixChartProps {
 
 export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
   const { theme } = useTheme();
-  const [excludeTWDoan, setExcludeTWDoan] = useState(true);
 
   // Aggregate stats for brands using AVG Buzz Volume & AVG BSI
   const matrixData = useMemo(() => {
@@ -72,13 +71,6 @@ export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
     });
 
     const brands = Object.values(brandMap)
-      .filter(b => {
-        if (excludeTWDoan) {
-          const name = b.brand.toUpperCase();
-          if (name.includes('TW ĐOÀN') || name.includes('ĐOÀN TNCS')) return false;
-        }
-        return true;
-      })
       .map(b => {
         const avgBuzz = Math.round(b.buzzTotal / b.count);
         const avgBSI = Math.round(b.bsiTotal / b.count);
@@ -97,7 +89,7 @@ export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
       .sort((a, b) => b.y - a.y);
 
     return brands;
-  }, [data, excludeTWDoan]);
+  }, [data]);
 
   // Calculate EXACT dataset averages for dynamic quadrant lines
   const { avgX, avgY } = useMemo(() => {
@@ -253,30 +245,6 @@ export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
             <span className="w-2 h-2 rounded-full bg-slate-400 flex-shrink-0" />
             <span className="truncate">Bottom-Left: <strong>FOR IMPROVEMENT</strong></span>
           </div>
-        </div>
-
-        {/* Toggle Button to Exclude / Include TW ĐOÀN */}
-        <div className="flex justify-end pt-0.5">
-          <button
-            onClick={() => setExcludeTWDoan(prev => !prev)}
-            className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border transition flex items-center gap-1.5 cursor-pointer ${
-              excludeTWDoan
-                ? 'bg-orange-50 text-buzz border-orange-200 dark:bg-orange-950 dark:border-orange-900'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
-            }`}
-          >
-            {excludeTWDoan ? (
-              <>
-                <Eye className="w-3 h-3 text-buzz" />
-                <span>Show TW ĐOÀN</span>
-              </>
-            ) : (
-              <>
-                <EyeOff className="w-3 h-3 text-slate-400" />
-                <span>Hide TW ĐOÀN</span>
-              </>
-            )}
-          </button>
         </div>
       </div>
     </div>

@@ -42,6 +42,8 @@ export interface FilterState {
   endMonth: string;
   // Top 10 BSI per month toggle
   top10BsiOnly: boolean;
+  // Extra brands toggle (TW Đoàn)
+  includeExtraBrands?: boolean;
 }
 
 export interface BenchmarkMetrics {

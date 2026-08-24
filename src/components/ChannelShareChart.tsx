@@ -6,6 +6,7 @@ import { Doughnut } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
 import { downloadChartAsImage } from '../utils/chartExporter';
+import { InfoTooltip } from './common/InfoTooltip';
 
 ChartJS.register(...registerables, ChartDataLabels);
 
@@ -67,7 +68,11 @@ export const ChannelShareChart: React.FC<ChannelShareChartProps> = ({ data }) =>
     <div id="channel-share-container" className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-          <PieChart className="w-4 h-4 text-buzz" /> PAID - OWNED - EARNED MEDIA SHARE
+          <PieChart className="w-4 h-4 text-buzz" /> MEDIA CHANNEL SHARE DISTRIBUTION
+          <InfoTooltip
+            title="Media Channel Share"
+            content="Proportional breakdown of total campaign discussion volume across Earned, Paid, and Owned media channels."
+          />
         </h3>
 
         {/* Export PNG Chart Widget Button */}

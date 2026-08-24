@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Lock, CheckCircle2, KeyRound } from 'lucide-react';
 import { verifyAnyPasscode, unlockUserPermanently } from '../utils/abTestingEngine';
 
@@ -16,6 +16,16 @@ export const InternalUnlockModal: React.FC<InternalUnlockModalProps> = ({
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = original;
+      };
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -42,8 +52,8 @@ export const InternalUnlockModal: React.FC<InternalUnlockModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex justify-center items-start pt-12 md:pt-20 p-4">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-md p-6 relative max-h-[85vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex justify-center items-center p-4">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-md p-6 relative max-h-[85vh] overflow-y-auto overscroll-contain my-auto">
         <button
           onClick={onClose}
           type="button"

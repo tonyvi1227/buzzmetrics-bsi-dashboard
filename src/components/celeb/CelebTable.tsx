@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Award, ArrowUpDown, Download, Users, Target, ExternalLink, Calendar, Flame, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Award, ArrowUpDown, Download, Users, Target, ExternalLink, Calendar, Flame, ChevronLeft, ChevronRight, Crown, Medal } from 'lucide-react';
 import { AggregatedCelebRecord, CelebSortColumn, SortDirection } from '../../types/celeb';
 import { InfoTooltip } from '../common/InfoTooltip';
+import { formatNum } from '../../utils/brandStandardizer';
 
 interface CelebTableProps {
   data: AggregatedCelebRecord[];
@@ -66,19 +67,33 @@ export const CelebTable: React.FC<CelebTableProps> = ({
   const startRecordNum = isAll ? 1 : (activePage - 1) * pageSize + 1;
   const endRecordNum = isAll ? totalItems : Math.min(activePage * pageSize, totalItems);
 
-  const formatNum = (val: number) => Math.round(val).toLocaleString('vi-VN');
-
   const getRankBadge = (rank: number) => {
     if (rank === 1) {
-      return <span className="w-6 h-6 rounded-full bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center shadow-md">1</span>;
+      return (
+        <span className="w-6 h-6 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 font-black text-xs flex items-center justify-center shadow-md border border-amber-200" title="Rank #1 Gold">
+          <Crown className="w-3.5 h-3.5 fill-current text-slate-950" />
+        </span>
+      );
     }
     if (rank === 2) {
-      return <span className="w-6 h-6 rounded-full bg-slate-300 text-slate-900 font-bold text-xs flex items-center justify-center shadow">2</span>;
+      return (
+        <span className="w-6 h-6 rounded-full bg-gradient-to-tr from-slate-400 to-slate-200 text-slate-900 font-bold text-xs flex items-center justify-center shadow border border-slate-300" title="Rank #2 Silver">
+          <Medal className="w-3.5 h-3.5 text-slate-900" />
+        </span>
+      );
     }
     if (rank === 3) {
-      return <span className="w-6 h-6 rounded-full bg-amber-700 text-white font-bold text-xs flex items-center justify-center shadow">3</span>;
+      return (
+        <span className="w-6 h-6 rounded-full bg-gradient-to-tr from-amber-700 to-amber-500 text-white font-bold text-xs flex items-center justify-center shadow border border-amber-600" title="Rank #3 Bronze">
+          <Award className="w-3.5 h-3.5 text-white" />
+        </span>
+      );
     }
-    return <span className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-xs flex items-center justify-center">{rank}</span>;
+    return (
+      <span className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs flex items-center justify-center border border-slate-200 dark:border-slate-700">
+        {rank}
+      </span>
+    );
   };
 
   return (
@@ -88,21 +103,21 @@ export const CelebTable: React.FC<CelebTableProps> = ({
         <div>
           <h3 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight flex items-center gap-2">
             <Award className="w-5 h-5 text-buzz" />
-            BẢNG XẾP HẠNG TỔNG HỢP CELEBRITIES (BSI TOP 10 RANKING)
+            Influencer BSI Top10 Detail Performance
             <InfoTooltip
-              title="Bảng Xếp Hạng Celeb"
-              content="Bảng dữ liệu gom nhóm theo từng nghệ sĩ độc lập. Click vào dòng của nghệ sĩ để xem chi tiết lịch sử điểm BSI và thứ hạng qua từng tháng."
+              title="Influencer BSI Performance Table"
+              content="Aggregated performance database grouped by individual celebrities. Click any row to inspect historical monthly BSI trends, audience reach, and engagement breakdown."
             />
           </h3>
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
-            Danh sách nghệ sĩ với chỉ số BSI trung bình, thứ hạng trung bình & số lần lọt Top (Click vào nghệ sĩ để xem chi tiết)
+            List of celebrities with average BSI, average rank & total Top 10 appearances (Click row for deep-dive)
           </p>
         </div>
 
         <div className="flex items-center gap-3 self-start sm:self-auto">
           {/* Page size limit selector */}
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400">
-            <span>Hiển thị:</span>
+            <span>Show:</span>
             <select
               value={pageSize}
               onChange={(e) => {
@@ -111,19 +126,19 @@ export const CelebTable: React.FC<CelebTableProps> = ({
               }}
               className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold rounded-lg text-xs py-1 px-2 outline-none focus:ring-2 focus:ring-buzz"
             >
-              <option value={10}>10 dòng</option>
-              <option value={20}>20 dòng</option>
-              <option value={50}>50 dòng</option>
-              <option value={-1}>Tất cả ({totalItems})</option>
+              <option value={10}>10 rows</option>
+              <option value={20}>20 rows</option>
+              <option value={50}>50 rows</option>
+              <option value={-1}>All ({totalItems})</option>
             </select>
           </div>
 
           <button
             onClick={onExport}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black text-white bg-buzz hover:bg-orange-600 active:bg-orange-700 rounded-xl shadow transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black text-white bg-buzz hover:bg-orange-600 active:bg-orange-700 rounded-xl shadow transition-colors cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
-            Xuất Data
+            Export Data
           </button>
         </div>
       </div>
@@ -133,14 +148,14 @@ export const CelebTable: React.FC<CelebTableProps> = ({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 dark:bg-slate-900/60 text-slate-700 dark:text-slate-300 text-[11px] font-black border-b border-slate-200 dark:border-slate-800 uppercase tracking-wider">
-              <th className="py-3.5 px-3 w-12 text-center">STT</th>
+              <th className="py-3.5 px-3 w-12 text-center">#</th>
               
               <th
                 onClick={() => handleSort('celebName')}
                 className="py-3.5 px-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               >
                 <div className="flex items-center gap-1">
-                  Nghệ sĩ / KOL
+                  CELEBRITY / KOL
                   <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
                 </div>
               </th>
@@ -150,38 +165,38 @@ export const CelebTable: React.FC<CelebTableProps> = ({
                 className="py-3.5 px-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap"
               >
                 <div className="flex items-center gap-1">
-                  Lĩnh vực
+                  PROFESSION
                   <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
                 </div>
               </th>
 
-              {/* Cột Số lần lọt Top 10 BSI */}
+              {/* Total Appearances Column */}
               <th
                 onClick={() => handleSort('totalAppearances')}
                 className="py-3.5 px-3 text-center cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-950/40 transition-colors bg-orange-50/60 dark:bg-orange-950/30 text-buzz dark:text-orange-300 whitespace-nowrap"
               >
                 <div className="flex items-center justify-center gap-1">
                   <Flame className="w-3.5 h-3.5 text-buzz" />
-                  Số lần lọt Top
+                  TOP 10 APPEARANCES
                   <InfoTooltip
-                    title="Số lần lọt Top 10 BSI"
-                    content="Tổng số tháng nghệ sĩ lọt vào bảng xếp hạng BSI Top 10 trong khoảng thời gian lọc."
+                    title="Top 10 Appearances"
+                    content="Total months this celebrity entered the BSI Top 10 ranking during the filtered period."
                   />
                   <ArrowUpDown className="w-3.5 h-3.5" />
                 </div>
               </th>
 
-              {/* Cột Average BSI top10 rank */}
+              {/* Average BSI top10 rank Column */}
               <th
                 onClick={() => handleSort('avgRank')}
                 className="py-3.5 px-4 text-center cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-950/40 transition-colors bg-amber-50/60 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300 whitespace-nowrap"
               >
                 <div className="flex items-center justify-center gap-1">
                   <Calendar className="w-3.5 h-3.5 text-amber-500" />
-                  AVG Top10 Rank
+                  AVG TOP 10 RANK
                   <InfoTooltip
-                    title="Average BSI Top10 Rank"
-                    content="Rank TB = Tổng xếp hạng trong các tháng lọt Top / Số tháng lọt Top. (Kèm thứ hạng đỉnh cao tốt nhất đạt được)."
+                    title="Average Top 10 Rank"
+                    content="Average rank = Sum of ranks across Top 10 appearances / Count of appearances. (Includes best rank attained)."
                   />
                   <ArrowUpDown className="w-3.5 h-3.5" />
                 </div>
@@ -193,10 +208,10 @@ export const CelebTable: React.FC<CelebTableProps> = ({
                 className="py-3.5 px-4 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap"
               >
                 <div className="flex items-center justify-end gap-1 text-buzz">
-                  AVG BSI Score
+                  AVG BSI SCORE
                   <InfoTooltip
-                    title="Điểm BSI Trung Bình"
-                    content="BSIScore trung bình khi nghệ sĩ lọt vào Top 10 BSI."
+                    title="Average BSI Score"
+                    content="Average BSI score achieved across Top 10 appearances."
                   />
                   <ArrowUpDown className="w-3.5 h-3.5" />
                 </div>
@@ -208,10 +223,10 @@ export const CelebTable: React.FC<CelebTableProps> = ({
                 className="py-3.5 px-4 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap"
               >
                 <div className="flex items-center justify-end gap-1">
-                  AVG Buzz
+                  AVG BUZZ VOL
                   <InfoTooltip
-                    title="Thảo luận Trung Bình"
-                    content="Lượng bài viết, bình luận, chia sẻ trung bình của nghệ sĩ."
+                    title="Average Buzz Volume"
+                    content="Average posts, comments, and shares related to the celebrity."
                   />
                   <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
                 </div>
@@ -224,10 +239,10 @@ export const CelebTable: React.FC<CelebTableProps> = ({
               >
                 <div className="flex items-center justify-end gap-1 text-buzz-darkblue">
                   <Users className="w-3.5 h-3.5" />
-                  Qualified User (QU)
+                  QUALIFIED USER (QU)
                   <InfoTooltip
                     title="Qualified User (QU)"
-                    content="Lượng khán giả độc lập thảo luận chất lượng trung bình."
+                    content="Average genuine unique users engaging in discussions."
                   />
                   <ArrowUpDown className="w-3.5 h-3.5" />
                 </div>
@@ -239,10 +254,10 @@ export const CelebTable: React.FC<CelebTableProps> = ({
                 className="py-3.5 px-3 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap"
               >
                 <div className="flex items-center justify-end gap-1">
-                  AVG Sentiment
+                  AVG SENTIMENT
                   <InfoTooltip
-                    title="Chỉ số cảm xúc trung bình"
-                    content="Sentiment index trung bình của nghệ sĩ (từ 0 đến 1)."
+                    title="Average Sentiment Index"
+                    content="Average audience sentiment index (from 0 to 1)."
                   />
                   <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
                 </div>
@@ -255,10 +270,10 @@ export const CelebTable: React.FC<CelebTableProps> = ({
               >
                 <div className="flex items-center justify-end gap-1 text-indigo-600 dark:text-indigo-400">
                   <Target className="w-3.5 h-3.5" />
-                  AVG Relevance
+                  AVG RELEVANCE
                   <InfoTooltip
-                    title="Trung bình thảo luận liên quan"
-                    content="Tỷ lệ % thảo luận nhắc đến nghệ sĩ đúng chủ đề liên quan."
+                    title="Average Relevance"
+                    content="Percentage of discussions directly focused on the celebrity."
                   />
                   <ArrowUpDown className="w-3.5 h-3.5" />
                 </div>
@@ -285,28 +300,28 @@ export const CelebTable: React.FC<CelebTableProps> = ({
                     </div>
                   </td>
 
-                  {/* Cột Lĩnh Vực - Clean Badge with whitespace-nowrap */}
+                  {/* Profession Column */}
                   <td className="py-3 px-3 text-xs font-bold text-slate-600 dark:text-slate-300">
                     <span className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 whitespace-nowrap inline-block font-extrabold">
                       {item.category}
                     </span>
                   </td>
 
-                  {/* Cột Số lần lọt Top 10 BSI */}
+                  {/* Total Appearances Column */}
                   <td className="py-3 px-3 text-center font-black text-buzz">
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-orange-100 dark:bg-orange-950/60 text-buzz border border-orange-200 dark:border-orange-900 font-black whitespace-nowrap">
-                      {item.totalAppearances} tháng
+                      {item.totalAppearances} Months
                     </span>
                   </td>
 
-                  {/* Cột AVG Top10 Rank */}
+                  {/* AVG Top 10 Rank Column */}
                   <td className="py-3 px-4 text-center whitespace-nowrap">
                     <div className="inline-flex flex-col items-center justify-center px-3 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900">
                       <span className="text-xs font-black text-amber-900 dark:text-amber-300">
-                        Rank TB: #{item.avgRank}
+                        Avg Rank: #{item.avgRank}
                       </span>
                       <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">
-                        (Cao nhất: #{item.bestRank})
+                        (Best: #{item.bestRank})
                       </span>
                     </div>
                   </td>
@@ -324,7 +339,7 @@ export const CelebTable: React.FC<CelebTableProps> = ({
                   </td>
 
                   <td className="py-3 px-3 text-right font-bold whitespace-nowrap">
-                    <span className={item.avgSentiment >= 0.9 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}>
+                    <span className={item.avgSentiment >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
                       {item.avgSentiment.toFixed(2)}
                     </span>
                   </td>
@@ -339,7 +354,7 @@ export const CelebTable: React.FC<CelebTableProps> = ({
             {paginatedData.length === 0 && (
               <tr>
                 <td colSpan={10} className="py-8 text-center text-slate-400 font-bold">
-                  Không tìm thấy nghệ sĩ nào phù hợp với bộ lọc.
+                  No celebrities found matching the selected filter criteria.
                 </td>
               </tr>
             )}
@@ -351,15 +366,15 @@ export const CelebTable: React.FC<CelebTableProps> = ({
       {!isAll && totalPages > 1 && (
         <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-900/40">
           <div>
-            Hiển thị <strong className="text-slate-900 dark:text-white">{startRecordNum}</strong> - <strong className="text-slate-900 dark:text-white">{endRecordNum}</strong> trong tổng số <strong className="text-buzz">{totalItems}</strong> nghệ sĩ
+            Showing <strong className="text-slate-900 dark:text-white">{startRecordNum}</strong> - <strong className="text-slate-900 dark:text-white">{endRecordNum}</strong> of <strong className="text-buzz">{totalItems}</strong> celebrities
           </div>
 
           <div className="flex items-center gap-1.5">
             <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={activePage === 1}
-              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
-              title="Trang trước"
+              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+              title="Previous page"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -368,7 +383,7 @@ export const CelebTable: React.FC<CelebTableProps> = ({
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`w-7 h-7 rounded-lg border text-xs font-black transition ${
+                className={`w-7 h-7 rounded-lg border text-xs font-black transition cursor-pointer ${
                   page === activePage
                     ? 'bg-buzz text-white border-buzz shadow-sm'
                     : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
@@ -381,8 +396,8 @@ export const CelebTable: React.FC<CelebTableProps> = ({
             <button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={activePage === totalPages}
-              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
-              title="Trang sau"
+              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+              title="Next page"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

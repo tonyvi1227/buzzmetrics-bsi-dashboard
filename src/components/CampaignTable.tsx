@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Table, ArrowUpDown, ChevronLeft, ChevronRight, Eye, Download } from 'lucide-react';
+import { Table, ArrowUpDown, ChevronLeft, ChevronRight, Eye, Download, ExternalLink, Crown, Medal, Award } from 'lucide-react';
 import { CampaignRecord, SortColumn, SortOrder } from '../types/dashboard';
 import { formatNum } from '../utils/brandStandardizer';
+import { InfoTooltip } from './common/InfoTooltip';
 
 interface CampaignTableProps {
   data: CampaignRecord[];
@@ -79,6 +80,33 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
     document.body.removeChild(link);
   };
 
+  const getRankBadge = (rank: number) => {
+    if (rank === 1) {
+      return (
+        <span className="w-5 h-5 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 font-black text-xs inline-flex items-center justify-center shadow-sm border border-amber-200" title="Rank #1 Gold">
+          <Crown className="w-3 h-3 fill-current text-slate-950" />
+        </span>
+      );
+    }
+    if (rank === 2) {
+      return (
+        <span className="w-5 h-5 rounded-full bg-gradient-to-tr from-slate-400 to-slate-200 text-slate-900 font-bold text-xs inline-flex items-center justify-center shadow border border-slate-300" title="Rank #2 Silver">
+          <Medal className="w-3 h-3 text-slate-900" />
+        </span>
+      );
+    }
+    if (rank === 3) {
+      return (
+        <span className="w-5 h-5 rounded-full bg-gradient-to-tr from-amber-700 to-amber-500 text-white font-bold text-xs inline-flex items-center justify-center shadow border border-amber-600" title="Rank #3 Bronze">
+          <Award className="w-3 h-3 text-white" />
+        </span>
+      );
+    }
+    return (
+      <span className="text-slate-400 text-[11px] font-extrabold">{rank}</span>
+    );
+  };
+
   const renderTypeBadge = (type?: string) => {
     switch (type) {
       case 'Product Launch & Rebranding':
@@ -119,7 +147,11 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
         <div>
           <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-            <Table className="w-4 h-4 text-buzz" /> CAMPAIGN ANALYTICS DATA TABLE
+            <Table className="w-4 h-4 text-buzz" /> CAMPAIGN PERFORMANCE DETAIL TABLE
+            <InfoTooltip
+              title="Campaign Detail Performance Table"
+              content="Comprehensive database of all tracked campaigns with granular metrics for Buzz, BSI, Sentiment, Relevance, and Media split. Click any row for deep-dive benchmark analysis."
+            />
           </h3>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">
             Click any row to open campaign deep-dive analysis & benchmark spider radar.
@@ -269,7 +301,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
                   onClick={() => onSelectCampaign(item)}
                   className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition cursor-pointer group"
                 >
-                  <td className="p-3 text-center text-slate-400 text-[11px] font-extrabold">{globalIndex}</td>
+                  <td className="p-3 text-center text-slate-400 text-[11px] font-extrabold">{getRankBadge(globalIndex)}</td>
                   <td className="p-3 whitespace-nowrap text-slate-700 dark:text-slate-300">
                     {item.month} {item.year}
                   </td>
@@ -285,7 +317,11 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
                   <td className="p-3 text-right font-black text-slate-900 dark:text-white">{formatNum(item.bsi)}</td>
                   <td className="p-3 text-right text-slate-700 dark:text-slate-300">{formatNum(item.contentQU)}</td>
                   <td className="p-3 text-right text-slate-700 dark:text-slate-300">{formatNum(item.quUser)}</td>
-                  <td className="p-3 text-right text-slate-700 dark:text-slate-300">{item.sentiment.toFixed(2)}</td>
+                  <td className="p-3 text-right whitespace-nowrap">
+                    <span className={item.sentiment >= 0 ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-rose-600 dark:text-rose-400 font-bold'}>
+                      {item.sentiment.toFixed(2)}
+                    </span>
+                  </td>
                   
                   {/* Relevancy with Refined Progress Bar */}
                   <td className="p-3 text-right text-slate-700 dark:text-slate-300">
@@ -333,7 +369,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
       </div>
 
       {/* Pagination Controls */}
-      <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
         <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
           Showing {Math.min((currentPage - 1) * itemsPerPage + 1, sortedData.length)} - {Math.min(currentPage * itemsPerPage, sortedData.length)} of {sortedData.length} entries
         </span>
@@ -342,7 +378,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
           <button
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
-            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"
+            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -352,7 +388,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
           <button
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
             disabled={currentPage === totalPages}
-            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"
+            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
           >
             <ChevronRight className="w-4 h-4" />
           </button>

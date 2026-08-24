@@ -92,11 +92,11 @@ export const CelebMatrixChart: React.FC<CelebMatrixChartProps> = ({ celebs }) =>
             label: (context: any) => {
               const raw = context.raw;
               return [
-                ` Nghệ sĩ: ${raw.celebName}`,
-                ` • Ranking TB khi lọt Top: #${raw.x} (Cao nhất: #${raw.bestRank})`,
-                ` • Số tháng lọt Top 10 BSI: ${raw.totalAppearances} tháng`,
-                ` • Điểm BSI Trung bình: ${Math.round(raw.y).toLocaleString('vi-VN')}`,
-                ` • Buzz Volume Trung bình: ${Math.round(raw.avgBuzz).toLocaleString('vi-VN')}`,
+                ` Celebrity: ${raw.celebName}`,
+                ` • Avg Rank: #${raw.x} (Best: #${raw.bestRank})`,
+                ` • Top 10 Appearances: ${raw.totalAppearances} Months`,
+                ` • Average BSI Score: ${Math.round(raw.y).toLocaleString('en-US')}`,
+                ` • Average Buzz Volume: ${Math.round(raw.avgBuzz).toLocaleString('en-US')}`,
               ];
             },
           },
@@ -107,7 +107,7 @@ export const CelebMatrixChart: React.FC<CelebMatrixChartProps> = ({ celebs }) =>
           reverse: true, // Rank #1 is best -> placed on far RIGHT!
           title: {
             display: true,
-            text: '← Ranking TB Thấp dần | Ranking TB Cao dần (Sát Top #1) →',
+            text: '← Lower Avg Rank | Higher Avg Rank (Closest to #1) →',
             color: textColor,
             font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const },
           },
@@ -121,7 +121,7 @@ export const CelebMatrixChart: React.FC<CelebMatrixChartProps> = ({ celebs }) =>
         y: {
           title: {
             display: true,
-            text: 'Điểm BSI Trung Bình (AVG BSI Score)',
+            text: 'AVG BSI Score',
             color: textColor,
             font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const },
           },
@@ -141,10 +141,10 @@ export const CelebMatrixChart: React.FC<CelebMatrixChartProps> = ({ celebs }) =>
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
           <Trophy className="w-4 h-4 text-buzz" />
-          MA TRẬN VỊ THẾ CELEB (RANKING TB VS AVG BSI VS TẦN SUẤT TOP 10)
+          CELEBRITY POSITIONING MATRIX
           <InfoTooltip
-            title="Ma Trận Vị Thế Celeb"
-            content="Phân tích 4 chiều: Trục X = Rank TB khi lọt Top (càng về bên phải càng gần #1); Trục Y = BSI trung bình; Kích thước bong bóng = Số tháng lọt Top 10 BSI; Màu sắc = Lĩnh vực hoạt động."
+            title="Celebrity Positioning Matrix"
+            content="4-dimensional analysis: X-axis = Average Rank (further right is closer to #1); Y-axis = Average BSI Score; Bubble Size = Total Top 10 Months; Color = Profession."
           />
         </h3>
         <span className="whitespace-nowrap inline-flex items-center justify-center text-[10px] font-black bg-orange-100 dark:bg-orange-950 text-buzz dark:text-orange-300 border border-orange-300 dark:border-orange-800 px-2.5 py-0.5 rounded-full">
@@ -157,7 +157,7 @@ export const CelebMatrixChart: React.FC<CelebMatrixChartProps> = ({ celebs }) =>
           <Bubble data={chartData} options={options} />
         ) : (
           <div className="h-full flex items-center justify-center text-xs font-bold text-slate-400">
-            Không có dữ liệu cho bộ lọc này
+            No data available for this filter
           </div>
         )}
       </div>

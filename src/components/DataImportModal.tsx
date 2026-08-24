@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { X, UploadCloud, FileSpreadsheet, Check, Download, AlertCircle, RefreshCw, ShieldCheck, Sparkles, Tag, Layers } from 'lucide-react';
 import { parseCSVData } from '../utils/csvParser';
 import { CampaignRecord } from '../types/dashboard';
@@ -24,6 +24,16 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
   const [parsedPreview, setParsedPreview] = useState<CampaignRecord[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [verificationStep, setVerificationStep] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = original;
+      };
+    }
+  }, [isOpen]);
 
   // Detect Existing Brands & Categories
   const existingBrandsSet = useMemo(() => {
@@ -58,28 +68,23 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
   if (!isOpen) return null;
 
   const handleFile = (f: File) => {
-    setError(null);
-    setVerificationStep(false);
-    if (!f.name.endsWith('.csv') && !f.name.endsWith('.txt')) {
-      setError('Vui lòng chọn file CSV chuẩn dữ liệu báo cáo (.csv)');
-      return;
-    }
-
     setFile(f);
+    setError(null);
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
         const text = e.target?.result as string;
         const records = parseCSVData(text);
         if (records.length === 0) {
-          setError('File CSV không đúng định dạng 22 cột dữ liệu Buzzmetrics.');
+          setError('No valid campaign data could be parsed from the CSV file. Please verify format.');
           setParsedPreview([]);
+          setVerificationStep(false);
         } else {
           setParsedPreview(records);
-          setVerificationStep(true); // Proceed to Final Check Stage
+          setVerificationStep(true);
         }
       } catch (err) {
-        setError('Có lỗi xảy ra khi đọc file CSV.');
+        setError('Error encountered while parsing CSV file.');
         setParsedPreview([]);
       }
     };
@@ -112,19 +117,19 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 overflow-y-auto">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-xl overflow-hidden my-auto overscroll-contain">
         {/* Header */}
         <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-buzz" />
             <h3 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-wide">
-              {verificationStep ? 'Kiểm Chứng & Duyệt Dữ Liệu Mới (Final Check)' : 'Cập Nhật Dữ Liệu Báo Cáo Tháng Mới'}
+              {verificationStep ? 'Dataset Verification (Final Check)' : 'Update Dashboard Dataset'}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg"
+            className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -157,10 +162,10 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
           >
             <FileSpreadsheet className="w-9 h-9 text-buzz mx-auto mb-2" />
             <p className="text-xs font-black text-slate-800 dark:text-slate-200">
-              Kéo thả file CSV dữ liệu tháng mới vào đây hoặc <span className="text-buzz underline">chọn file từ máy</span>
+              Drag & drop monthly CSV file here or <span className="text-buzz underline">browse from computer</span>
             </p>
             <p className="text-[11px] text-slate-400 dark:text-slate-500 font-bold mt-1">
-              Hỗ trợ file CSV chuẩn 22 cột dữ liệu Buzzmetrics
+              Supports standard Buzzmetrics 22-column CSV dataset format
             </p>
           </div>
 
@@ -176,10 +181,10 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
             <div className="p-4 bg-orange-50/70 dark:bg-slate-800/80 border border-orange-200 dark:border-orange-900 rounded-2xl space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black text-slate-900 dark:text-white uppercase flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-buzz" /> Báo cáo quét dữ liệu (Data Scan Result)
+                  <Sparkles className="w-4 h-4 text-buzz" /> Data Scan Result
                 </span>
                 <span className="text-xs font-black bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-2.5 py-0.5 rounded-full">
-                  {parsedPreview.length} Chiến dịch hợp lệ
+                  {parsedPreview.length} Valid Campaigns
                 </span>
               </div>
 
@@ -187,9 +192,9 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
               <div className="space-y-1">
                 <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
                   <span className="flex items-center gap-1">
-                    <Tag className="w-3.5 h-3.5 text-buzz" /> Thương hiệu mới phát hiện:
+                    <Tag className="w-3.5 h-3.5 text-buzz" /> New Brands Detected:
                   </span>
-                  <span className="font-black text-buzz">{newBrandsDetected.length} Brand mới</span>
+                  <span className="font-black text-buzz">{newBrandsDetected.length} New Brands</span>
                 </div>
                 {newBrandsDetected.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5 pt-1">
@@ -200,7 +205,7 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-[11px] text-slate-500 font-semibold">Tất cả Brand đều nằm trong danh mục quy chuẩn đã có.</p>
+                  <p className="text-[11px] text-slate-500 font-semibold">All brands match existing standard dictionary.</p>
                 )}
               </div>
 
@@ -208,9 +213,9 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
               <div className="space-y-1 pt-1 border-t border-orange-200/60 dark:border-slate-700">
                 <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
                   <span className="flex items-center gap-1">
-                    <Layers className="w-3.5 h-3.5 text-buzz" /> Ngành hàng mới phát hiện:
+                    <Layers className="w-3.5 h-3.5 text-buzz" /> New Categories Detected:
                   </span>
-                  <span className="font-black text-buzz">{newCategoriesDetected.length} Ngành mới</span>
+                  <span className="font-black text-buzz">{newCategoriesDetected.length} New Categories</span>
                 </div>
                 {newCategoriesDetected.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5 pt-1">
@@ -221,7 +226,7 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-[11px] text-slate-500 font-semibold">Tất cả Ngành hàng đều nằm trong danh mục đã có.</p>
+                  <p className="text-[11px] text-slate-500 font-semibold">All categories match existing category list.</p>
                 )}
               </div>
             </div>
@@ -230,7 +235,7 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
           {/* Import Mode Options */}
           <div className="space-y-2">
             <label className="block text-xs font-black text-slate-700 dark:text-slate-300">
-              Chế độ nạp dữ liệu:
+              Dataset Import Mode:
             </label>
             <div className="grid grid-cols-2 gap-3">
               <label
@@ -249,8 +254,8 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
                   className="accent-buzz"
                 />
                 <div>
-                  <p className="font-black">Bổ sung (Append)</p>
-                  <p className="text-[10px] opacity-80">Gộp thêm tháng mới vào dữ liệu cũ</p>
+                  <p className="font-black">Append</p>
+                  <p className="text-[10px] opacity-80">Merge new month into existing data</p>
                 </div>
               </label>
 
@@ -270,8 +275,8 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
                   className="accent-buzz"
                 />
                 <div>
-                  <p className="font-black">Ghi đè (Overwrite)</p>
-                  <p className="text-[10px] opacity-80">Thay thế toàn bộ tập data hiện tại</p>
+                  <p className="font-black">Overwrite</p>
+                  <p className="text-[10px] opacity-80">Replace entire active dataset</p>
                 </div>
               </label>
             </div>
@@ -281,16 +286,16 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
           <div className="flex justify-between items-center pt-1">
             <button
               onClick={handleDownloadTemplate}
-              className="text-xs font-bold text-buzz hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-buzz hover:underline flex items-center gap-1 cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5" /> Tải File Mẫu (Template CSV)
+              <Download className="w-3.5 h-3.5" /> Download Template CSV
             </button>
 
             <button
               onClick={onResetToDefault}
-              className="text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 flex items-center gap-1"
+              className="text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 flex items-center gap-1 cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Khôi phục Data 18 tháng gốc
+              <RefreshCw className="w-3.5 h-3.5" /> Restore Default 18-Month Dataset
             </button>
           </div>
         </div>
@@ -299,16 +304,16 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
         <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl hover:bg-slate-300 transition"
+            className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl hover:bg-slate-300 transition cursor-pointer"
           >
-            Hủy
+            Cancel
           </button>
           <button
             disabled={parsedPreview.length === 0}
             onClick={handleConfirmImport}
-            className="px-5 py-2 bg-buzz text-white text-xs font-black rounded-xl hover:bg-buzz-hover transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+            className="px-5 py-2 bg-buzz text-white text-xs font-black rounded-xl hover:bg-buzz-hover transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer"
           >
-            <ShieldCheck className="w-4 h-4" /> Duyệt & Nạp Data
+            <ShieldCheck className="w-4 h-4" /> Confirm & Load Data
           </button>
         </div>
       </div>
