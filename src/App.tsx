@@ -66,8 +66,8 @@ const DashboardContent: React.FC = () => {
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
 
-  // A/B Testing & Gated Lead Capture States
-  const [isUnlocked, setIsUnlocked] = useState(() => isUserUnlocked());
+  // A/B Testing & Gated Lead Capture States (Defaults to locked on reload)
+  const [isUnlocked, setIsUnlocked] = useState(false);
   const [assignedVariant, setAssignedVariant] = useState<ABVariant>(() => getAssignedVariant());
   const [clickCount, setClickCount] = useState(() => getClickCount());
 
@@ -307,14 +307,10 @@ const DashboardContent: React.FC = () => {
     setDataset(initial);
   };
 
-  // Dev Hidden Password & Auth State
+  // Dev Hidden Password & Auth State (Always requires re-entering passcode upon page reload)
   const [isDevPasswordOpen, setIsDevPasswordOpen] = useState(false);
-  const [isDevAuthed, setIsDevAuthed] = useState<boolean>(() => {
-    return localStorage.getItem('buzz_dev_authed') === 'true';
-  });
-  const [showDevToolbar, setShowDevToolbar] = useState<boolean>(() => {
-    return localStorage.getItem('buzz_dev_authed') === 'true' || window.location.search.includes('dev=true');
-  });
+  const [isDevAuthed, setIsDevAuthed] = useState<boolean>(false);
+  const [showDevToolbar, setShowDevToolbar] = useState<boolean>(false);
 
   const handleOpenDevClick = () => {
     if (isDevAuthed || isAdmin) {

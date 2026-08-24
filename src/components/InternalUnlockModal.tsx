@@ -37,9 +37,6 @@ export const InternalUnlockModal: React.FC<InternalUnlockModalProps> = ({
       setError('');
       setIsSuccess(true);
       unlockUserPermanently(result.isInternal);
-      if (result.isDev) {
-        localStorage.setItem('buzz_dev_authed', 'true');
-      }
       setTimeout(() => {
         setIsSuccess(false);
         setPassword('');

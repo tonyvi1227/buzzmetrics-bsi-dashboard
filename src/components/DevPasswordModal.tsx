@@ -30,7 +30,6 @@ export const DevPasswordModal: React.FC<DevPasswordModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (password.trim().toLowerCase() === 'devonly' || password.trim() === 'D3vonly') {
-      localStorage.setItem('buzz_dev_authed', 'true');
       setError('');
       setPassword('');
       onSuccess();

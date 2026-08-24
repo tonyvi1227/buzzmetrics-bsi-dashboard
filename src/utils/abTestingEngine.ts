@@ -119,11 +119,15 @@ export function hasSubmittedLead(): boolean {
   return localStorage.getItem(HAS_LEAD_KEY) === 'true';
 }
 
-// Clear stale persistent unlocks from previous versions on script load
+// Clear any persistent unlocks & dev auth on page load so refreshing always requires re-authenticating
 if (typeof window !== 'undefined') {
   try {
     localStorage.removeItem(INTERNAL_UNLOCKED_KEY);
     localStorage.removeItem(UNLOCKED_KEY);
+    localStorage.removeItem('buzz_dev_authed');
+    sessionStorage.removeItem(INTERNAL_UNLOCKED_KEY);
+    sessionStorage.removeItem(UNLOCKED_KEY);
+    sessionStorage.removeItem('buzz_dev_authed');
   } catch (e) {}
 }
 
