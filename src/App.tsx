@@ -286,7 +286,7 @@ const DashboardContent: React.FC = () => {
     return localStorage.getItem('buzz_dev_authed') === 'true';
   });
   const [showDevToolbar, setShowDevToolbar] = useState<boolean>(() => {
-    return import.meta.env.DEV || window.location.search.includes('dev=true');
+    return localStorage.getItem('buzz_dev_authed') === 'true' || window.location.search.includes('dev=true');
   });
 
   const handleOpenDevClick = () => {
@@ -573,7 +573,7 @@ const DashboardContent: React.FC = () => {
       />
 
       {/* Dev A/B Testing Toolbar (Rendered in Footer Area) */}
-      {(showDevToolbar || isAdmin) && (
+      {(isDevAuthed && showDevToolbar) && (
         <div className="mt-8">
           <DevABToolbar
             currentVariant={assignedVariant}

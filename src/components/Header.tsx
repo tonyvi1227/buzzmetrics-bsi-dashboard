@@ -48,17 +48,17 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Right Section: Unlock Full Version, Request Custom Insights & Admin Actions */}
+        {/* Right Section: Sign up to Unlock Insights, Unlock Full Version & Admin Actions */}
         <div className="flex items-center gap-2 flex-wrap self-end lg:self-auto">
           {/* Main Lead Generation CTA Button */}
           {onOpenContactModal && (
             <button
               onClick={onOpenContactModal}
               className="px-3.5 py-1.5 bg-buzz hover:bg-orange-600 text-white text-xs font-black rounded-xl shadow-sm hover:shadow transition flex items-center gap-1.5 cursor-pointer"
-              title="Request Custom Campaign Analysis & Industry Insights"
+              title="Sign up to Unlock Insights & Industry Deep Dives"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Request Custom Insights</span>
+              <span>Sign up to Unlock Insights</span>
             </button>
           )}
 
