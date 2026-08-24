@@ -38,33 +38,23 @@ export const Header: React.FC<HeaderProps> = ({
         
         {/* Left Official Logo & Title */}
         <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
-          <img
-            src={BUZZMETRICS_LOGO_BASE64}
-            alt="Buzzmetrics Logo"
-            className="h-7 sm:h-8 md:h-9 object-contain"
-          />
+          <a
+            href="https://www.buzzmetrics.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:opacity-85 transition cursor-pointer flex items-center"
+            title="Visit Buzzmetrics Website"
+          >
+            <img
+              src={BUZZMETRICS_LOGO_BASE64}
+              alt="Buzzmetrics Logo"
+              className="h-7 sm:h-8 md:h-9 object-contain"
+            />
+          </a>
 
           <span className="text-xs md:text-sm font-black tracking-tight text-white uppercase whitespace-nowrap bg-slate-900 px-2.5 sm:px-3 py-1 rounded-xl border border-slate-700 shadow-md">
             BSI Top10 Dashboard
           </span>
-
-
-          {/* Freemium 7-Action Live Countdown Badge for Variant C */}
-          {!isUnlocked && variant === 'C' && (
-            <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black border transition cursor-default shadow-sm ${
-                remainingClicks > 2
-                  ? 'bg-sky-50 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 border-sky-300 dark:border-sky-800'
-                  : remainingClicks > 0
-                  ? 'bg-amber-50 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800'
-                  : 'bg-rose-50 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800 animate-pulse'
-              }`}
-              title={`Freemium Preview: ${remainingClicks} of ${MAX_FREE_CLICKS} free interactive actions remaining`}
-            >
-              <Zap className="w-3 h-3 text-amber-500 flex-shrink-0" />
-              <span>{remainingClicks > 0 ? `FREE PREVIEW: ${remainingClicks}/${MAX_FREE_CLICKS} ACTIONS LEFT` : '0/7 ACTIONS LEFT (LIMIT REACHED)'}</span>
-            </span>
-          )}
         </div>
 
         {/* Right Section: Sign up to Unlock Insights, Unlock Full Version & Admin Actions */}
