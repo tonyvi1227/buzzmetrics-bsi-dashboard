@@ -100,14 +100,14 @@ export const TopBrandsTable: React.FC<TopBrandsTableProps> = ({ data, isUnlocked
     const maxRank = Math.max(...brandList.map(b => b.avgRank), 10);
     const minRank = Math.min(...brandList.map(b => b.avgRank), 1);
 
-    // Compute Weighted Score: 60% Avg BSI + 30% Avg Rank + 10% Months on Top 10
+    // Compute Weighted Score: 50% Avg BSI + 25% Avg Rank + 25% Months on Top 10
     const scoredBrands = brandList.map(b => {
       const normBsi = (b.avgBSI - minBSI) / (maxBSI - minBSI || 1);
       const normMonths = (b.monthsOnTop10 - minMonths) / (maxMonths - minMonths || 1);
       // Invert rank: lower rank number is better (Rank 1 -> 1.0)
       const normRank = maxRank === minRank ? 1 : 1 - (b.avgRank - minRank) / (maxRank - minRank);
 
-      const compositeScore = normBsi * 0.60 + normRank * 0.30 + normMonths * 0.10;
+      const compositeScore = normBsi * 0.50 + normRank * 0.25 + normMonths * 0.25;
 
       return {
         ...b,
@@ -155,7 +155,7 @@ export const TopBrandsTable: React.FC<TopBrandsTableProps> = ({ data, isUnlocked
   };
 
   const tooltipText = showFormula
-    ? "Top Brands Performance: 60% Avg BSI + 30% Avg Rank + 10% Months on Top 10 (Min 2 months on Top 10)."
+    ? "Top Brands Performance: 50% Avg BSI + 25% Avg Rank + 25% Months on Top 10 (Min 2 months on Top 10)."
     : "Leaderboard of top performing brands ranked by combined BSI performance, average ranking, and campaign consistency.";
 
   return (

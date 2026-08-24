@@ -1,7 +1,7 @@
 {
   "name": "buzzmetrics-campaign-dashboard",
   "private": true,
-  "version": "1.42.0",
+  "version": "4.41.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

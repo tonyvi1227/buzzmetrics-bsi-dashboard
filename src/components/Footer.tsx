@@ -14,9 +14,9 @@ export const Footer: React.FC<FooterProps> = ({
 }) => {
   return (
     <footer className="mt-10 py-6 border-t border-slate-200 dark:border-slate-800 text-center text-xs font-bold text-slate-500 dark:text-slate-400 flex flex-col md:flex-row items-center justify-between gap-4 px-2">
-      {/* Left Copyright */}
+      {/* Left Copyright & Version */}
       <div className="flex items-center gap-2">
-        <span>© {new Date().getFullYear()} Buzzmetrics BSI Dashboard v1.42</span>
+        <span>© {new Date().getFullYear()} Buzzmetrics BSI Dashboard v4.41</span>
       </div>
 
       {/* Center Dataset Scope Card */}
@@ -30,26 +30,16 @@ export const Footer: React.FC<FooterProps> = ({
         </div>
       </div>
 
-      {/* Right Credits & Hidden Dev A/B Button (Only visible after unlocking dev mode) */}
+      {/* Right Actions & Dev Trigger */}
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-slate-400 font-bold">Credits:</span>
-        <span className="text-buzz font-black bg-orange-50 dark:bg-orange-950/80 px-2.5 py-0.5 rounded-full border border-orange-200 dark:border-orange-900">
-          Idea - GiangLHT
-        </span>
-        <span className="text-slate-300 dark:text-slate-700">•</span>
-        <span className="text-buzz font-black bg-orange-50 dark:bg-orange-950/80 px-2.5 py-0.5 rounded-full border border-orange-200 dark:border-orange-900">
-          Dev - TuanVM
-        </span>
-
-        {/* Dev A/B Button: Only visible once Dev Mode is unlocked */}
-        {isDevAuthed && onOpenDevPassword && (
+        {onOpenDevPassword && (
           <button
             onClick={onOpenDevPassword}
-            title="Dev A/B Toolbar"
-            className="ml-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-700 transition flex items-center gap-1 cursor-pointer shadow-sm"
+            title="Dev Access"
+            className="px-2.5 py-1 rounded-full text-[10px] font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition flex items-center gap-1 cursor-pointer opacity-60 hover:opacity-100"
           >
-            <Sparkles className="w-3 h-3 text-amber-400" />
-            <span>🛠️ Dev Tool</span>
+            <Sparkles className="w-3 h-3 text-slate-400" />
+            <span>Dev Access</span>
           </button>
         )}
       </div>

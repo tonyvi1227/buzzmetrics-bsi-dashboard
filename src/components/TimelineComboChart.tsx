@@ -61,21 +61,25 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
   }, [timelineMonths]);
 
   const chartData = React.useMemo(() => {
-    const map: Record<string, { buzz: number; count: number }> = {};
+    const map: Record<string, { buzz: number; cfqu: number; count: number }> = {};
     timelineMonths.forEach(m => {
-      map[m] = { buzz: 0, count: 0 };
+      map[m] = { buzz: 0, cfqu: 0, count: 0 };
     });
 
     data.forEach(d => {
       const key = `${d.month} ${d.year}`;
       if (map[key]) {
         map[key].buzz += d.buzzVolume;
+        map[key].cfqu += (d.contentQU || 0);
         map[key].count += 1;
       }
     });
 
     const buzzVolMillions = timelineMonths.map(k => parseFloat((map[k].buzz / 1000000).toFixed(2)));
-    const campaignCounts = timelineMonths.map(k => map[k].count);
+    const cfquPercentage = timelineMonths.map(k => {
+      if (map[k].buzz === 0) return 0;
+      return parseFloat(((map[k].cfqu / map[k].buzz) * 100).toFixed(1));
+    });
 
     return {
       labels: formattedLabels,
@@ -90,8 +94,8 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
         },
         {
           type: 'line' as const,
-          label: 'Campaign Count',
-          data: campaignCounts,
+          label: '% CFQU',
+          data: cfquPercentage,
           borderColor: '#125876', // Buzzmetrics Dark Blue
           backgroundColor: '#125876',
           borderWidth: 2.5,
@@ -126,6 +130,16 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
           cornerRadius: 8,
           bodyFont: { family: "'Inter', sans-serif", size: 12, weight: 'bold' as const },
           titleFont: { family: "'Inter', sans-serif", size: 13, weight: 'bold' as const },
+          callbacks: {
+            label: (context: any) => {
+              const label = context.dataset.label || '';
+              const val = context.parsed.y;
+              if (label.includes('%')) {
+                return `${label}: ${val}%`;
+              }
+              return `${label}: ${val}M`;
+            },
+          },
         },
       },
       scales: {
@@ -148,8 +162,12 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
         y1: {
           type: 'linear' as const,
           position: 'right' as const,
-          title: { display: true, text: 'Campaign Count', font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const }, color: textColor },
-          ticks: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' as const } },
+          title: { display: true, text: '% CFQU', font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const }, color: textColor },
+          ticks: {
+            color: textColor,
+            font: { family: "'Inter', sans-serif", weight: 'bold' as const },
+            callback: (val: any) => `${val}%`,
+          },
           grid: { display: false },
         },
       },
@@ -160,10 +178,10 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
     <div id="timeline-combo-container" className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-buzz" /> MONTHLY BUZZ & CAMPAIGN TIMELINE
+          <TrendingUp className="w-4 h-4 text-buzz" /> MONTHLY BUZZ & % CFQU TIMELINE
           <InfoTooltip
-            title="Monthly Buzz & Campaign Timeline"
-            content="Monthly evolution of total discussion volume (Orange bars in millions) and active campaign count (Blue trendline)."
+            title="Monthly Buzz & % CFQU Timeline"
+            content="Monthly evolution of total discussion volume (Orange bars in Millions) and % Content & Form Quality (% CFQU / Total Buzz in Blue trendline)."
           />
         </h3>
 
