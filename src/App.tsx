@@ -489,6 +489,7 @@ const DashboardContent: React.FC = () => {
                 variant={assignedVariant}
                 onOpenGateModal={triggerGateModal}
                 onUnlockNow={() => setIsUnlocked(true)}
+                onOpenPasscodeModal={() => setIsInternalModalOpen(true)}
                 clickCount={clickCount}
               />
             )}

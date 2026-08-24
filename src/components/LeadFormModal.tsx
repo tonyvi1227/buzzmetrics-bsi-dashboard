@@ -81,13 +81,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/65 flex items-center justify-center p-4 md:p-6"
-      style={{
-        willChange: 'transform, opacity',
-        transform: 'translateZ(0)',
-      }}
-    >
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex items-center justify-center p-4 md:p-6">
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg p-6 md:p-7 relative my-auto">
         <button
           onClick={handleCloseModal}
@@ -99,7 +93,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
 
         {isSubmittedSuccess ? (
           <div className="text-center py-4 space-y-4">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center border border-emerald-200 dark:border-emerald-800 shadow-md">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center border border-emerald-200 dark:border-emerald-800 shadow-sm">
               <CheckCircle2 className="w-7 h-7" />
             </div>
 
@@ -107,8 +101,8 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
               <h3 className="text-base md:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">
                 ĐÃ GỬI THÔNG TIN DỰ ÁN THÀNH CÔNG!
               </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 font-semibold mt-2 leading-relaxed max-w-sm mx-auto">
-                Cảm ơn bạn đã đăng ký. Đội ngũ chuyên gia Buzzmetrics đã nhận được thông tin và sẽ liên hệ xác minh thông tin dự án qua SĐT/Email của bạn trong 15-30 phút để cấp quyền mở khóa BSI Campaign Full Version.
+              <p className="text-xs text-slate-700 dark:text-slate-300 font-bold mt-2 leading-relaxed max-w-sm mx-auto">
+                Đội ngũ Buzzmetrics đã tiếp nhận yêu cầu và sẽ liên hệ xác minh thông tin, và cấp quyền mở khóa Full Version cho bạn sớm nhất.
               </p>
             </div>
 
@@ -119,7 +113,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                 onSuccess();
                 onClose();
               }}
-              className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs md:text-sm rounded-xl transition shadow-md shadow-emerald-500/20 cursor-pointer"
+              className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs md:text-sm rounded-xl transition shadow cursor-pointer"
             >
               ✓ ĐÃ NẮM RÕ THÔNG TIN
             </button>
@@ -127,7 +121,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
         ) : (
           <>
             <div className="text-center mb-5">
-              <div className="w-11 h-11 rounded-2xl bg-orange-50 dark:bg-orange-950/80 text-buzz mx-auto flex items-center justify-center mb-2 border border-orange-200 dark:border-orange-800 shadow-md">
+              <div className="w-11 h-11 rounded-2xl bg-orange-50 dark:bg-orange-950/80 text-buzz mx-auto flex items-center justify-center mb-2 border border-orange-200 dark:border-orange-800 shadow-sm">
                 <LockKeyhole className="w-5 h-5" />
               </div>
               <h3 className="text-base md:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">
@@ -299,7 +293,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 bg-buzz hover:bg-orange-600 text-white font-black text-xs md:text-sm rounded-xl transition shadow-md shadow-orange-500/20 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full py-3 bg-buzz hover:bg-orange-600 text-white font-black text-xs md:text-sm rounded-xl transition shadow cursor-pointer flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <span>Đang gửi thông tin đăng ký...</span>

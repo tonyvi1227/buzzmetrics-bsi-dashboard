@@ -10,8 +10,17 @@ const CLICK_COUNT_KEY = 'buzz_click_count';
 const WINNING_VARIANT_KEY = 'buzz_winning_variant';
 const LOCAL_LEADS_KEY = 'buzz_local_leads';
 
-// Passwords for Internal Team & Manual Verification Unlock
-export const INTERNAL_PASSWORDS = ['CIMKT', 'BUZZINTERNAL', 'BUZZQUALIFIED', 'BUZZ2026'];
+// Dedicated Passcodes for Verified Clients (View & Filter Only - NO Dev Toolbar Access)
+export const CLIENT_PASSCODES = ['BUZZVIP', 'BSI2026', 'BUZZFULL', 'BUZZQUALIFIED', 'CIMKT', 'BUZZINTERNAL'];
+
+// Internal Dev & Admin Team Passwords
+export const INTERNAL_PASSWORDS = ['CIMKT', 'BUZZINTERNAL'];
+
+export function verifyClientPasscode(passcode: string): boolean {
+  if (!passcode) return false;
+  const cleaned = passcode.trim().toUpperCase();
+  return CLIENT_PASSCODES.includes(cleaned);
+}
 
 export function verifyInternalPassword(password: string): boolean {
   if (!password) return false;
