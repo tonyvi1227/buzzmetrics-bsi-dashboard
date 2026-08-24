@@ -1,16 +1,16 @@
 import React from 'react';
-import { KeyRound, Calendar, Sparkles } from 'lucide-react';
+import { Calendar, Sparkles } from 'lucide-react';
 
 interface FooterProps {
-  onOpenInternalUnlock?: () => void;
   onOpenDevPassword?: () => void;
+  isDevAuthed?: boolean;
   totalRecordsCount?: number;
 }
 
 export const Footer: React.FC<FooterProps> = ({
-  onOpenInternalUnlock,
   onOpenDevPassword,
-  totalRecordsCount = 35,
+  isDevAuthed = false,
+  totalRecordsCount = 318,
 }) => {
   return (
     <footer className="mt-10 py-6 border-t border-slate-200 dark:border-slate-800 text-center text-xs font-bold text-slate-500 dark:text-slate-400 flex flex-col md:flex-row items-center justify-between gap-4 px-2">
@@ -19,7 +19,7 @@ export const Footer: React.FC<FooterProps> = ({
         <span>© {new Date().getFullYear()} Buzzmetrics BSI Dashboard v1.42</span>
       </div>
 
-      {/* Center Dataset Scope Card moved to Footer */}
+      {/* Center Dataset Scope Card */}
       <div className="whitespace-nowrap px-3 py-1.5 bg-slate-50/90 dark:bg-slate-800/60 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2 pointer-events-none select-none">
         <Calendar className="w-4 h-4 text-buzz flex-shrink-0" />
         <div className="text-left">
@@ -30,7 +30,7 @@ export const Footer: React.FC<FooterProps> = ({
         </div>
       </div>
 
-      {/* Right Credits, Internal Button & Dev A/B Button */}
+      {/* Right Credits & Hidden Dev A/B Button (Only visible after unlocking dev mode) */}
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-slate-400 font-bold">Credits:</span>
         <span className="text-buzz font-black bg-orange-50 dark:bg-orange-950/80 px-2.5 py-0.5 rounded-full border border-orange-200 dark:border-orange-900">
@@ -41,8 +41,8 @@ export const Footer: React.FC<FooterProps> = ({
           Dev - TuanVM
         </span>
 
-        {/* Dev A/B Button requiring Devonly password */}
-        {onOpenDevPassword && (
+        {/* Dev A/B Button: Only visible once Dev Mode is unlocked */}
+        {isDevAuthed && onOpenDevPassword && (
           <button
             onClick={onOpenDevPassword}
             title="Dev A/B Toolbar"
@@ -50,18 +50,6 @@ export const Footer: React.FC<FooterProps> = ({
           >
             <Sparkles className="w-3 h-3 text-amber-400" />
             <span>⚡ Dev A/B</span>
-          </button>
-        )}
-
-        {/* Small Internal Unlock Button */}
-        {onOpenInternalUnlock && (
-          <button
-            onClick={onOpenInternalUnlock}
-            title="Internal Team Access"
-            className="px-2 py-1 rounded-full text-[10px] font-black bg-slate-100 dark:bg-slate-800 hover:bg-orange-100 dark:hover:bg-slate-700 text-slate-500 hover:text-buzz border border-slate-200 dark:border-slate-700 transition flex items-center gap-1 cursor-pointer"
-          >
-            <KeyRound className="w-3 h-3 text-buzz" />
-            <span>Internal</span>
           </button>
         )}
       </div>

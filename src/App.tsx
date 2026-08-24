@@ -340,6 +340,8 @@ const DashboardContent: React.FC = () => {
         activeTab={activeTab}
         onTabChange={handleTabChange}
         onOpenContactModal={triggerGateModal}
+        onOpenUnlockModal={() => setIsInternalModalOpen(true)}
+        isUnlocked={isUnlocked}
       />
 
       {/* Admin Panel for A/B Testing & Leads Management */}
@@ -586,8 +588,8 @@ const DashboardContent: React.FC = () => {
 
       {/* Footer */}
       <Footer
-        onOpenInternalUnlock={() => setIsInternalModalOpen(true)}
         onOpenDevPassword={handleOpenDevClick}
+        isDevAuthed={isDevAuthed}
         totalRecordsCount={activeTab === 'campaigns' ? dataset.length : celebDataset.length}
       />
     </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Upload, Download, Sparkles } from 'lucide-react';
+import { Upload, Download, Sparkles, KeyRound } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import { BUZZMETRICS_LOGO_BASE64 } from '../assets/buzzmetricsLogoData';
 
@@ -9,12 +9,16 @@ interface HeaderProps {
   activeTab: 'campaigns' | 'celebs';
   onTabChange: (tab: 'campaigns' | 'celebs') => void;
   onOpenContactModal?: () => void;
+  onOpenUnlockModal?: () => void;
+  isUnlocked?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenImport,
   onOpenExport,
   onOpenContactModal,
+  onOpenUnlockModal,
+  isUnlocked = false,
 }) => {
   const { isAdmin } = useAdmin();
 
@@ -38,23 +42,35 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Live Data Status Indicator */}
             <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               <span>LIVE DATA</span>
             </span>
           </div>
         </div>
 
-        {/* Right Section: Request Custom Insights CTA & Admin Hidden Actions */}
+        {/* Right Section: Unlock Full Version, Request Custom Insights & Admin Actions */}
         <div className="flex items-center gap-2 flex-wrap self-end lg:self-auto">
           {/* Main Lead Generation CTA Button */}
           {onOpenContactModal && (
             <button
               onClick={onOpenContactModal}
-              className="px-3.5 py-1.5 bg-buzz hover:bg-orange-600 text-white text-xs font-black rounded-xl shadow-sm hover:shadow transition flex items-center gap-1.5 cursor-pointer animate-pulse"
+              className="px-3.5 py-1.5 bg-buzz hover:bg-orange-600 text-white text-xs font-black rounded-xl shadow-sm hover:shadow transition flex items-center gap-1.5 cursor-pointer"
               title="Request Custom Campaign Analysis & Industry Insights"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Request Custom Insights</span>
+            </button>
+          )}
+
+          {/* Unlock Full Version CTA Button */}
+          {!isUnlocked && onOpenUnlockModal && (
+            <button
+              onClick={onOpenUnlockModal}
+              className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-amber-400 text-xs font-black rounded-xl shadow-sm border border-slate-700 transition flex items-center gap-1.5 cursor-pointer"
+              title="Unlock Full Dashboard Version"
+            >
+              <KeyRound className="w-3.5 h-3.5 text-amber-400" />
+              <span>Unlock Full Version</span>
             </button>
           )}
 
