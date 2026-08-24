@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { X, Lock, CheckCircle2, KeyRound } from 'lucide-react';
-import { verifyInternalPassword, verifyClientPasscode, unlockUserPermanently } from '../utils/abTestingEngine';
+import { verifyAnyPasscode, unlockUserPermanently } from '../utils/abTestingEngine';
 
 interface InternalUnlockModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (isDev?: boolean) => void;
 }
 
 export const InternalUnlockModal: React.FC<InternalUnlockModalProps> = ({
@@ -21,21 +21,23 @@ export const InternalUnlockModal: React.FC<InternalUnlockModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const isInternal = verifyInternalPassword(password);
-    const isClientPass = verifyClientPasscode(password);
+    const result = verifyAnyPasscode(password);
 
-    if (isInternal || isClientPass) {
+    if (result.valid) {
       setError('');
       setIsSuccess(true);
-      unlockUserPermanently(isInternal);
+      unlockUserPermanently(result.isInternal);
+      if (result.isDev) {
+        localStorage.setItem('buzz_dev_authed', 'true');
+      }
       setTimeout(() => {
         setIsSuccess(false);
         setPassword('');
-        onSuccess();
+        onSuccess(result.isDev);
         onClose();
       }, 500);
     } else {
-      setError('Invalid code. Please check and try again.');
+      setError('Invalid passcode. Please check and try again.');
     }
   };
 

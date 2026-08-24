@@ -557,7 +557,13 @@ const DashboardContent: React.FC = () => {
       <InternalUnlockModal
         isOpen={isInternalModalOpen}
         onClose={() => setIsInternalModalOpen(false)}
-        onSuccess={() => setIsUnlocked(true)}
+        onSuccess={(isDev) => {
+          setIsUnlocked(true);
+          if (isDev) {
+            setIsDevAuthed(true);
+            setShowDevToolbar(true);
+          }
+        }}
       />
 
       <DevPasswordModal

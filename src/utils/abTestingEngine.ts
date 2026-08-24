@@ -10,11 +10,35 @@ const CLICK_COUNT_KEY = 'buzz_click_count';
 const WINNING_VARIANT_KEY = 'buzz_winning_variant';
 const LOCAL_LEADS_KEY = 'buzz_local_leads';
 
-// Dedicated Passcodes for Verified Clients (View & Filter Only - NO Dev Toolbar Access)
-export const CLIENT_PASSCODES = ['BUZZVIP', 'BSI2026', 'BUZZFULL', 'BUZZQUALIFIED', 'CIMKT', 'BUZZINTERNAL'];
+// Passcode Configuration:
+// 1. Dev Password (Unlocks Dashboard AND reveals ⚡ Dev A/B Toolbar)
+export const DEV_PASSWORDS = ['D3VONLY'];
 
-// Internal Dev & Admin Team Passwords
-export const INTERNAL_PASSWORDS = ['CIMKT', 'BUZZINTERNAL'];
+// 2. Internal Team Password (Unlocks Dashboard, NO Dev Toolbar)
+export const INTERNAL_PASSWORDS = ['BUZZINTERN@L', 'CIMKT', 'BUZZINTERNAL'];
+
+// 3. Client Passcodes (Unlocks Dashboard View & Filtering Only)
+export const CLIENT_PASSCODES = [
+  'BUZZBDK',
+  'BUZZBDT',
+  'BUZZBDN',
+  'BUZZBDQ',
+  'BUZZVIP',
+  'BSI2026',
+  'BUZZFULL',
+];
+
+export function verifyDevPassword(passcode: string): boolean {
+  if (!passcode) return false;
+  const cleaned = passcode.trim().toUpperCase();
+  return DEV_PASSWORDS.includes(cleaned);
+}
+
+export function verifyInternalPassword(passcode: string): boolean {
+  if (!passcode) return false;
+  const cleaned = passcode.trim().toUpperCase();
+  return INTERNAL_PASSWORDS.includes(cleaned);
+}
 
 export function verifyClientPasscode(passcode: string): boolean {
   if (!passcode) return false;
@@ -22,10 +46,28 @@ export function verifyClientPasscode(passcode: string): boolean {
   return CLIENT_PASSCODES.includes(cleaned);
 }
 
-export function verifyInternalPassword(password: string): boolean {
-  if (!password) return false;
-  const cleaned = password.trim().toUpperCase();
-  return INTERNAL_PASSWORDS.includes(cleaned);
+export interface PasscodeVerificationResult {
+  valid: boolean;
+  isDev: boolean;
+  isInternal: boolean;
+  isClient: boolean;
+}
+
+export function verifyAnyPasscode(code: string): PasscodeVerificationResult {
+  if (!code) return { valid: false, isDev: false, isInternal: false, isClient: false };
+  const cleaned = code.trim().toUpperCase();
+
+  if (DEV_PASSWORDS.includes(cleaned)) {
+    return { valid: true, isDev: true, isInternal: true, isClient: false };
+  }
+  if (INTERNAL_PASSWORDS.includes(cleaned)) {
+    return { valid: true, isDev: false, isInternal: true, isClient: false };
+  }
+  if (CLIENT_PASSCODES.includes(cleaned)) {
+    return { valid: true, isDev: false, isInternal: false, isClient: true };
+  }
+
+  return { valid: false, isDev: false, isInternal: false, isClient: false };
 }
 
 export function getWinningVariant(): ABVariant | null {
@@ -132,7 +174,7 @@ export async function saveLeadRecord(lead: Omit<LeadRecord, 'id' | 'createdAt' |
   const updated = [newLead, ...existing];
   localStorage.setItem(LOCAL_LEADS_KEY, JSON.stringify(updated));
 
-  // 2. Mark that Lead Form was submitted (Requires Buzzmetrics Team Manual Qualification Call to Unlock)
+  // 2. Mark that Lead Form was submitted
   localStorage.setItem(HAS_LEAD_KEY, 'true');
 
   // 3. Send Email Notification to tuan.vi@buzzmetrics.com
