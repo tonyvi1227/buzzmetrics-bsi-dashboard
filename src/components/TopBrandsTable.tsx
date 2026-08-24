@@ -88,9 +88,9 @@ export const TopBrandsTable: React.FC<TopBrandsTableProps> = ({ data, isUnlocked
       };
     });
 
-    // Require minimum 3 months on Top 10 if there are >= 5 qualifying brands, else fallback
-    const brandsWithMin3Months = rawBrandList.filter(b => b.monthsOnTop10 >= 3);
-    const brandList = brandsWithMin3Months.length >= 5 ? brandsWithMin3Months : rawBrandList;
+    // Require minimum 2 months on Top 10 if there are >= 5 qualifying brands, else fallback
+    const qualifyingBrands = rawBrandList.filter(b => b.monthsOnTop10 >= 2);
+    const brandList = qualifyingBrands.length >= 5 ? qualifyingBrands : rawBrandList;
 
     // Step 3: Compute min/max ranges for normalization
     const maxBSI = Math.max(...brandList.map(b => b.avgBSI), 1);
@@ -155,7 +155,7 @@ export const TopBrandsTable: React.FC<TopBrandsTableProps> = ({ data, isUnlocked
   };
 
   const tooltipText = showFormula
-    ? "Top Brands Performance: 60% Avg BSI + 30% Avg Rank + 10% Months on Top 10 (Min 3 months on Top 10)."
+    ? "Top Brands Performance: 60% Avg BSI + 30% Avg Rank + 10% Months on Top 10 (Min 2 months on Top 10)."
     : "Leaderboard of top performing brands ranked by combined BSI performance, average ranking, and campaign consistency.";
 
   return (
