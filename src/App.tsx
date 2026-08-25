@@ -356,6 +356,26 @@ const DashboardContent: React.FC = () => {
     };
   }, [activeTab, isAdvancedChartsExpanded, isUnlocked, showDevToolbar]);
 
+  // Track if ANY modal is currently open to sync scroll lock with parent Webflow page
+  const isAnyModalOpen = Boolean(
+    selectedCampaign ||
+    selectedCeleb ||
+    isLeadModalOpen ||
+    isInternalModalOpen ||
+    isImportModalOpen ||
+    isExportModalOpen ||
+    isAdminModalOpen ||
+    isAIChatModalOpen ||
+    isDevPasswordOpen ||
+    isSupabaseModalOpen
+  );
+
+  useEffect(() => {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'BSI_MODAL_STATE', isOpen: isAnyModalOpen }, '*');
+    }
+  }, [isAnyModalOpen]);
+
   // Gating evaluation:
   // - Variant A: Always blurred & gated when locked (!isUnlocked).
   // - Variant C: Explorable for first 5 actions, blurred & gated on 5th action.
