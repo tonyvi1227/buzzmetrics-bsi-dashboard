@@ -23,9 +23,6 @@ export const CLIENT_PASSCODES = [
   'BUZZBDT',
   'BUZZBDN',
   'BUZZBDQ',
-  'BUZZVIP',
-  'BSI2026',
-  'BUZZFULL',
 ];
 
 export function verifyDevPassword(passcode: string): boolean {
