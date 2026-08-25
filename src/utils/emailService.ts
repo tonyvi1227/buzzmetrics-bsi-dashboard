@@ -5,11 +5,11 @@ const TARGET_EMAIL = 'tuan.vi@buzzmetrics.com';
 export function getEmailSubject(lead: LeadRecord): string {
   switch (lead.variant) {
     case 'A':
-      return `[BUZZMETRICS BSI LEAD - FORM GATE] Lead mới từ ${lead.company} (${lead.fullName})`;
+      return `[BUZZMETRICS BSI LEAD] Lead mới từ ${lead.company} (${lead.fullName})`;
     case 'B':
-      return `[BUZZMETRICS BSI LEAD - AI CHATBOT] Lead mới từ ${lead.company} (${lead.fullName}) - Score: ${lead.leadScore}`;
+      return `[BUZZMETRICS BSI LEAD] Lead mới từ ${lead.company} (${lead.fullName}) - Score: ${lead.leadScore}`;
     case 'C':
-      return `[BUZZMETRICS BSI LEAD - FREEMIUM 3-CLICK] Lead mới từ ${lead.company} (${lead.fullName})`;
+      return `[BUZZMETRICS BSI LEAD - FREEMIUM] Lead mới từ ${lead.company} (${lead.fullName})`;
     default:
       return `[BUZZMETRICS BSI LEAD] Lead mới từ ${lead.company} (${lead.fullName})`;
   }
@@ -18,50 +18,41 @@ export function getEmailSubject(lead: LeadRecord): string {
 export async function sendLeadEmailNotification(lead: LeadRecord): Promise<boolean> {
   const subject = getEmailSubject(lead);
 
-  const emailPayload = {
-    to: TARGET_EMAIL,
-    subject: subject,
-    body: `
-===========================================================
-🔔 THÔNG BÁO CÓ LEAD MỚI TỪ BUZZMETRICS BSI DASHBOARD
-===========================================================
-
-• Biến thể A/B Test: Variant ${lead.variant}
-• Họ và tên: ${lead.fullName}
-• Email công ty: ${lead.workEmail}
-• Số điện thoại / Zalo: ${lead.phone}
-• Công ty / Doanh nghiệp: ${lead.company}
-
-• Ngành hàng (Type-in): ${lead.categoryInterest}
-• Thương hiệu quan tâm: ${lead.brandInterest || 'Chưa nhập'}
-• Nhu cầu thực tế: ${lead.actualNeed || 'Xem data tham khảo chung'}
-${lead.customNeedNote ? `• Ghi chú nhu cầu chi tiết: "${lead.customNeedNote}"` : ''}
-
-• Đánh giá Lead Score: ${lead.leadScore}
-• Thời gian đăng ký: ${new Date(lead.createdAt).toLocaleString('vi-VN')}
-
-${lead.aiConversationSummary ? `-----------------------------------------------------------\n📝 TÓM TẮT TƯ VẤN AI CONSULTANT CHATBOT:\n"${lead.aiConversationSummary}"\n-----------------------------------------------------------` : ''}
-
-Dữ liệu lead đã được lưu an toàn vào Supabase Cloud DB & Local Backup.
-===========================================================
-    `.trim(),
+  const payload = {
+    _subject: subject,
+    _captcha: 'false',
+    _template: 'table',
+    'Họ và tên': lead.fullName,
+    'Email doanh nghiệp': lead.workEmail,
+    'Số điện thoại / Zalo': lead.phone,
+    'Công ty / Doanh nghiệp': lead.company,
+    'Ngành hàng quan tâm': lead.categoryInterest || 'Chưa chọn',
+    'Thương hiệu quan tâm': lead.brandInterest || 'Chưa nhập',
+    'Mục đích / Need hiện tại': lead.actualNeed || 'General Reference',
+    'Nhu cầu với dữ liệu': lead.dataNeed || '18-Month Dataset',
+    'Nhu cầu khác / Ghi chú': lead.customNeedNote || 'Không có',
+    'Lead Score': lead.leadScore,
+    'A/B Variant': `Variant ${lead.variant}`,
+    'Thời gian đăng ký': new Date(lead.createdAt).toLocaleString('vi-VN'),
   };
 
-  console.log(`[Email Dispatch Service] Sending lead notification to ${TARGET_EMAIL}:`, emailPayload);
+  console.log(`[Email Dispatch Service] Sending lead notification to ${TARGET_EMAIL}:`, payload);
 
   try {
-    await fetch('https://formspree.io/f/xbjnqkyv', {
+    const res = await fetch(`https://formsubmit.co/ajax/${TARGET_EMAIL}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: TARGET_EMAIL,
-        subject: subject,
-        message: emailPayload.body,
-        leadDetails: lead,
-      }),
-    }).catch(() => {});
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json().catch(() => null);
+    console.log('[Email Dispatch Service Response]:', data);
     return true;
   } catch (e) {
+    console.warn('[Email Dispatch Service Error (fallback to DB)]:', e);
     return true;
   }
 }

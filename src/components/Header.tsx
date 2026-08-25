@@ -32,36 +32,32 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Top Header Row: Logo, Badge, Description, Version & Actions */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         
-        {/* Left Official Logo, BSI Top 10 Badge, Description & Version 2026 */}
-        <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
-          <a
-            href="https://www.buzzmetrics.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:opacity-85 transition cursor-pointer flex items-center flex-shrink-0"
-            title="Visit Buzzmetrics Website"
-          >
-            <img
-              src={BUZZMETRICS_LOGO_BASE64}
-              alt="Buzzmetrics Logo"
-              className="h-8 sm:h-9 md:h-10 object-contain"
-            />
-          </a>
+        {/* Left Official Logo, BSI Top 10 Badge & Subtitle */}
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-3 sm:gap-3.5 flex-wrap">
+            <a
+              href="https://www.buzzmetrics.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:opacity-85 transition cursor-pointer flex items-center flex-shrink-0"
+              title="Visit Buzzmetrics Website"
+            >
+              <img
+                src={BUZZMETRICS_LOGO_BASE64}
+                alt="Buzzmetrics Logo"
+                className="h-8 sm:h-9 md:h-10 object-contain"
+              />
+            </a>
 
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs sm:text-sm font-black tracking-tight text-white uppercase whitespace-nowrap bg-slate-900 px-3 py-1 rounded-xl border border-slate-700 shadow-sm flex items-center gap-1.5">
-                <BarChart3 className="w-3.5 h-3.5 text-buzz" />
-                BSI TOP10
-              </span>
-              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-lg bg-orange-50 dark:bg-orange-950/80 text-buzz border border-orange-200 dark:border-orange-900">
-                Version 2026
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300">
-              Insights from most prominent Campaigns & Influencers on social media
-            </p>
+            <span className="text-xs sm:text-sm font-black tracking-tight text-white uppercase whitespace-nowrap bg-slate-900 px-3 py-1 rounded-xl border border-slate-700 shadow-sm flex items-center gap-1.5">
+              <BarChart3 className="w-3.5 h-3.5 text-buzz" />
+              BSI TOP10
+            </span>
           </div>
+
+          <p className="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300">
+            Insights from most prominent Campaigns & Influencers on social media
+          </p>
         </div>
 
         {/* Right Section: Sign up to Unlock Insights, Unlock Full Version & Admin Actions */}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Lock, CheckCircle2, KeyRound } from 'lucide-react';
-import { verifyAnyPasscode, unlockUserPermanently } from '../utils/abTestingEngine';
+import { verifyAnyPasscode, unlockUserPermanently, logPasscodeUsage } from '../utils/abTestingEngine';
 
 interface InternalUnlockModalProps {
   isOpen: boolean;
@@ -32,6 +32,7 @@ export const InternalUnlockModal: React.FC<InternalUnlockModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const result = verifyAnyPasscode(password);
+    logPasscodeUsage(password, result);
 
     if (result.valid) {
       setError('');

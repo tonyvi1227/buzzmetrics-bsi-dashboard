@@ -11,6 +11,7 @@ export interface LeadRecord {
   categoryInterest: string;
   brandInterest?: string;
   actualNeed?: string;
+  dataNeed?: string;
   customNeedNote?: string;
   aiConversationSummary?: string;
   leadScore: 'HIGH' | 'MEDIUM' | 'LOW';

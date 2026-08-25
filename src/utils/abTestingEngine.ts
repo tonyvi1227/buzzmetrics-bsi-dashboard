@@ -9,6 +9,43 @@ const INTERNAL_UNLOCKED_KEY = 'buzz_internal_unlocked';
 const CLICK_COUNT_KEY = 'buzz_click_count';
 const WINNING_VARIANT_KEY = 'buzz_winning_variant';
 const LOCAL_LEADS_KEY = 'buzz_local_leads';
+const PASSCODE_LOGS_KEY = 'buzz_passcode_usage_logs';
+
+// Blocked Personal / Free Email Domains
+export const BLOCKED_EMAIL_DOMAINS = [
+  'gmail.com',
+  'googlemail.com',
+  'yahoo.com',
+  'yahoo.com.vn',
+  'ymail.com',
+  'outlook.com',
+  'hotmail.com',
+  'live.com',
+  'msn.com',
+  'icloud.com',
+  'me.com',
+  'mac.com',
+  'aol.com',
+  'zoho.com',
+  'protonmail.com',
+  'proton.me',
+  'mail.com',
+  'gmx.com',
+  'gmx.net',
+  'yandex.com',
+  'yandex.ru',
+  'tutanota.com',
+  'fastmail.com',
+  'hushmail.com',
+];
+
+export function isCorporateEmail(email: string): boolean {
+  if (!email || !email.includes('@')) return false;
+  const parts = email.trim().toLowerCase().split('@');
+  if (parts.length !== 2) return false;
+  const domain = parts[1];
+  return !BLOCKED_EMAIL_DOMAINS.includes(domain);
+}
 
 // Passcode Configuration:
 // 1. Dev Password (Unlocks Dashboard AND reveals ⚡ Dev A/B Toolbar)
@@ -65,6 +102,83 @@ export function verifyAnyPasscode(code: string): PasscodeVerificationResult {
   }
 
   return { valid: false, isDev: false, isInternal: false, isClient: false };
+}
+
+export interface PasscodeUsageLog {
+  id: string;
+  passcode: string;
+  passcodeType: 'DEV' | 'INTERNAL' | 'CLIENT' | 'INVALID';
+  timestamp: string;
+  success: boolean;
+  userAgent?: string;
+}
+
+export function logPasscodeUsage(code: string, verification: PasscodeVerificationResult) {
+  try {
+    const raw = localStorage.getItem(PASSCODE_LOGS_KEY);
+    const logs: PasscodeUsageLog[] = raw ? JSON.parse(raw) : [];
+
+    let passcodeType: PasscodeUsageLog['passcodeType'] = 'INVALID';
+    if (verification.isDev) passcodeType = 'DEV';
+    else if (verification.isInternal) passcodeType = 'INTERNAL';
+    else if (verification.isClient) passcodeType = 'CLIENT';
+
+    const newLog: PasscodeUsageLog = {
+      id: `log_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      passcode: code.trim().toUpperCase(),
+      passcodeType,
+      timestamp: new Date().toISOString(),
+      success: verification.valid,
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+    };
+
+    logs.unshift(newLog);
+    // Keep last 200 usage events locally
+    localStorage.setItem(PASSCODE_LOGS_KEY, JSON.stringify(logs.slice(0, 200)));
+
+    // Also persist log to Supabase 'passcode_logs' if database connected
+    const supabase = getSupabaseClient();
+    if (supabase && verification.valid) {
+      Promise.resolve(
+        supabase.from('passcode_logs').insert({
+          id: newLog.id,
+          passcode: newLog.passcode,
+          passcode_type: newLog.passcodeType,
+          success: newLog.success,
+          created_at: newLog.timestamp,
+          user_agent: newLog.userAgent,
+        })
+      ).catch(() => {});
+    }
+  } catch (e) {}
+}
+
+export function getPasscodeUsageStats(): Record<string, { count: number; lastUsed: string; type: string }> {
+  try {
+    const raw = localStorage.getItem(PASSCODE_LOGS_KEY);
+    const logs: PasscodeUsageLog[] = raw ? JSON.parse(raw) : [];
+    const stats: Record<string, { count: number; lastUsed: string; type: string }> = {};
+
+    // Pre-populate known client codes with 0
+    for (const c of CLIENT_PASSCODES) {
+      stats[c] = { count: 0, lastUsed: 'Never', type: 'CLIENT' };
+    }
+
+    for (const log of logs) {
+      if (log.success) {
+        if (!stats[log.passcode]) {
+          stats[log.passcode] = { count: 0, lastUsed: log.timestamp, type: log.passcodeType };
+        }
+        stats[log.passcode].count += 1;
+        if (stats[log.passcode].lastUsed === 'Never') {
+          stats[log.passcode].lastUsed = log.timestamp;
+        }
+      }
+    }
+    return stats;
+  } catch (e) {
+    return {};
+  }
 }
 
 export function getWinningVariant(): ABVariant | null {
@@ -203,6 +317,10 @@ export async function saveLeadRecord(lead: Omit<LeadRecord, 'id' | 'createdAt' |
         phone: newLead.phone,
         company: newLead.company,
         category_interest: newLead.categoryInterest,
+        brand_interest: newLead.brandInterest || null,
+        actual_need: newLead.actualNeed || null,
+        data_need: newLead.dataNeed || null,
+        custom_need_note: newLead.customNeedNote || null,
         ai_conversation_summary: newLead.aiConversationSummary || null,
         lead_score: newLead.leadScore,
         status: newLead.status,

@@ -52,8 +52,7 @@ import { GatedOverlay } from './components/GatedOverlay';
 import { LeadFormModal } from './components/LeadFormModal';
 import { AIChatbotModal } from './components/AIChatbotModal';
 import { InternalUnlockModal } from './components/InternalUnlockModal';
-import { AdminABTestPanel } from './components/AdminABTestPanel';
-import { DevABToolbar } from './components/DevABToolbar';
+import { AdminPanel } from './components/AdminPanel';
 import { DevPasswordModal } from './components/DevPasswordModal';
 import { FloatingPreviewBox } from './components/FloatingPreviewBox';
 
@@ -409,8 +408,23 @@ const DashboardContent: React.FC = () => {
       {/* Understanding BSI Top10 Standard (6 Measurement Pillars) */}
       <BSIIntroSection />
 
-      {/* Admin Panel for A/B Testing & Leads Management */}
-      {isAdmin && <AdminABTestPanel />}
+      {/* Unified Admin Panel (Revealed with Dev/Internal Password or Admin Auth) */}
+      {(showDevToolbar || isAdmin || isDevAuthed) && (
+        <AdminPanel
+          currentVariant={assignedVariant}
+          isUnlocked={isUnlocked}
+          onUpdateState={(newVariant, newUnlocked) => {
+            setAssignedVariant(newVariant);
+            setIsUnlocked(newUnlocked);
+            setClickCount(0);
+          }}
+          onOpenImport={handleOpenImportClick}
+          onClose={() => {
+            setShowDevToolbar(false);
+            setIsDevAuthed(false);
+          }}
+        />
+      )}
 
       {/* ========================================================================= */}
       {/* TAB 1: CAMPAIGNS DASHBOARD */}
@@ -680,28 +694,12 @@ const DashboardContent: React.FC = () => {
       />
 
       {/* Floating Live 5-Action Preview Box (Floating Bottom-Right Widget) */}
-      {!isUnlocked && !showDevToolbar && (
+      {!isUnlocked && !showDevToolbar && !isAdmin && !isDevAuthed && (
         <FloatingPreviewBox
           clickCount={clickCount}
           onOpenContactModal={triggerGateModal}
           onOpenUnlockModal={() => setIsInternalModalOpen(true)}
         />
-      )}
-
-      {/* Dev Floating Toolbar - Revealed only with Dev Password */}
-      {showDevToolbar && (
-        <div className="fixed bottom-3 right-3 z-50 animate-bounce-subtle max-w-[95vw]">
-          <DevABToolbar
-            currentVariant={assignedVariant}
-            isUnlocked={isUnlocked}
-            onUpdateState={(newVariant, newUnlocked) => {
-              setAssignedVariant(newVariant);
-              setIsUnlocked(newUnlocked);
-              setClickCount(0);
-            }}
-            onOpenImport={() => setIsImportModalOpen(true)}
-          />
-        </div>
       )}
     </div>
   );

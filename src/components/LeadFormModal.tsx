@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { X, Send, Building, User, Mail, Phone, LockKeyhole, Tag, Target, FileText, CheckCircle2 } from 'lucide-react';
-import { saveLeadRecord } from '../utils/abTestingEngine';
+import { X, Send, Building, User, Mail, Phone, LockKeyhole, Tag, Target, FileText, CheckCircle2, AlertCircle, Database } from 'lucide-react';
+import { saveLeadRecord, isCorporateEmail } from '../utils/abTestingEngine';
 import { ABVariant } from '../types/leadGen';
 
 interface LeadFormModalProps {
@@ -16,21 +16,24 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
   onSuccess,
   variant = 'A',
 }) => {
-  // Use DOM refs for instant 0ms typing with ZERO React re-renders on keystroke
+  // Use DOM refs for instant 0ms typing with zero React re-renders on keystroke
   const fullNameRef = useRef<HTMLInputElement>(null);
   const workEmailRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
   const companyRef = useRef<HTMLInputElement>(null);
-  const categoryInterestRef = useRef<HTMLInputElement>(null);
+  const categoryInterestRef = useRef<HTMLSelectElement>(null);
+  const customCategoryRef = useRef<HTMLInputElement>(null);
   const brandInterestRef = useRef<HTMLInputElement>(null);
   const customNeedNoteRef = useRef<HTMLTextAreaElement>(null);
 
   const [actualNeed, setActualNeed] = useState('General Data Benchmark Reference');
+  const [dataNeed, setDataNeed] = useState('Full 18-Month BSI Benchmark Data Access');
+  const [selectedCategory, setSelectedCategory] = useState('Handhelds');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmittedSuccess, setIsSubmittedSuccess] = useState(false);
   const [error, setError] = useState('');
 
-  // Lock background scroll when modal is open to ensure only internal box scrolls
+  // Lock background scroll when modal is open
   useEffect(() => {
     if (isOpen) {
       const original = document.body.style.overflow;
@@ -43,31 +46,37 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
 
   if (!isOpen) return null;
 
+  const handleEmailBlur = () => {
+    const email = workEmailRef.current?.value || '';
+    if (email && !isCorporateEmail(email)) {
+      setError('Please use your official Work/Company email. Personal email domains (@gmail, @yahoo, @outlook, etc.) are not accepted.');
+    } else if (error.includes('Personal email domains')) {
+      setError('');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const fullName = fullNameRef.current?.value || '';
     const workEmail = workEmailRef.current?.value || '';
     const phone = phoneRef.current?.value || '';
     const company = companyRef.current?.value || '';
-    const categoryInterest = categoryInterestRef.current?.value || '';
+    const category = selectedCategory === 'Other' ? (customCategoryRef.current?.value || 'Other') : selectedCategory;
     const brandInterest = brandInterestRef.current?.value || '';
     const customNeedNote = customNeedNoteRef.current?.value || '';
 
     if (!fullName.trim() || !workEmail.trim() || !phone.trim() || !company.trim()) {
-      setError('Please fill in all required contact information.');
+      setError('Please fill in all required contact information (*).');
       return;
     }
 
-    if (!workEmail.includes('@')) {
-      setError('Please enter a valid work email address.');
+    if (!isCorporateEmail(workEmail)) {
+      setError('Please use your official Work/Company email. Personal email domains (@gmail, @yahoo, @outlook, @icloud, etc.) are not accepted.');
       return;
     }
 
     setIsSubmitting(true);
     setError('');
-
-    const isWorkEmail = !workEmail.endsWith('@gmail.com') && !workEmail.endsWith('@yahoo.com') && !workEmail.endsWith('@hotmail.com');
-    const leadScore = isWorkEmail ? 'HIGH' : 'MEDIUM';
 
     await saveLeadRecord({
       variant: variant,
@@ -75,11 +84,12 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
       workEmail: workEmail.trim(),
       phone: phone.trim(),
       company: company.trim(),
-      categoryInterest: categoryInterest.trim() || 'General Category',
+      categoryInterest: category.trim() || 'General Category',
       brandInterest: brandInterest.trim(),
       actualNeed: actualNeed,
+      dataNeed: dataNeed,
       customNeedNote: customNeedNote.trim(),
-      leadScore: leadScore,
+      leadScore: 'HIGH',
     });
 
     setIsSubmitting(false);
@@ -92,8 +102,8 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex justify-center items-start p-3 sm:p-6 pt-6 sm:pt-12 md:pt-16 pb-12">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-3xl lg:max-w-4xl max-h-[85vh] md:max-h-[640px] flex flex-col overscroll-contain overflow-hidden relative">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex justify-center items-start p-3 sm:p-6 pt-6 sm:pt-10 md:pt-14 pb-12">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-3xl lg:max-w-4xl max-h-[90vh] md:max-h-[660px] flex flex-col overscroll-contain overflow-hidden relative">
         {/* Sticky Header Close Button */}
         <button
           onClick={handleCloseModal}
@@ -105,7 +115,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
         </button>
 
         {isSubmittedSuccess ? (
-          <div className="text-center py-8 px-6 space-y-4 max-w-md mx-auto my-auto">
+          <div className="text-center py-10 px-6 space-y-4 max-w-md mx-auto my-auto animate-fadeIn">
             <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center border border-emerald-200 dark:border-emerald-800 shadow-sm">
               <CheckCircle2 className="w-8 h-8" />
             </div>
@@ -115,7 +125,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                 REGISTRATION SUBMITTED SUCCESSFULLY!
               </h3>
               <p className="text-xs text-slate-700 dark:text-slate-300 font-bold mt-2 leading-relaxed">
-                The Buzzmetrics team has received your request and will contact you via Phone/Email to verify and provide your Access Passcode shortly.
+                Thank you for your interest! The Buzzmetrics Business Development team has received your project details and will contact you via Phone/Email to verify and grant your Access Passcode shortly.
               </p>
             </div>
 
@@ -148,18 +158,18 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
 
             {/* Scrollable Form Body */}
             <form onSubmit={handleSubmit} className="p-5 overflow-y-auto overscroll-contain flex-1 space-y-4">
-              {/* Responsive 2-Column Layout on PC / Desktop screens */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              {/* Responsive 2-Column Layout */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
                 
-                {/* LEFT COLUMN: Section 1 & Section 2 */}
-                <div className="space-y-4">
-                  {/* SECTION 1: PERSONAL CONTACT INFO */}
-                  <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-3">
+                {/* LEFT COLUMN: Section 1 (Contact Info) & Section 3 (Industry & Target) */}
+                <div className="space-y-3.5">
+                  {/* SECTION 1: PERSONAL & COMPANY CONTACT INFO */}
+                  <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2.5">
                     <span className="text-[10px] font-black uppercase tracking-wider text-buzz flex items-center gap-1">
                       <User className="w-3 h-3" /> 1. CONTACT INFORMATION (*)
                     </span>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
                           FULL NAME (*)
@@ -169,7 +179,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                             ref={fullNameRef}
                             type="text"
                             required
-                            placeholder="John Doe"
+                            placeholder="e.g. Nguyen Van A"
                             className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                           />
                           <User className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3" />
@@ -178,7 +188,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
 
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
-                          PHONE / MOBILE (*)
+                          PHONE / ZALO (*)
                         </label>
                         <div className="relative">
                           <input
@@ -193,7 +203,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
                           WORK EMAIL (*)
@@ -203,11 +213,13 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                             ref={workEmailRef}
                             type="email"
                             required
+                            onBlur={handleEmailBlur}
                             placeholder="name@company.com"
                             className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                           />
                           <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3" />
                         </div>
+                        <span className="text-[9px] text-slate-400 font-semibold block mt-0.5">Company domain only (no @gmail, @yahoo)</span>
                       </div>
 
                       <div>
@@ -219,7 +231,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                             ref={companyRef}
                             type="text"
                             required
-                            placeholder="e.g. Vinamilk, Samsung..."
+                            placeholder="e.g. Unilever, Vinamilk..."
                             className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                           />
                           <Building className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3" />
@@ -228,23 +240,36 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                     </div>
                   </div>
 
-                  {/* SECTION 2: CATEGORY & BRAND */}
+                  {/* SECTION 2: INDUSTRY & TARGET BRAND */}
                   <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2.5">
                     <span className="text-[10px] font-black uppercase tracking-wider text-buzz flex items-center gap-1">
-                      <Tag className="w-3 h-3" /> 2. CATEGORY & BRAND OF INTEREST (*)
+                      <Tag className="w-3 h-3" /> 2. INDUSTRY & BRAND OF INTEREST (*)
                     </span>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
-                          CATEGORY
+                          INDUSTRY / CATEGORY (*)
                         </label>
-                        <input
+                        <select
                           ref={categoryInterestRef}
-                          type="text"
-                          placeholder="e.g. Handhelds, Beer, Dairy..."
-                          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz"
-                        />
+                          value={selectedCategory}
+                          onChange={(e) => setSelectedCategory(e.target.value)}
+                          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz cursor-pointer"
+                        >
+                          <option value="Handhelds">Handhelds (Smartphones/Tech)</option>
+                          <option value="Alcoholic drink">Alcoholic Drink (Beer, Spirits)</option>
+                          <option value="Non-alcoholic drink">Non-alcoholic Drink (RTD, Tea)</option>
+                          <option value="Dairy">Dairy & Milk Nutrition</option>
+                          <option value="Home Care">Home Care (Detergent, Cleaners)</option>
+                          <option value="Personal Care">Personal Care (Shampoo, Skin)</option>
+                          <option value="Banking">Banking & Financial Services</option>
+                          <option value="Real Estate">Real Estate & Property</option>
+                          <option value="F&B">F&B & Restaurant Chains</option>
+                          <option value="Automotive">Automotive & Motorbikes</option>
+                          <option value="E-commerce">E-commerce & Retail</option>
+                          <option value="Other">Other Category...</option>
+                        </select>
                       </div>
 
                       <div>
@@ -254,53 +279,104 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                         <input
                           ref={brandInterestRef}
                           type="text"
-                          placeholder="e.g. Heineken, Samsung, Tiger..."
+                          placeholder="e.g. Heineken, Samsung, OMO..."
                           className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz"
                         />
                       </div>
                     </div>
+
+                    {selectedCategory === 'Other' && (
+                      <input
+                        ref={customCategoryRef}
+                        type="text"
+                        placeholder="Please specify your industry category..."
+                        className="w-full bg-white dark:bg-slate-900 border border-orange-300 dark:border-orange-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz animate-fadeIn"
+                      />
+                    )}
                   </div>
                 </div>
 
-                {/* RIGHT COLUMN: Section 3 & Submit Button */}
-                <div className="space-y-4 flex flex-col justify-between">
-                  {/* SECTION 3: ACTUAL INTENT & NEED */}
+                {/* RIGHT COLUMN: Section 3 (Needs) & Additional Requirements */}
+                <div className="space-y-3.5 flex flex-col justify-between">
+                  
+                  {/* SECTION 3: CURRENT NEED & DATA USAGE OBJECTIVE */}
                   <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2.5">
                     <span className="text-[10px] font-black uppercase tracking-wider text-buzz flex items-center gap-1">
-                      <Target className="w-3 h-3" /> 3. PROJECT OBJECTIVE (*)
+                      <Target className="w-3 h-3" /> 3. PROJECT NEED & DATA OBJECTIVE (*)
                     </span>
 
-                    <div className="space-y-1.5">
-                      {[
-                        'General Data Benchmark Reference',
-                        'Upcoming Campaign / Product Launch Planning',
-                        'Competitor BSI & Sentiment Benchmarking',
-                        'Post-Campaign Performance & ROI Evaluation Report',
-                      ].map((needOption) => (
-                        <label
-                          key={needOption}
-                          onClick={() => setActualNeed(needOption)}
-                          className={`flex items-center gap-2 p-2 rounded-xl border text-xs font-bold transition cursor-pointer ${
-                            actualNeed === needOption
-                              ? 'bg-orange-50 dark:bg-orange-950/80 border-buzz text-buzz shadow-sm'
-                              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="actualNeedRadio"
-                            checked={actualNeed === needOption}
-                            onChange={() => setActualNeed(needOption)}
-                            className="accent-orange-500"
-                          />
-                          <span>{needOption}</span>
-                        </label>
-                      ))}
+                    {/* Need hiện tại */}
+                    <div>
+                      <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-1">
+                        CURRENT NEED / PURPOSE (*)
+                      </label>
+                      <div className="grid grid-cols-1 gap-1.5">
+                        {[
+                          'General Data Benchmark Reference',
+                          'Upcoming Campaign / Product Launch Planning',
+                          'Competitor BSI & Sentiment Benchmarking',
+                          'Post-Campaign Performance & ROI Evaluation',
+                        ].map((needOption) => (
+                          <label
+                            key={needOption}
+                            onClick={() => setActualNeed(needOption)}
+                            className={`flex items-center gap-2 p-2 rounded-xl border text-xs font-bold transition cursor-pointer ${
+                              actualNeed === needOption
+                                ? 'bg-orange-50 dark:bg-orange-950/80 border-buzz text-buzz shadow-2xs'
+                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="actualNeedRadio"
+                              checked={actualNeed === needOption}
+                              onChange={() => setActualNeed(needOption)}
+                              className="accent-orange-500"
+                            />
+                            <span className="text-[11px] leading-tight">{needOption}</span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
 
-                    <div>
+                    {/* Nhu cầu với dữ liệu */}
+                    <div className="pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+                      <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-1 flex items-center gap-1">
+                        <Database className="w-3 h-3 text-buzz" /> DATA REQUIREMENT (*)
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                        {[
+                          { id: 'Full 18-Month BSI Benchmark Data Access', label: '18-Month BSI Dataset' },
+                          { id: 'Category Deep-Dive & Advanced Spider Radar', label: 'Category & Radar Deep-Dive' },
+                          { id: 'Top Influencer Landscape & KOL Vetting', label: 'Influencer / KOL Landscape' },
+                          { id: 'Tailored Custom Social Listening Report', label: 'Custom Social Listening' },
+                        ].map((item) => (
+                          <label
+                            key={item.id}
+                            onClick={() => setDataNeed(item.id)}
+                            className={`flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px] font-bold transition cursor-pointer ${
+                              dataNeed === item.id
+                                ? 'bg-orange-50 dark:bg-orange-950/80 border-buzz text-buzz'
+                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="dataNeedRadio"
+                              checked={dataNeed === item.id}
+                              onChange={() => setDataNeed(item.id)}
+                              className="accent-orange-500"
+                            />
+                            <span className="leading-tight">{item.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Nhu cầu khác */}
+                    <div className="pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
                       <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5 flex items-center gap-1">
-                        <FileText className="w-3 h-3" /> ADDITIONAL REQUIREMENT
+                        <FileText className="w-3 h-3" /> ADDITIONAL REQUIREMENTS / NOTES
                       </label>
                       <textarea
                         ref={customNeedNoteRef}
@@ -311,12 +387,17 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                     </div>
                   </div>
 
-                  {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
+                  {error && (
+                    <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-start gap-2">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                      <span>{error}</span>
+                    </div>
+                  )}
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3.5 bg-buzz hover:bg-orange-600 text-white font-black text-xs md:text-sm rounded-xl transition shadow cursor-pointer flex items-center justify-center gap-2 mt-auto"
+                    className="w-full py-3.5 bg-buzz hover:bg-orange-600 text-white font-black text-xs md:text-sm rounded-xl transition shadow-md hover:shadow-lg cursor-pointer flex items-center justify-center gap-2 mt-auto"
                   >
                     {isSubmitting ? (
                       <span>Submitting Registration...</span>
