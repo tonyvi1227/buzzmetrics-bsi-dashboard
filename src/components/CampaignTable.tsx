@@ -10,7 +10,7 @@ interface CampaignTableProps {
 }
 
 export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCampaign }) => {
-  const [sortColumn, setSortColumn] = useState<SortColumn>('buzzVolume');
+  const [sortColumn, setSortColumn] = useState<SortColumn>('bsi');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
@@ -273,7 +273,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
               </th>
               <th
                 onClick={() => handleSort('relevancy')}
-                className="p-3 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition min-w-[120px]"
+                className="p-3 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition whitespace-nowrap"
               >
                 <div className="flex items-center justify-end gap-1">
                   <span>RELEVANCY</span>
@@ -282,14 +282,13 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
               </th>
               <th
                 onClick={() => handleSort('earnedPct')}
-                className="p-3 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition min-w-[130px]"
+                className="p-3 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition whitespace-nowrap"
               >
                 <div className="flex items-center justify-end gap-1">
                   <span>EARNED MEDIA %</span>
                   <ArrowUpDown className="w-3 h-3 text-buzz" />
                 </div>
               </th>
-              <th className="p-3 text-center">ACTION</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-semibold">
@@ -323,43 +322,14 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
                     </span>
                   </td>
                   
-                  {/* Relevancy with Refined Progress Bar */}
-                  <td className="p-3 text-right text-slate-700 dark:text-slate-300">
-                    <div className="flex items-center justify-end gap-1.5">
-                      <span>{item.relevancy.toFixed(2)}</span>
-                      <div className="w-10 bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                        <div
-                          className="bg-sky-500 h-full rounded-full"
-                          style={{ width: `${Math.min(100, (item.relevancy / 2) * 100)}%` }}
-                        />
-                      </div>
-                    </div>
+                  {/* Relevancy (Clean Numerical Value) */}
+                  <td className="p-3 text-right text-slate-700 dark:text-slate-300 font-semibold whitespace-nowrap">
+                    {item.relevancy.toFixed(2)}
                   </td>
 
-                  {/* Earned Media % with Refined Progress Bar */}
-                  <td className="p-3 text-right font-black text-slate-900 dark:text-white">
-                    <div className="flex items-center justify-end gap-1.5">
-                      <span>{item.earnedPct.toFixed(1)}%</span>
-                      <div className="w-12 bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                        <div
-                          className="bg-emerald-500 h-full rounded-full"
-                          style={{ width: `${Math.min(100, item.earnedPct)}%` }}
-                        />
-                      </div>
-                    </div>
-                  </td>
-
-                  <td className="p-3 text-center">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSelectCampaign(item);
-                      }}
-                      className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-buzz hover:text-white text-slate-500 transition cursor-pointer"
-                      title="View campaign details"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                    </button>
+                  {/* Earned Media % (Clean Numerical Value) */}
+                  <td className="p-3 text-right font-black text-slate-900 dark:text-white whitespace-nowrap">
+                    {item.earnedPct.toFixed(1)}%
                   </td>
                 </tr>
               );

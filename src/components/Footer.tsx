@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Sparkles } from 'lucide-react';
+import { Calendar, Sparkles, Phone, Mail } from 'lucide-react';
 
 interface FooterProps {
   onOpenDevPassword?: () => void;
@@ -13,35 +13,54 @@ export const Footer: React.FC<FooterProps> = ({
   totalRecordsCount = 318,
 }) => {
   return (
-    <footer className="mt-10 py-6 border-t border-slate-200 dark:border-slate-800 text-center text-xs font-bold text-slate-500 dark:text-slate-400 flex flex-col md:flex-row items-center justify-between gap-4 px-2">
-      {/* Left Copyright & Version */}
-      <div className="flex items-center gap-2">
-        <span>© {new Date().getFullYear()} Buzzmetrics BSI Dashboard v4.41</span>
-      </div>
+    <footer className="mt-12 pt-6 pb-8 border-t border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-500 dark:text-slate-400 space-y-4">
+      {/* Contact Details (Clean, single-row minimal styling without redundant headers) */}
+      <div className="flex flex-wrap items-center justify-between gap-4 text-xs pb-4 border-b border-slate-100 dark:border-slate-800/80">
+        <div className="flex items-center gap-4 sm:gap-6 flex-wrap font-medium">
+          {/* Phone 1 */}
+          <a
+            href="tel:+84919040201"
+            className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-buzz transition font-mono"
+          >
+            <Phone className="w-3.5 h-3.5 text-buzz" />
+            <span>Hotline: (+84) 91 904 0201</span>
+          </a>
 
-      {/* Center Dataset Scope Card */}
-      <div className="whitespace-nowrap px-3 py-1.5 bg-slate-50/90 dark:bg-slate-800/60 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2 pointer-events-none select-none">
-        <Calendar className="w-4 h-4 text-buzz flex-shrink-0" />
-        <div className="text-left">
-          <span className="text-[9px] uppercase font-black tracking-wider text-slate-400 block leading-none">Dataset Scope</span>
-          <span className="text-slate-800 dark:text-slate-200 font-extrabold text-[11px]">
-            Jan 2025 – Jun 2026 (18 Months) • <strong className="text-buzz font-black">Total Records: {totalRecordsCount}</strong>
-          </span>
+          {/* Phone 2 */}
+          <a
+            href="tel:+84909267338"
+            className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-buzz transition font-mono"
+          >
+            <Phone className="w-3.5 h-3.5 text-buzz" />
+            <span>Direct: (+84) 909 267 338</span>
+          </a>
+
+          {/* Email */}
+          <a
+            href="mailto:quynh.do@buzzmetrics.com"
+            className="flex items-center gap-1.5 text-buzz hover:underline font-bold"
+          >
+            <Mail className="w-3.5 h-3.5" />
+            <span>quynh.do@buzzmetrics.com</span>
+          </a>
         </div>
       </div>
 
-      {/* Right Actions & Dev Trigger */}
-      <div className="flex items-center gap-2 flex-wrap">
-        {onOpenDevPassword && (
-          <button
-            onClick={onOpenDevPassword}
-            title="Dev Access"
-            className="px-2.5 py-1 rounded-full text-[10px] font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition flex items-center gap-1 cursor-pointer opacity-60 hover:opacity-100"
-          >
-            <Sparkles className="w-3 h-3 text-slate-400" />
-            <span>Dev Access</span>
-          </button>
-        )}
+      {/* Bottom Metadata Row: Copyright, Scope & Subtle Dev Link */}
+      {/* Bottom Metadata Row: Copyright & Scope */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500 dark:text-slate-400">
+        {/* Left Copyright */}
+        <div className="flex items-center gap-2">
+          <span>© {new Date().getFullYear()} Buzzmetrics BSI Dashboard v4.41</span>
+        </div>
+
+        {/* Right Dataset Scope */}
+        <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 font-bold">
+          <Calendar className="w-3.5 h-3.5 text-buzz" />
+          <span>
+            Dataset Scope: Jan 2025 – Jun 2026 (18 Months) • <strong className="text-buzz font-black">Total Records: {totalRecordsCount}</strong>
+          </span>
+        </div>
       </div>
     </footer>
   );

@@ -107,9 +107,8 @@ export function getAssignedVariant(): ABVariant {
     return stored as ABVariant;
   }
 
-  // 50% Variant A (Form Gate) / 50% Variant C (3-Click Freemium)
-  const rand = Math.random();
-  const assigned: ABVariant = rand < 0.5 ? 'A' : 'C';
+  // Default to Variant C (5-Action Freemium Interactive Preview)
+  const assigned: ABVariant = 'C';
 
   localStorage.setItem(AB_VARIANT_KEY, assigned);
   return assigned;

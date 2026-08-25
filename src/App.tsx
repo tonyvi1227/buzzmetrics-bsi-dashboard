@@ -57,6 +57,11 @@ import { DevABToolbar } from './components/DevABToolbar';
 import { DevPasswordModal } from './components/DevPasswordModal';
 import { FloatingPreviewBox } from './components/FloatingPreviewBox';
 
+// Additional Strategic Landing Page Components
+import { FloatingStickyHeader } from './components/FloatingStickyHeader';
+import { BSIIntroSection } from './components/BSIIntroSection';
+import { TeaserDataSection } from './components/TeaserDataSection';
+
 const DashboardContent: React.FC = () => {
   const [dataset, setDataset] = useState<CampaignRecord[]>(() => getStoredCampaigns());
   const [selectedCampaign, setSelectedCampaign] = useState<CampaignRecord | null>(null);
@@ -359,7 +364,16 @@ const DashboardContent: React.FC = () => {
   return (
     <div className="min-h-screen p-2.5 sm:p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto font-sans relative">
 
-      {/* Header Bar */}
+      {/* Floating Sticky Top Bar (Triggers on Scroll) */}
+      <FloatingStickyHeader
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        onOpenContactModal={triggerGateModal}
+        onOpenUnlockModal={() => setIsInternalModalOpen(true)}
+        isUnlocked={isUnlocked}
+      />
+
+      {/* Hero Header Banner */}
       <Header
         onOpenImport={handleOpenImportClick}
         onOpenExport={() => setIsExportModalOpen(true)}
@@ -371,6 +385,9 @@ const DashboardContent: React.FC = () => {
         variant={assignedVariant}
         clickCount={clickCount}
       />
+
+      {/* Understanding BSI Top10 Standard (6 Measurement Pillars) */}
+      <BSIIntroSection />
 
       {/* Admin Panel for A/B Testing & Leads Management */}
       {isAdmin && <AdminABTestPanel />}
@@ -413,6 +430,12 @@ const DashboardContent: React.FC = () => {
             </div>
             <ChannelShareChart data={filteredCampaignData} />
           </div>
+
+          {/* Full Version Benefits & Use Cases (Placed directly above the locked section) */}
+          <TeaserDataSection
+            onOpenContactModal={triggerGateModal}
+            isUnlocked={isUnlocked}
+          />
 
           {/* SINGLE UNIFIED GATED CONTAINER COVERING BOTH ADVANCED CHARTS & CAMPAIGN TABLE */}
           <div className="relative rounded-3xl overflow-hidden min-h-[350px]">
@@ -504,6 +527,12 @@ const DashboardContent: React.FC = () => {
                 handleDetailsClick(() => setSelectedCeleb(matched));
               }
             }}
+          />
+
+          {/* Full Version Benefits & Use Cases (Placed directly above the locked section) */}
+          <TeaserDataSection
+            onOpenContactModal={triggerGateModal}
+            isUnlocked={isUnlocked}
           />
 
           {/* GATED SECTION: CELEB CHARTS & CELEB TABLE (LOCKED UNTIL PASSCODE / REGISTRATION) */}
@@ -623,15 +652,15 @@ const DashboardContent: React.FC = () => {
         onSuccess={handleDevPasswordSuccess}
       />
 
-      {/* Footer Section with Hidden Dev Trigger */}
+      {/* Footer Section with Integrated Minimalist Contact Info & Dev Trigger */}
       <Footer
         onOpenDevPassword={handleOpenDevClick}
         isDevAuthed={isDevAuthed || isAdmin}
         totalRecordsCount={dataset.length}
       />
 
-      {/* Variant C Floating Live 5-Action Preview Box (Floating Bottom-Right Widget) */}
-      {!isUnlocked && assignedVariant === 'C' && !showDevToolbar && (
+      {/* Floating Live 5-Action Preview Box (Floating Bottom-Right Widget) */}
+      {!isUnlocked && !showDevToolbar && (
         <FloatingPreviewBox
           clickCount={clickCount}
           onOpenContactModal={triggerGateModal}
