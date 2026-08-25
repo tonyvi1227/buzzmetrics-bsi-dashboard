@@ -96,8 +96,8 @@ export const AIChatbotModal: React.FC<AIChatbotModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/75 overflow-y-auto">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-xl p-6 relative flex flex-col max-h-[85vh] md:max-h-[640px] overflow-hidden my-auto overscroll-contain">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-6 sm:pt-14 md:pt-16 pb-12 bg-slate-900/75 overflow-y-auto">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-xl p-6 relative flex flex-col max-h-[85vh] md:max-h-[640px] overflow-hidden overscroll-contain">
         {/* Modal Header */}
         <div className="flex justify-between items-center pb-3.5 border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
           <div className="flex items-center gap-3">

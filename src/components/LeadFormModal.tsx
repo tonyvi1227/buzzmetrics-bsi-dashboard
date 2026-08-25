@@ -92,8 +92,8 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex justify-center items-center p-3 sm:p-6">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-3xl lg:max-w-4xl max-h-[85vh] md:max-h-[640px] flex flex-col my-auto overscroll-contain overflow-hidden relative">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex justify-center items-start p-3 sm:p-6 pt-6 sm:pt-12 md:pt-16 pb-12">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-3xl lg:max-w-4xl max-h-[85vh] md:max-h-[640px] flex flex-col overscroll-contain overflow-hidden relative">
         {/* Sticky Header Close Button */}
         <button
           onClick={handleCloseModal}

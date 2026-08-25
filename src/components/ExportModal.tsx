@@ -33,8 +33,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, data 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 overflow-y-auto">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-md overflow-hidden my-auto overscroll-contain">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-6 sm:pt-14 md:pt-20 pb-12 bg-slate-900/60 overflow-y-auto">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-md overflow-hidden overscroll-contain">
         {/* Header */}
         <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
           <div className="flex items-center gap-2">

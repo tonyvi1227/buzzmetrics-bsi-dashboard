@@ -39,8 +39,8 @@ export const DevPasswordModal: React.FC<DevPasswordModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 overflow-y-auto">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4 my-auto overscroll-contain">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-6 sm:pt-14 md:pt-20 pb-12 bg-slate-900/60 overflow-y-auto">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4 overscroll-contain">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-slate-900 dark:text-white">
             <KeyRound className="w-5 h-5 text-buzz" />

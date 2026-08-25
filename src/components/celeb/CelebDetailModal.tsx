@@ -95,8 +95,8 @@ export const CelebDetailModal: React.FC<CelebDetailModalProps> = ({ celeb, onClo
   if (!celeb) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex justify-center items-center p-3 sm:p-6">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-4xl w-full max-h-[85vh] md:max-h-[660px] flex flex-col overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 transition-colors my-auto overscroll-contain">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex justify-center items-start p-3 sm:p-6 pt-6 sm:pt-10 md:pt-14 pb-12">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-4xl w-full max-h-[85vh] md:max-h-[660px] flex flex-col overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 transition-colors overscroll-contain">
         
         {/* Modal Header */}
         <div className="p-5 md:p-6 bg-slate-900 text-white flex-shrink-0 relative flex items-center justify-between border-b border-slate-800">

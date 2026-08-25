@@ -240,8 +240,8 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex justify-center items-center p-3 sm:p-6">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-4xl max-h-[85vh] md:max-h-[660px] flex flex-col my-auto overscroll-contain overflow-hidden">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex justify-center items-start p-3 sm:p-6 pt-6 sm:pt-10 md:pt-14 pb-12">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-4xl max-h-[85vh] md:max-h-[660px] flex flex-col overscroll-contain overflow-hidden">
         {/* Modal Fixed Header */}
         <div className="p-5 md:p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-start bg-slate-50 dark:bg-slate-800/80 flex-shrink-0 z-10">
           <div>
