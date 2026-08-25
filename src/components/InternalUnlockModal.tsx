@@ -21,6 +21,7 @@ export const InternalUnlockModal: React.FC<InternalUnlockModalProps> = ({
     if (isOpen) {
       const original = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return () => {
         document.body.style.overflow = original;
       };
@@ -50,8 +51,8 @@ export const InternalUnlockModal: React.FC<InternalUnlockModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex justify-center items-start p-4 pt-6 sm:pt-14 md:pt-20 pb-12">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-md p-6 relative max-h-[85vh] overflow-y-auto overscroll-contain">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/75 flex justify-center items-start p-3 sm:p-4 pt-6 sm:pt-14 md:pt-20 pb-12">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-sm sm:max-w-md p-5 sm:p-6 relative max-h-[85vh] overflow-y-auto overscroll-contain">
         <button
           onClick={onClose}
           type="button"

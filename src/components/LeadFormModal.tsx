@@ -33,11 +33,12 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
   const [isSubmittedSuccess, setIsSubmittedSuccess] = useState(false);
   const [error, setError] = useState('');
 
-  // Lock background scroll when modal is open
+  // Lock background scroll and scroll to top when modal is open
   useEffect(() => {
     if (isOpen) {
       const original = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return () => {
         document.body.style.overflow = original;
       };
@@ -102,26 +103,26 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex justify-center items-start p-3 sm:p-6 pt-6 sm:pt-10 md:pt-14 pb-12">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-3xl lg:max-w-4xl max-h-[90vh] md:max-h-[660px] flex flex-col overscroll-contain overflow-hidden relative">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/75 flex justify-center items-start p-2 sm:p-4 md:p-6 pt-3 sm:pt-8 md:pt-12 pb-8">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-4xl max-h-[92vh] sm:max-h-[88vh] md:max-h-[660px] flex flex-col overscroll-contain overflow-hidden relative">
         {/* Sticky Header Close Button */}
         <button
           onClick={handleCloseModal}
           type="button"
-          className="absolute right-4 top-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer z-20"
+          className="absolute right-3 top-3 sm:right-4 sm:top-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer z-20"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
         </button>
 
         {isSubmittedSuccess ? (
-          <div className="text-center py-10 px-6 space-y-4 max-w-md mx-auto my-auto animate-fadeIn">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center border border-emerald-200 dark:border-emerald-800 shadow-sm">
+          <div className="text-center py-8 sm:py-10 px-4 sm:px-6 space-y-4 max-w-md mx-auto my-auto animate-fadeIn">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center border border-emerald-200 dark:border-emerald-800 shadow-sm">
               <CheckCircle2 className="w-8 h-8" />
             </div>
 
             <div>
-              <h3 className="text-base md:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">
+              <h3 className="text-sm sm:text-base md:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">
                 REGISTRATION SUBMITTED SUCCESSFULLY!
               </h3>
               <p className="text-xs text-slate-700 dark:text-slate-300 font-bold mt-2 leading-relaxed">
@@ -144,27 +145,27 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
         ) : (
           <>
             {/* Fixed Header */}
-            <div className="text-center p-5 pb-3 border-b border-slate-100 dark:border-slate-800/80 flex-shrink-0 bg-white dark:bg-slate-900">
-              <div className="w-9 h-9 rounded-xl bg-orange-50 dark:bg-orange-950/80 text-buzz mx-auto flex items-center justify-center mb-1.5 border border-orange-200 dark:border-orange-800 shadow-sm">
+            <div className="text-center p-3.5 sm:p-5 pb-2.5 sm:pb-3 border-b border-slate-100 dark:border-slate-800/80 flex-shrink-0 bg-white dark:bg-slate-900">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-orange-50 dark:bg-orange-950/80 text-buzz mx-auto flex items-center justify-center mb-1 border border-orange-200 dark:border-orange-800 shadow-sm">
                 <LockKeyhole className="w-4 h-4" />
               </div>
-              <h3 className="text-base md:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+              <h3 className="text-sm sm:text-base md:text-lg font-black text-slate-900 dark:text-white tracking-tight">
                 Register to unlock BSI Campaign Insights
               </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 font-semibold leading-relaxed mt-1">
+              <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 font-semibold leading-relaxed mt-0.5 sm:mt-1">
                 Submit your project details for the Buzzmetrics team to verify and grant access to full analytics.
               </p>
             </div>
 
             {/* Scrollable Form Body */}
-            <form onSubmit={handleSubmit} className="p-5 overflow-y-auto overscroll-contain flex-1 space-y-4">
-              {/* Responsive 2-Column Layout */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+            <form onSubmit={handleSubmit} className="p-3 sm:p-5 overflow-y-auto overscroll-contain flex-1 space-y-3 sm:space-y-4">
+              {/* Responsive 2-Column Layout on Tablet/PC */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 md:gap-5">
                 
-                {/* LEFT COLUMN: Section 1 (Contact Info) & Section 3 (Industry & Target) */}
-                <div className="space-y-3.5">
+                {/* LEFT COLUMN: Contact Info & Industry */}
+                <div className="space-y-3 sm:space-y-3.5">
                   {/* SECTION 1: PERSONAL & COMPANY CONTACT INFO */}
-                  <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2.5">
+                  <div className="bg-slate-50 dark:bg-slate-800/60 p-3 sm:p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2 sm:space-y-2.5">
                     <span className="text-[10px] font-black uppercase tracking-wider text-buzz flex items-center gap-1">
                       <User className="w-3 h-3" /> 1. CONTACT INFORMATION (*)
                     </span>
@@ -180,9 +181,9 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                             type="text"
                             required
                             placeholder="e.g. Nguyen Van A"
-                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
+                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2 sm:p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                           />
-                          <User className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3" />
+                          <User className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 sm:top-3" />
                         </div>
                       </div>
 
@@ -198,7 +199,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                             placeholder="+84 90x xxx xxx"
                             className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                           />
-                          <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3" />
+                          <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 sm:top-3" />
                         </div>
                       </div>
                     </div>
@@ -215,11 +216,11 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                             required
                             onBlur={handleEmailBlur}
                             placeholder="name@company.com"
-                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
+                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2 sm:p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                           />
-                          <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3" />
+                          <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 sm:top-3" />
                         </div>
-                        <span className="text-[9px] text-slate-400 font-semibold block mt-0.5">Company domain only (no @gmail, @yahoo)</span>
+                        <span className="text-[9px] text-slate-400 font-semibold block mt-0.5">Corporate domain (no @gmail, @yahoo)</span>
                       </div>
 
                       <div>
@@ -232,16 +233,16 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                             type="text"
                             required
                             placeholder="e.g. Unilever, Vinamilk..."
-                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
+                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2 sm:p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                           />
-                          <Building className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3" />
+                          <Building className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 sm:top-3" />
                         </div>
                       </div>
                     </div>
                   </div>
 
                   {/* SECTION 2: INDUSTRY & TARGET BRAND */}
-                  <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2.5">
+                  <div className="bg-slate-50 dark:bg-slate-800/60 p-3 sm:p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2 sm:space-y-2.5">
                     <span className="text-[10px] font-black uppercase tracking-wider text-buzz flex items-center gap-1">
                       <Tag className="w-3 h-3" /> 2. INDUSTRY & BRAND OF INTEREST (*)
                     </span>
@@ -255,7 +256,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                           ref={categoryInterestRef}
                           value={selectedCategory}
                           onChange={(e) => setSelectedCategory(e.target.value)}
-                          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz cursor-pointer"
+                          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2 sm:p-2.5 outline-none focus:ring-2 focus:ring-buzz cursor-pointer"
                         >
                           <option value="Handhelds">Handhelds (Smartphones/Tech)</option>
                           <option value="Alcoholic drink">Alcoholic Drink (Beer, Spirits)</option>
@@ -280,7 +281,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                           ref={brandInterestRef}
                           type="text"
                           placeholder="e.g. Heineken, Samsung, OMO..."
-                          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz"
+                          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2 sm:p-2.5 outline-none focus:ring-2 focus:ring-buzz"
                         />
                       </div>
                     </div>
@@ -290,17 +291,17 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                         ref={customCategoryRef}
                         type="text"
                         placeholder="Please specify your industry category..."
-                        className="w-full bg-white dark:bg-slate-900 border border-orange-300 dark:border-orange-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz animate-fadeIn"
+                        className="w-full bg-white dark:bg-slate-900 border border-orange-300 dark:border-orange-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2 sm:p-2.5 outline-none focus:ring-2 focus:ring-buzz animate-fadeIn"
                       />
                     )}
                   </div>
                 </div>
 
                 {/* RIGHT COLUMN: Section 3 (Needs) & Additional Requirements */}
-                <div className="space-y-3.5 flex flex-col justify-between">
+                <div className="space-y-3 sm:space-y-3.5 flex flex-col justify-between">
                   
                   {/* SECTION 3: CURRENT NEED & DATA USAGE OBJECTIVE */}
-                  <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2.5">
+                  <div className="bg-slate-50 dark:bg-slate-800/60 p-3 sm:p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2 sm:space-y-2.5">
                     <span className="text-[10px] font-black uppercase tracking-wider text-buzz flex items-center gap-1">
                       <Target className="w-3 h-3" /> 3. PROJECT NEED & DATA OBJECTIVE (*)
                     </span>
@@ -310,7 +311,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                       <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-1">
                         CURRENT NEED / PURPOSE (*)
                       </label>
-                      <div className="grid grid-cols-1 gap-1.5">
+                      <div className="grid grid-cols-1 gap-1 sm:gap-1.5">
                         {[
                           'General Data Benchmark Reference',
                           'Upcoming Campaign / Product Launch Planning',
@@ -320,7 +321,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                           <label
                             key={needOption}
                             onClick={() => setActualNeed(needOption)}
-                            className={`flex items-center gap-2 p-2 rounded-xl border text-xs font-bold transition cursor-pointer ${
+                            className={`flex items-center gap-2 p-1.5 sm:p-2 rounded-xl border text-[11px] sm:text-xs font-bold transition cursor-pointer ${
                               actualNeed === needOption
                                 ? 'bg-orange-50 dark:bg-orange-950/80 border-buzz text-buzz shadow-2xs'
                                 : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300'
@@ -333,7 +334,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                               onChange={() => setActualNeed(needOption)}
                               className="accent-orange-500"
                             />
-                            <span className="text-[11px] leading-tight">{needOption}</span>
+                            <span className="leading-tight">{needOption}</span>
                           </label>
                         ))}
                       </div>
@@ -344,7 +345,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                       <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-1 flex items-center gap-1">
                         <Database className="w-3 h-3 text-buzz" /> DATA REQUIREMENT (*)
                       </label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-1.5">
                         {[
                           { id: 'Full 18-Month BSI Benchmark Data Access', label: '18-Month BSI Dataset' },
                           { id: 'Category Deep-Dive & Advanced Spider Radar', label: 'Category & Radar Deep-Dive' },
@@ -354,7 +355,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                           <label
                             key={item.id}
                             onClick={() => setDataNeed(item.id)}
-                            className={`flex items-center gap-1.5 p-1.5 rounded-lg border text-[11px] font-bold transition cursor-pointer ${
+                            className={`flex items-center gap-1.5 p-1.5 rounded-lg border text-[10px] sm:text-[11px] font-bold transition cursor-pointer ${
                               dataNeed === item.id
                                 ? 'bg-orange-50 dark:bg-orange-950/80 border-buzz text-buzz'
                                 : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300'
@@ -397,14 +398,14 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3.5 bg-buzz hover:bg-orange-600 text-white font-black text-xs md:text-sm rounded-xl transition shadow-md hover:shadow-lg cursor-pointer flex items-center justify-center gap-2 mt-auto"
+                    className="w-full py-3 sm:py-3.5 bg-buzz hover:bg-orange-600 text-white font-black text-xs sm:text-sm rounded-xl transition shadow-md hover:shadow-lg cursor-pointer flex items-center justify-center gap-2 mt-2 sm:mt-auto"
                   >
                     {isSubmitting ? (
                       <span>Submitting Registration...</span>
                     ) : (
                       <>
                         <Send className="w-4 h-4" />
-                        <span>SUBMIT REGISTRATION FOR ACCESS</span>
+                        <span className="uppercase tracking-wider">SUBMIT REGISTRATION FOR ACCESS</span>
                       </>
                     )}
                   </button>
