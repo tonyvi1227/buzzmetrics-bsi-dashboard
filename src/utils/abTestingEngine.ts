@@ -48,13 +48,16 @@ export function isCorporateEmail(email: string): boolean {
 }
 
 // Passcode Configuration:
-// 1. Dev Password (Unlocks Dashboard AND reveals ⚡ Dev A/B Toolbar)
+// Tier 1: Dev Password (God Mode: Unlocks Dashboard, Full Admin Panel & Direct Upload Data without CIMKT)
 export const DEV_PASSWORDS = ['D3VONLY'];
 
-// 2. Internal Team Password (Unlocks Dashboard, NO Dev Toolbar)
-export const INTERNAL_PASSWORDS = ['BUZZINTERN@L', 'CIMKT', 'BUZZINTERNAL'];
+// Tier 2: Admin Password (Internal Management: Unlocks Dashboard & Has Upload Data Button)
+export const ADMIN_PASSWORDS = ['CIMKT'];
 
-// 3. Client Passcodes (Unlocks Dashboard View & Filtering Only)
+// Tier 3: Internal Team Password (Internal View: Full Dashboard & Formula Breakdown, NO Upload & NO Admin Panel)
+export const INTERNAL_PASSWORDS = ['BUZZINTERN@L', 'BUZZINTERNAL'];
+
+// Tier 4: Client Passcodes (Client View: Full Dashboard View & Filtering Only, NO Upload & NO Admin Panel)
 export const CLIENT_PASSCODES = [
   'BUZZBDK',
   'BUZZBDT',
@@ -66,6 +69,12 @@ export function verifyDevPassword(passcode: string): boolean {
   if (!passcode) return false;
   const cleaned = passcode.trim().toUpperCase();
   return DEV_PASSWORDS.includes(cleaned);
+}
+
+export function verifyAdminPassword(passcode: string): boolean {
+  if (!passcode) return false;
+  const cleaned = passcode.trim().toUpperCase();
+  return ADMIN_PASSWORDS.includes(cleaned);
 }
 
 export function verifyInternalPassword(passcode: string): boolean {
@@ -82,26 +91,35 @@ export function verifyClientPasscode(passcode: string): boolean {
 
 export interface PasscodeVerificationResult {
   valid: boolean;
+  tier: 'DEV' | 'ADMIN_CIMKT' | 'INTERNAL' | 'CLIENT' | 'NONE';
   isDev: boolean;
+  isAdmin: boolean;
   isInternal: boolean;
   isClient: boolean;
 }
 
 export function verifyAnyPasscode(code: string): PasscodeVerificationResult {
-  if (!code) return { valid: false, isDev: false, isInternal: false, isClient: false };
+  if (!code) return { valid: false, tier: 'NONE', isDev: false, isAdmin: false, isInternal: false, isClient: false };
   const cleaned = code.trim().toUpperCase();
 
+  // Tier 1: D3VONLY
   if (DEV_PASSWORDS.includes(cleaned)) {
-    return { valid: true, isDev: true, isInternal: true, isClient: false };
+    return { valid: true, tier: 'DEV', isDev: true, isAdmin: true, isInternal: true, isClient: false };
   }
+  // Tier 2: CIMKT
+  if (ADMIN_PASSWORDS.includes(cleaned)) {
+    return { valid: true, tier: 'ADMIN_CIMKT', isDev: false, isAdmin: true, isInternal: true, isClient: false };
+  }
+  // Tier 3: BUZZINTERN@L, BUZZINTERNAL
   if (INTERNAL_PASSWORDS.includes(cleaned)) {
-    return { valid: true, isDev: false, isInternal: true, isClient: false };
+    return { valid: true, tier: 'INTERNAL', isDev: false, isAdmin: false, isInternal: true, isClient: false };
   }
+  // Tier 4: Client codes
   if (CLIENT_PASSCODES.includes(cleaned)) {
-    return { valid: true, isDev: false, isInternal: false, isClient: true };
+    return { valid: true, tier: 'CLIENT', isDev: false, isAdmin: false, isInternal: false, isClient: true };
   }
 
-  return { valid: false, isDev: false, isInternal: false, isClient: false };
+  return { valid: false, tier: 'NONE', isDev: false, isAdmin: false, isInternal: false, isClient: false };
 }
 
 export interface PasscodeUsageLog {

@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { CampaignRecord, FilterState } from '../types/dashboard';
 
 export const ALL_OPTION = 'ALL';
@@ -31,7 +31,57 @@ const initialFilters: FilterState = {
 };
 
 export function useSmartFilters(allCampaigns: CampaignRecord[]) {
-  const [filters, setFilters] = useState<FilterState>(initialFilters);
+  // Compute the dynamic min and max month/year present in the active dataset
+  const { minYear, minMonth, maxYear, maxMonth } = useMemo(() => {
+    if (!allCampaigns || allCampaigns.length === 0) {
+      return { minYear: '2025', minMonth: 'Jan', maxYear: '2026', maxMonth: 'Jun' };
+    }
+
+    let minVal = Infinity;
+    let maxVal = -Infinity;
+    let minRec = { year: '2025', month: 'Jan' };
+    let maxRec = { year: '2026', month: 'Jun' };
+
+    allCampaigns.forEach(c => {
+      if (c.year && c.month) {
+        const val = getMonthValue(c.year, c.month);
+        if (val < minVal) {
+          minVal = val;
+          minRec = { year: c.year, month: c.month };
+        }
+        if (val > maxVal) {
+          maxVal = val;
+          maxRec = { year: c.year, month: c.month };
+        }
+      }
+    });
+
+    return {
+      minYear: minRec.year,
+      minMonth: minRec.month,
+      maxYear: maxRec.year,
+      maxMonth: maxRec.month,
+    };
+  }, [allCampaigns]);
+
+  const [filters, setFilters] = useState<FilterState>(() => ({
+    ...initialFilters,
+    startYear: minYear,
+    startMonth: minMonth,
+    endYear: maxYear,
+    endMonth: maxMonth,
+  }));
+
+  // Auto-sync Date Range to the latest dataset month whenever dataset is updated (e.g. Jul 2026 imported)
+  useEffect(() => {
+    setFilters(prev => ({
+      ...prev,
+      startYear: prev.startYear || minYear,
+      startMonth: prev.startMonth || minMonth,
+      endYear: maxYear,
+      endMonth: maxMonth,
+    }));
+  }, [maxYear, maxMonth, minYear, minMonth]);
 
   // Helper to extract Top 10 BSI campaigns per month
   const filterTop10BsiPerMonth = useCallback((records: CampaignRecord[]): CampaignRecord[] => {
@@ -59,10 +109,16 @@ export function useSmartFilters(allCampaigns: CampaignRecord[]) {
     }));
   }, []);
 
-  // Reset all filters to default
+  // Reset all filters to default with latest max date
   const resetFilters = useCallback(() => {
-    setFilters(initialFilters);
-  }, []);
+    setFilters({
+      ...initialFilters,
+      startYear: minYear,
+      startMonth: minMonth,
+      endYear: maxYear,
+      endMonth: maxMonth,
+    });
+  }, [minYear, minMonth, maxYear, maxMonth]);
 
   // Get list of available Years in dataset
   const availableYears = useMemo(() => {

@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { CelebRecord, MonthlyCelebRankRecord, AggregatedCelebRecord, CelebFilterState, CelebBenchmarkMetrics, TopCelebHighlights } from '../types/celeb';
 import { MONTH_ORDER, getMonthValue } from './useSmartFilters';
 
@@ -15,7 +15,57 @@ const initialCelebFilters: CelebFilterState = {
 };
 
 export function useCelebSmartFilters(rawDataset: CelebRecord[]) {
-  const [filters, setFilters] = useState<CelebFilterState>(initialCelebFilters);
+  // Dynamically compute min and max date present in celeb dataset
+  const { minYear, minMonth, maxYear, maxMonth } = useMemo(() => {
+    if (!rawDataset || rawDataset.length === 0) {
+      return { minYear: '2025', minMonth: 'Jan', maxYear: '2026', maxMonth: 'Jun' };
+    }
+
+    let minVal = Infinity;
+    let maxVal = -Infinity;
+    let minRec = { year: '2025', month: 'Jan' };
+    let maxRec = { year: '2026', month: 'Jun' };
+
+    rawDataset.forEach(c => {
+      if (c.year && c.month) {
+        const val = getMonthValue(c.year, c.month);
+        if (val < minVal) {
+          minVal = val;
+          minRec = { year: c.year, month: c.month };
+        }
+        if (val > maxVal) {
+          maxVal = val;
+          maxRec = { year: c.year, month: c.month };
+        }
+      }
+    });
+
+    return {
+      minYear: minRec.year,
+      minMonth: minRec.month,
+      maxYear: maxRec.year,
+      maxMonth: maxRec.month,
+    };
+  }, [rawDataset]);
+
+  const [filters, setFilters] = useState<CelebFilterState>(() => ({
+    ...initialCelebFilters,
+    startYear: minYear,
+    startMonth: minMonth,
+    endYear: maxYear,
+    endMonth: maxMonth,
+  }));
+
+  // Auto-sync Date Range to the latest dataset month
+  useEffect(() => {
+    setFilters(prev => ({
+      ...prev,
+      startYear: prev.startYear || minYear,
+      startMonth: prev.startMonth || minMonth,
+      endYear: maxYear,
+      endMonth: maxMonth,
+    }));
+  }, [maxYear, maxMonth, minYear, minMonth]);
 
   // Step 1: Pre-calculate monthly rankings for each year-month in the dataset
   const datasetWithRanks = useMemo<MonthlyCelebRankRecord[]>(() => {
@@ -214,8 +264,14 @@ export function useCelebSmartFilters(rawDataset: CelebRecord[]) {
   }, []);
 
   const resetFilters = useCallback(() => {
-    setFilters(initialCelebFilters);
-  }, []);
+    setFilters({
+      ...initialCelebFilters,
+      startYear: minYear,
+      startMonth: minMonth,
+      endYear: maxYear,
+      endMonth: maxMonth,
+    });
+  }, [minYear, minMonth, maxYear, maxMonth]);
 
   return {
     filters,

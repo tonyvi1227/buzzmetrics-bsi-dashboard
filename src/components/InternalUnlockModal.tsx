@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { X, Lock, CheckCircle2, KeyRound } from 'lucide-react';
-import { verifyAnyPasscode, unlockUserPermanently, logPasscodeUsage } from '../utils/abTestingEngine';
+import { verifyAnyPasscode, unlockUserPermanently, logPasscodeUsage, PasscodeVerificationResult } from '../utils/abTestingEngine';
 
 interface InternalUnlockModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (isDev?: boolean) => void;
+  onSuccess: (result: PasscodeVerificationResult) => void;
 }
 
 export const InternalUnlockModal: React.FC<InternalUnlockModalProps> = ({
@@ -42,7 +42,7 @@ export const InternalUnlockModal: React.FC<InternalUnlockModalProps> = ({
       setTimeout(() => {
         setIsSuccess(false);
         setPassword('');
-        onSuccess(result.isDev);
+        onSuccess(result);
         onClose();
       }, 500);
     } else {

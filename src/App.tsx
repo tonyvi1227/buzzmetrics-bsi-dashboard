@@ -82,7 +82,7 @@ const DashboardContent: React.FC = () => {
   const [isAIChatModalOpen, setIsAIChatModalOpen] = useState(false);
   const [isInternalModalOpen, setIsInternalModalOpen] = useState(false);
 
-  const { isAdmin } = useAdmin();
+  const { isAdmin, loginAdmin, logoutAdmin } = useAdmin();
 
   const [activeTab, setActiveTab] = useState<'campaigns' | 'celebs'>('campaigns');
 
@@ -408,8 +408,8 @@ const DashboardContent: React.FC = () => {
       {/* Understanding BSI Top10 Standard (6 Measurement Pillars) */}
       <BSIIntroSection />
 
-      {/* Unified Admin Panel (Revealed with Dev/Internal Password or Admin Auth) */}
-      {(showDevToolbar || isAdmin || isDevAuthed) && (
+      {/* Unified Admin Panel (Revealed ONLY with Dev Password D3VONLY) */}
+      {(showDevToolbar || isDevAuthed) && (
         <AdminPanel
           currentVariant={assignedVariant}
           isUnlocked={isUnlocked}
@@ -671,11 +671,23 @@ const DashboardContent: React.FC = () => {
       <InternalUnlockModal
         isOpen={isInternalModalOpen}
         onClose={() => setIsInternalModalOpen(false)}
-        onSuccess={(isDev) => {
+        onSuccess={(result) => {
           setIsUnlocked(true);
-          if (isDev) {
+          if (result.isDev) {
+            // Tier 1: D3VONLY (God Mode - Full Admin Panel, Direct Upload Data, Formulas)
             setIsDevAuthed(true);
             setShowDevToolbar(true);
+            loginAdmin('D3VONLY');
+          } else if (result.isAdmin) {
+            // Tier 2: CIMKT (Internal Management - Direct Upload Data, Formulas)
+            setIsDevAuthed(false);
+            setShowDevToolbar(false);
+            loginAdmin('CIMKT');
+          } else {
+            // Tier 3 (Internal View) & Tier 4 (Client View) - Read & Filter Only
+            setIsDevAuthed(false);
+            setShowDevToolbar(false);
+            logoutAdmin();
           }
         }}
       />
