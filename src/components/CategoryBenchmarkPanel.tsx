@@ -2,6 +2,7 @@ import React from 'react';
 import { Layers, CheckCircle2 } from 'lucide-react';
 import { CategoryBenchmark } from '../types/dashboard';
 import { formatNum } from '../utils/brandStandardizer';
+import { useTranslation } from '../context/LanguageContext';
 
 interface CategoryBenchmarkPanelProps {
   categoryBenchmark: CategoryBenchmark | null;
@@ -12,6 +13,8 @@ export const CategoryBenchmarkPanel: React.FC<CategoryBenchmarkPanelProps> = ({
   categoryBenchmark,
   selectedCategoryName,
 }) => {
+  const { t } = useTranslation();
+
   if (!categoryBenchmark || selectedCategoryName === 'ALL') {
     return null;
   }
@@ -26,17 +29,17 @@ export const CategoryBenchmarkPanel: React.FC<CategoryBenchmarkPanelProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wide">
-                Dedicated Industry Benchmark: <span className="text-buzz uppercase">{selectedCategoryName}</span>
+                {t.categoryBenchmark.title(selectedCategoryName)}
               </h3>
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold">
-              Category-specific benchmark metrics & performance baseline
+              {t.categoryBenchmark.subtitle}
             </p>
           </div>
         </div>
         <span className="text-xs font-black bg-buzz text-white px-3 py-1 rounded-full shadow-sm">
-          {categoryBenchmark.totalCampaigns} Campaigns in Category
+          {t.categoryBenchmark.countBadge(categoryBenchmark.totalCampaigns)}
         </span>
       </div>
 
@@ -44,15 +47,15 @@ export const CategoryBenchmarkPanel: React.FC<CategoryBenchmarkPanelProps> = ({
         <table className="w-full text-xs text-left">
           <thead className="bg-orange-100/70 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-black uppercase">
             <tr>
-              <th className="p-3 rounded-l-xl">Category</th>
-              <th className="p-3 text-right">Campaigns</th>
-              <th className="p-3 text-right">Avg Buzz Vol</th>
-              <th className="p-3 text-right">Avg BSI Score</th>
-              <th className="p-3 text-right">Avg CFQU</th>
-              <th className="p-3 text-right">Avg QU</th>
-              <th className="p-3 text-right">Avg Sentiment</th>
-              <th className="p-3 text-right">Avg Relevancy</th>
-              <th className="p-3 text-right rounded-r-xl">Avg % Earned</th>
+              <th className="p-3 rounded-l-xl">{t.categoryBenchmark.colCategory}</th>
+              <th className="p-3 text-right">{t.categoryBenchmark.colCampaigns}</th>
+              <th className="p-3 text-right">{t.categoryBenchmark.colAvgBuzz}</th>
+              <th className="p-3 text-right">{t.categoryBenchmark.colAvgBsi}</th>
+              <th className="p-3 text-right">{t.categoryBenchmark.colAvgCfqu}</th>
+              <th className="p-3 text-right">{t.categoryBenchmark.colAvgQu}</th>
+              <th className="p-3 text-right">{t.categoryBenchmark.colAvgSentiment}</th>
+              <th className="p-3 text-right">{t.categoryBenchmark.colAvgRelevancy}</th>
+              <th className="p-3 text-right rounded-r-xl">{t.categoryBenchmark.colAvgEarned}</th>
             </tr>
           </thead>
           <tbody className="font-extrabold text-slate-900 dark:text-slate-100">

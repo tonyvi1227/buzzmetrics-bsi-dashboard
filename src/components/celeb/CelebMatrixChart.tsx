@@ -12,6 +12,7 @@ import { Trophy } from 'lucide-react';
 import { AggregatedCelebRecord } from '../../types/celeb';
 import { useTheme } from '../../context/ThemeContext';
 import { InfoTooltip } from '../common/InfoTooltip';
+import { useTranslation } from '../../context/LanguageContext';
 
 ChartJS.register(LinearScale, PointElement, Tooltip, Legend, Title);
 
@@ -21,6 +22,7 @@ interface CelebMatrixChartProps {
 
 export const CelebMatrixChart: React.FC<CelebMatrixChartProps> = ({ celebs }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   // Vibrant distinct colors matching English category names
   const categoryColors: Record<string, string> = {
@@ -48,17 +50,16 @@ export const CelebMatrixChart: React.FC<CelebMatrixChartProps> = ({ celebs }) =>
         y: item.avgBsi,
         r: Math.max(6, Math.min(22, item.totalAppearances * 2.2)),
         celebName: item.celebName,
+        category: cat,
         totalAppearances: item.totalAppearances,
-        avgBuzz: item.avgBuzz,
-        bestRank: item.bestRank,
       })),
-      backgroundColor: categoryColors[cat] || 'rgba(255, 94, 30, 0.85)',
-      borderColor: '#ffffff',
+      backgroundColor: categoryColors[cat] || 'rgba(100, 116, 139, 0.85)',
+      borderColor: theme === 'dark' ? '#0f172a' : '#ffffff',
       borderWidth: 1.5,
     }));
 
     return { datasets };
-  }, [celebs]);
+  }, [celebs, theme]);
 
   const options = useMemo(() => {
     const isDark = theme === 'dark';
@@ -67,17 +68,13 @@ export const CelebMatrixChart: React.FC<CelebMatrixChartProps> = ({ celebs }) =>
     return {
       responsive: true,
       maintainAspectRatio: false,
-      layout: {
-        padding: { top: 10, bottom: 5 }
-      },
       plugins: {
         legend: {
           position: 'top' as const,
           labels: {
             color: textColor,
-            font: { family: "'Inter', sans-serif", size: 11, weight: 'bold' as const },
-            padding: 20, // Separates legend from chart canvas!
-            boxWidth: 12,
+            font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const },
+            boxWidth: 8,
             usePointStyle: true,
             pointStyle: 'circle',
           },
@@ -89,14 +86,16 @@ export const CelebMatrixChart: React.FC<CelebMatrixChartProps> = ({ celebs }) =>
           titleFont: { family: "'Inter', sans-serif", size: 12, weight: 'bold' as const },
           bodyFont: { family: "'Inter', sans-serif", size: 11, weight: 'bold' as const },
           callbacks: {
+            title: (context: any) => {
+              const item = context[0]?.raw;
+              return item ? `${item.celebName} (${item.category})` : '';
+            },
             label: (context: any) => {
               const raw = context.raw;
               return [
-                ` Celebrity: ${raw.celebName}`,
-                ` • Avg Rank: #${raw.x} (Best: #${raw.bestRank})`,
-                ` • Top 10 Appearances: ${raw.totalAppearances} Months`,
-                ` • Average BSI Score: ${Math.round(raw.y).toLocaleString('en-US')}`,
-                ` • Average Buzz Volume: ${Math.round(raw.avgBuzz).toLocaleString('en-US')}`,
+                ` • Avg Rank: #${raw.x}`,
+                ` • Avg BSI Score: ${Math.round(raw.y).toLocaleString('en-US')}`,
+                ` • Top 10 Months: ${raw.totalAppearances}`,
               ];
             },
           },
@@ -104,15 +103,18 @@ export const CelebMatrixChart: React.FC<CelebMatrixChartProps> = ({ celebs }) =>
       },
       scales: {
         x: {
-          reverse: true, // Rank #1 is best -> placed on far RIGHT!
+          reverse: true, // Rank 1 is on the far right (Honor zone)
+          min: 0.5,
+          max: 10.5,
           title: {
             display: true,
-            text: '← Lower Avg Rank | Higher Avg Rank (Closest to #1) →',
+            text: 'Average Top 10 Rank (#1 Honor Zone on Right)',
             color: textColor,
             font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const },
           },
           grid: { display: false },
           ticks: {
+            stepSize: 1,
             color: textColor,
             font: { family: "'Inter', sans-serif", size: 10, weight: 'bold' as const },
             callback: (val: any) => `#${val}`,
@@ -141,14 +143,14 @@ export const CelebMatrixChart: React.FC<CelebMatrixChartProps> = ({ celebs }) =>
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
           <Trophy className="w-4 h-4 text-buzz" />
-          CELEBRITY POSITIONING MATRIX
+          {t.celebCharts.matrixTitle}
           <InfoTooltip
-            title="Celebrity Positioning Matrix"
-            content="4-dimensional analysis: X-axis = Average Rank (further right is closer to #1); Y-axis = Average BSI Score; Bubble Size = Total Top 10 Months; Color = Profession."
+            title={t.celebCharts.matrixTooltipTitle}
+            content={t.celebCharts.matrixTooltipContent}
           />
         </h3>
         <span className="whitespace-nowrap inline-flex items-center justify-center text-[10px] font-black bg-orange-100 dark:bg-orange-950 text-buzz dark:text-orange-300 border border-orange-300 dark:border-orange-800 px-2.5 py-0.5 rounded-full">
-          POSITIONING MATRIX
+          {t.celebCharts.matrixBadge}
         </span>
       </div>
 
@@ -157,7 +159,7 @@ export const CelebMatrixChart: React.FC<CelebMatrixChartProps> = ({ celebs }) =>
           <Bubble data={chartData} options={options} />
         ) : (
           <div className="h-full flex items-center justify-center text-xs font-bold text-slate-400">
-            No data available for this filter
+            {t.celebCharts.noData}
           </div>
         )}
       </div>

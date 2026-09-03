@@ -4,6 +4,7 @@ import { Chart as ChartJS, registerables } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../context/LanguageContext';
 import { formatNum } from '../utils/brandStandardizer';
 import { downloadChartAsImage } from '../utils/chartExporter';
 import { InfoTooltip } from './common/InfoTooltip';
@@ -16,6 +17,7 @@ interface CategoryComparisonChartProps {
 
 export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = ({ data }) => {
   const { theme } = useTheme();
+  const { lang } = useTranslation();
 
   // Top 10 categories with highest AVG CFQU (Excluding 'Others' / 'Khác')
   const categoryStats = useMemo(() => {
@@ -131,10 +133,10 @@ export const CategoryComparisonChart: React.FC<CategoryComparisonChartProps> = (
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-            <Users className="w-4 h-4 text-buzz" /> TOP CATEGORIES PERFORMANCE
+            <Users className="w-4 h-4 text-buzz" /> {lang === 'vi' ? 'HIỆU QUẢ CÁC NGÀNH HÀNG HÀNG ĐẦU' : 'TOP CATEGORIES PERFORMANCE'}
             <InfoTooltip
-              title="Category Performance Comparison"
-              content="Comparison of Average Content Quality (CFQU) vs Genuine User Reach (QU) across top industries."
+              title={lang === 'vi' ? 'So sánh hiệu quả ngành hàng' : 'Category Performance Comparison'}
+              content={lang === 'vi' ? 'So sánh lượng thảo luận chất lượng (CFQU) và người dùng chất lượng (QU) giữa các ngành hàng hàng đầu.' : 'Comparison of Average Content Quality (CFQU) vs Genuine User Reach (QU) across top industries.'}
             />
           </h3>
 

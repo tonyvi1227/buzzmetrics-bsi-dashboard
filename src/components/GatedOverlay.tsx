@@ -2,6 +2,7 @@ import React from 'react';
 import { LockKeyhole, Sparkles, CheckCircle2, KeyRound } from 'lucide-react';
 import { ABVariant } from '../types/leadGen';
 import { hasSubmittedLead } from '../utils/abTestingEngine';
+import { useTranslation } from '../context/LanguageContext';
 
 interface GatedOverlayProps {
   variant: ABVariant;
@@ -18,6 +19,7 @@ export const GatedOverlay: React.FC<GatedOverlayProps> = ({
   onOpenPasscodeModal,
   clickCount = 0,
 }) => {
+  const { t } = useTranslation();
   const isAlreadySubmitted = hasSubmittedLead();
 
   return (
@@ -29,14 +31,14 @@ export const GatedOverlay: React.FC<GatedOverlayProps> = ({
 
         <div>
           <h3 className="text-sm sm:text-base md:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">
-            UNLOCK BSI CAMPAIGN REPORT
+            {t.gatedOverlay.title}
           </h3>
           <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 font-bold mt-1.5 leading-relaxed">
             {isAlreadySubmitted
-              ? 'The Buzzmetrics team has received your registration. If you have been provided with an Access Passcode, click below to unlock.'
+              ? t.gatedOverlay.submittedDesc
               : variant === 'C' && clickCount >= 5
-              ? 'You have reached the 5-action free preview limit. Sign up now for Buzzmetrics to grant full unlimited access!'
-              : 'Sign up to unlock advanced analytics, competitor benchmarks, and monthly BSI ranking reports.'}
+              ? t.gatedOverlay.limitReachedDesc
+              : t.gatedOverlay.defaultDesc}
           </p>
         </div>
 
@@ -47,7 +49,7 @@ export const GatedOverlay: React.FC<GatedOverlayProps> = ({
             className="w-full py-3 sm:py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs md:text-sm rounded-xl transition shadow cursor-pointer flex items-center justify-center gap-2 min-h-[44px]"
           >
             <CheckCircle2 className="w-4 h-4 text-emerald-200" />
-            <span>UNLOCK FULL VERSION (Registered)</span>
+            <span>{t.gatedOverlay.unlockFullRegistered}</span>
           </button>
         ) : (
           <div className="space-y-2.5">
@@ -57,7 +59,7 @@ export const GatedOverlay: React.FC<GatedOverlayProps> = ({
               className="w-full py-3 sm:py-3.5 bg-buzz hover:bg-orange-600 text-white font-black text-xs md:text-sm rounded-xl transition shadow cursor-pointer flex items-center justify-center gap-2 min-h-[44px]"
             >
               <Sparkles className="w-4 h-4 text-amber-300" />
-              <span>SIGN UP TO UNLOCK FULL REPORT</span>
+              <span>{t.gatedOverlay.signupFullReport}</span>
             </button>
 
             {onOpenPasscodeModal && (
@@ -67,7 +69,7 @@ export const GatedOverlay: React.FC<GatedOverlayProps> = ({
                 className="text-[11px] sm:text-xs font-bold text-slate-500 hover:text-buzz dark:text-slate-400 dark:hover:text-amber-400 underline transition cursor-pointer flex items-center justify-center gap-1 mx-auto py-1"
               >
                 <KeyRound className="w-3.5 h-3.5" />
-                <span>Already have an Access Code? Enter here</span>
+                <span>{t.gatedOverlay.havePasscode}</span>
               </button>
             )}
           </div>

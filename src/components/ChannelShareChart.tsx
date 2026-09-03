@@ -5,6 +5,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Doughnut } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../context/LanguageContext';
 import { downloadChartAsImage } from '../utils/chartExporter';
 import { InfoTooltip } from './common/InfoTooltip';
 
@@ -16,6 +17,7 @@ interface ChannelShareChartProps {
 
 export const ChannelShareChart: React.FC<ChannelShareChartProps> = ({ data }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   const chartData = React.useMemo(() => {
     const totalOwned = data.reduce((a, b) => a + b.owned, 0);
@@ -68,10 +70,10 @@ export const ChannelShareChart: React.FC<ChannelShareChartProps> = ({ data }) =>
     <div id="channel-share-container" className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-          <PieChart className="w-4 h-4 text-buzz" /> MEDIA CHANNEL SHARE DISTRIBUTION
+          <PieChart className="w-4 h-4 text-buzz" /> {t.channelShareChart.title}
           <InfoTooltip
-            title="Media Channel Share"
-            content="Proportional breakdown of total campaign discussion volume across Earned, Paid, and Owned media channels."
+            title={t.channelShareChart.tooltipTitle}
+            content={t.channelShareChart.tooltipContent}
           />
         </h3>
 

@@ -5,6 +5,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Doughnut } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../context/LanguageContext';
 import { formatNum } from '../utils/brandStandardizer';
 import { InfoTooltip } from './common/InfoTooltip';
 import { downloadChartAsImage } from '../utils/chartExporter';
@@ -33,7 +34,8 @@ const donutCenterLabelPlugin = {
 
     ctx.font = '700 9px sans-serif';
     ctx.fillStyle = '#64748b';
-    ctx.fillText('CAMPAIGNS', centerX, centerY + 10);
+    const centerLabel = chart.options.plugins.donutCenterText?.labelText || 'CAMPAIGNS';
+    ctx.fillText(centerLabel, centerX, centerY + 10);
 
     ctx.restore();
   },
@@ -45,15 +47,16 @@ interface CampaignTypeChartProps {
 
 export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   // Aggregate stats per campaign type and sort from largest to smallest per guideline
   const typeStats = useMemo(() => {
     const map: Record<string, { typeName: string; rawType: string; count: number; buzz: number }> = {
-      'Thematic & Brand Building': { typeName: 'Thematic', rawType: 'Thematic & Brand Building', count: 0, buzz: 0 },
-      'Product Launch & Rebranding': { typeName: 'Product Launch', rawType: 'Product Launch & Rebranding', count: 0, buzz: 0 },
-      'Sponsor & Event': { typeName: 'Sponsor & Event', rawType: 'Sponsor & Event', count: 0, buzz: 0 },
-      'Promotion': { typeName: 'Promotion', rawType: 'Promotion', count: 0, buzz: 0 },
-      'CSR & Sustainability': { typeName: 'CSR & Sustainability', rawType: 'CSR & Sustainability', count: 0, buzz: 0 },
+      'Thematic & Brand Building': { typeName: t.campaignTypeChart.thematic, rawType: 'Thematic & Brand Building', count: 0, buzz: 0 },
+      'Product Launch & Rebranding': { typeName: t.campaignTypeChart.launch, rawType: 'Product Launch & Rebranding', count: 0, buzz: 0 },
+      'Sponsor & Event': { typeName: t.campaignTypeChart.sponsor, rawType: 'Sponsor & Event', count: 0, buzz: 0 },
+      'Promotion': { typeName: t.campaignTypeChart.promotion, rawType: 'Promotion', count: 0, buzz: 0 },
+      'CSR & Sustainability': { typeName: t.campaignTypeChart.csr, rawType: 'CSR & Sustainability', count: 0, buzz: 0 },
     };
 
     data.forEach(d => {
@@ -65,7 +68,7 @@ export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) =>
     });
 
     return Object.values(map).sort((a, b) => b.count - a.count);
-  }, [data]);
+  }, [data, t]);
 
   const chartData = useMemo(() => {
     // Buzzmetrics Official Palette: Dark Blue, Signature Orange, Light Orange, Sandy Orange, Grey
@@ -100,7 +103,8 @@ export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) =>
       },
       plugins: {
         donutCenterText: {
-          textColor: textColor,
+          textColor,
+          labelText: t.campaignTypeChart.centerText,
         },
         legend: {
           labels: {
@@ -141,17 +145,17 @@ export const CampaignTypeChart: React.FC<CampaignTypeChartProps> = ({ data }) =>
         },
       },
     };
-  }, [theme, typeStats]);
+  }, [theme, typeStats, t]);
 
   return (
     <div id="campaign-type-container" className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:shadow-md transition">
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-            <Tag className="w-4 h-4 text-buzz" /> CAMPAIGN TYPE DISTRIBUTION
+            <Tag className="w-4 h-4 text-buzz" /> {t.campaignTypeChart.title}
             <InfoTooltip
-              title="Campaign Objective Distribution"
-              content="Share of marketing objectives across tracked campaigns: Product Launch & Rebranding, Sponsor & Event, Promotion, CSR & Sustainability, and Thematic."
+              title={t.campaignTypeChart.tooltipTitle}
+              content={t.campaignTypeChart.tooltipContent}
             />
           </h3>
 

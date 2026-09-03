@@ -5,6 +5,7 @@ import { PieChart } from 'lucide-react';
 import { AggregatedCelebRecord } from '../../types/celeb';
 import { useTheme } from '../../context/ThemeContext';
 import { InfoTooltip } from '../common/InfoTooltip';
+import { useTranslation } from '../../context/LanguageContext';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -14,6 +15,7 @@ interface CelebCategoryChartProps {
 
 export const CelebCategoryChart: React.FC<CelebCategoryChartProps> = ({ celebs }) => {
   const { theme } = useTheme();
+  const { lang, t } = useTranslation();
 
   const categoryStats = useMemo(() => {
     const map: Record<string, { bsiSum: number; count: number }> = {};
@@ -45,7 +47,7 @@ export const CelebCategoryChart: React.FC<CelebCategoryChartProps> = ({ celebs }
   };
 
   const chartData = {
-    labels: categoryStats.map(c => c.category),
+    labels: categoryStats.map(c => t.celebCategories[c.category] || c.category),
     datasets: [
       {
         data: categoryStats.map(c => c.count),
@@ -89,27 +91,27 @@ export const CelebCategoryChart: React.FC<CelebCategoryChartProps> = ({ celebs }
               const count = context.raw || 0;
               const total = categoryStats.reduce((a, b) => a + b.count, 0);
               const pct = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
-              return ` ${count} celebrities (${pct}%)`;
+              return ` ${count} Influencers (${pct}%)`;
             },
           },
         },
       },
     };
-  }, [theme, categoryStats]);
+  }, [theme, categoryStats, lang, t]);
 
   return (
     <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
           <PieChart className="w-4 h-4 text-buzz" />
-          CELEBRITY SHARE BY PROFESSION
+          {t.celebCharts.categoryShareTitle}
           <InfoTooltip
-            title="Profession Distribution"
-            content="Percentage share and count of celebrities entering the Top 10 BSI across professions."
+            title={t.celebCharts.categoryShareTooltipTitle}
+            content={t.celebCharts.categoryShareTooltipContent}
           />
         </h3>
         <span className="whitespace-nowrap inline-flex items-center justify-center text-[10px] font-black bg-orange-100 dark:bg-orange-950 text-buzz dark:text-orange-300 border border-orange-300 dark:border-orange-800 px-2.5 py-0.5 rounded-full">
-          CATEGORY SHARE
+          {t.celebCharts.categoryShareBadge}
         </span>
       </div>
 
@@ -117,7 +119,7 @@ export const CelebCategoryChart: React.FC<CelebCategoryChartProps> = ({ celebs }
         {categoryStats.length > 0 ? (
           <Pie data={chartData} options={options} />
         ) : (
-          <div className="text-xs font-bold text-slate-400">No data available for this filter</div>
+          <div className="text-xs font-bold text-slate-400">{t.celebCharts.noData}</div>
         )}
       </div>
     </div>

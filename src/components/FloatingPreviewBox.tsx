@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Zap, Sparkles, KeyRound, ChevronDown, ChevronUp } from 'lucide-react';
 import { MAX_FREE_CLICKS } from '../utils/abTestingEngine';
+import { useTranslation } from '../context/LanguageContext';
 
 interface FloatingPreviewBoxProps {
   clickCount: number;
@@ -13,6 +14,7 @@ export const FloatingPreviewBox: React.FC<FloatingPreviewBoxProps> = ({
   onOpenContactModal,
   onOpenUnlockModal,
 }) => {
+  const { t } = useTranslation();
   const [isMinimized, setIsMinimized] = useState(false);
   const remainingClicks = Math.max(0, MAX_FREE_CLICKS - clickCount);
   const progressPct = Math.round((remainingClicks / MAX_FREE_CLICKS) * 100);
@@ -45,10 +47,10 @@ export const FloatingPreviewBox: React.FC<FloatingPreviewBoxProps> = ({
               ? 'bg-amber-500 text-white border-amber-600'
               : 'bg-slate-900 text-amber-400 border-slate-700 hover:bg-slate-800'
           }`}
-          title="Expand Free Preview Status"
+          title={t.floatingPreview.title}
         >
           <Zap className="w-4 h-4 text-amber-300 animate-bounce" />
-          <span>{isLimitReached ? 'Preview Limit Reached (0/5)' : `Free: ${remainingClicks}/${MAX_FREE_CLICKS} Actions Left`}</span>
+          <span>{isLimitReached ? t.floatingPreview.minimizedLimit : t.floatingPreview.minimizedRemaining(remainingClicks, MAX_FREE_CLICKS)}</span>
           <ChevronUp className="w-4 h-4" />
         </button>
       </div>
@@ -66,11 +68,13 @@ export const FloatingPreviewBox: React.FC<FloatingPreviewBoxProps> = ({
             </div>
             <div>
               <h4 className="text-xs font-black uppercase tracking-tight">
-                Free Interactive Preview
+                {t.floatingPreview.title}
               </h4>
-              <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-                {isLimitReached ? 'Action limit reached' : 'Interactive exploration mode'}
-              </p>
+              {isLimitReached && (
+                <p className="text-[10px] font-semibold text-rose-500">
+                  {t.floatingPreview.limitReached}
+                </p>
+              )}
             </div>
           </div>
 
@@ -78,7 +82,7 @@ export const FloatingPreviewBox: React.FC<FloatingPreviewBoxProps> = ({
             <span
               className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${accentColor}`}
             >
-              {remainingClicks}/{MAX_FREE_CLICKS} LEFT
+              {t.floatingPreview.leftBadge(remainingClicks, MAX_FREE_CLICKS)}
             </span>
             <button
               onClick={() => setIsMinimized(true)}
@@ -100,8 +104,8 @@ export const FloatingPreviewBox: React.FC<FloatingPreviewBoxProps> = ({
           </div>
           <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold leading-tight">
             {isLimitReached
-              ? 'You have used all 5 free actions. Sign up to unlock full report!'
-              : 'Each filter selection or chart expansion uses 1 free action.'}
+              ? t.floatingPreview.limitHint
+              : t.floatingPreview.usageHint}
           </p>
         </div>
 
@@ -112,7 +116,7 @@ export const FloatingPreviewBox: React.FC<FloatingPreviewBoxProps> = ({
             className="w-full py-2.5 bg-buzz hover:bg-orange-600 text-white font-black text-xs rounded-xl transition shadow-md hover:shadow-lg flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>{isLimitReached ? 'Sign up to Unlock Insights' : 'Unlock Unlimited Insights'}</span>
+            <span>{isLimitReached ? t.floatingPreview.signupUnlock : t.floatingPreview.unlockUnlimited}</span>
           </button>
 
           <button
@@ -120,7 +124,7 @@ export const FloatingPreviewBox: React.FC<FloatingPreviewBoxProps> = ({
             className="w-full py-1 text-[11px] font-bold text-slate-500 hover:text-buzz dark:text-slate-400 dark:hover:text-amber-400 underline transition cursor-pointer flex items-center justify-center gap-1"
           >
             <KeyRound className="w-3 h-3" />
-            <span>Already have an Access Code? Enter here</span>
+            <span>{t.floatingPreview.haveCode}</span>
           </button>
         </div>
       </div>

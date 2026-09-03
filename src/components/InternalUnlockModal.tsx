@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Lock, CheckCircle2, KeyRound } from 'lucide-react';
 import { verifyAnyPasscode, unlockUserPermanently, logPasscodeUsage, PasscodeVerificationResult } from '../utils/abTestingEngine';
+import { useTranslation } from '../context/LanguageContext';
 
 interface InternalUnlockModalProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ export const InternalUnlockModal: React.FC<InternalUnlockModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const { t } = useTranslation();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
@@ -46,7 +48,7 @@ export const InternalUnlockModal: React.FC<InternalUnlockModalProps> = ({
         onClose();
       }, 500);
     } else {
-      setError('Invalid passcode. Please check and try again.');
+      setError(t.modals.unlockError);
     }
   };
 
@@ -67,31 +69,31 @@ export const InternalUnlockModal: React.FC<InternalUnlockModalProps> = ({
             <KeyRound className="w-6 h-6" />
           </div>
           <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">
-            Unlock Full Dashboard
+            {t.modals.unlockTitle}
           </h3>
           <p className="text-xs text-slate-600 dark:text-slate-300 font-bold mt-1.5 leading-relaxed">
-            Input your code to unlock Full Dashboard
+            {t.modals.unlockSubtitle}
           </p>
         </div>
 
         {isSuccess ? (
           <div className="p-4 bg-emerald-50 dark:bg-emerald-950/60 rounded-2xl border border-emerald-300 dark:border-emerald-800 text-center text-emerald-700 dark:text-emerald-300 space-y-2">
             <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-500" />
-            <p className="text-sm font-black">ACCESS GRANTED!</p>
-            <p className="text-xs font-semibold">Full Dashboard version unlocked successfully.</p>
+            <p className="text-sm font-black">{t.modals.unlockSuccessTitle}</p>
+            <p className="text-xs font-semibold">{t.modals.unlockSuccessDesc}</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
-                ACCESS CODE / PASSCODE
+                {t.modals.unlockCodeLabel}
               </label>
               <div className="relative">
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter passcode..."
+                  placeholder={t.modals.unlockCodePlaceholder}
                   className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-sm p-3 outline-none focus:ring-2 focus:ring-buzz"
                   autoFocus
                 />
@@ -105,7 +107,7 @@ export const InternalUnlockModal: React.FC<InternalUnlockModalProps> = ({
               className="w-full py-3 bg-buzz hover:bg-orange-600 text-white font-black text-sm rounded-xl transition shadow cursor-pointer flex items-center justify-center gap-2"
             >
               <KeyRound className="w-4 h-4" />
-              <span>Unlock Dashboard</span>
+              <span>{t.modals.unlockSubmitBtn}</span>
             </button>
           </form>
         )}

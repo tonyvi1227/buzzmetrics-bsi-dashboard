@@ -3,6 +3,7 @@ import { Award, ArrowUpDown, Download, Users, Target, ExternalLink, Calendar, Fl
 import { AggregatedCelebRecord, CelebSortColumn, SortDirection } from '../../types/celeb';
 import { InfoTooltip } from '../common/InfoTooltip';
 import { formatNum } from '../../utils/brandStandardizer';
+import { useTranslation } from '../../context/LanguageContext';
 
 interface CelebTableProps {
   data: AggregatedCelebRecord[];
@@ -15,6 +16,7 @@ export const CelebTable: React.FC<CelebTableProps> = ({
   onSelectCeleb,
   onExport,
 }) => {
+  const { lang, t } = useTranslation();
   const [sortColumn, setSortColumn] = useState<CelebSortColumn>('totalAppearances');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
@@ -103,21 +105,21 @@ export const CelebTable: React.FC<CelebTableProps> = ({
         <div>
           <h3 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight flex items-center gap-2">
             <Award className="w-5 h-5 text-buzz" />
-            Influencer BSI Top10 Detail Performance
+            {t.celebTable.title}
             <InfoTooltip
-              title="Influencer BSI Performance Table"
-              content="Aggregated performance database grouped by individual celebrities. Click any row to inspect historical monthly BSI trends, audience reach, and engagement breakdown."
+              title={t.celebTable.tooltipTitle}
+              content={t.celebTable.tooltipContent}
             />
           </h3>
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
-            List of celebrities with average BSI, average rank & total Top 10 appearances (Click row for deep-dive)
+            {t.celebTable.subtitle}
           </p>
         </div>
 
         <div className="flex items-center gap-3 self-start sm:self-auto">
           {/* Page size limit selector */}
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400">
-            <span>Show:</span>
+            <span>{lang === 'vi' ? 'Hiển thị:' : 'Show:'}</span>
             <select
               value={pageSize}
               onChange={(e) => {
@@ -126,10 +128,10 @@ export const CelebTable: React.FC<CelebTableProps> = ({
               }}
               className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold rounded-lg text-xs py-1 px-2 outline-none focus:ring-2 focus:ring-buzz"
             >
-              <option value={10}>10 rows</option>
-              <option value={20}>20 rows</option>
-              <option value={50}>50 rows</option>
-              <option value={-1}>All ({totalItems})</option>
+              <option value={10}>10 {lang === 'vi' ? 'dòng' : 'rows'}</option>
+              <option value={20}>20 {lang === 'vi' ? 'dòng' : 'rows'}</option>
+              <option value={50}>50 {lang === 'vi' ? 'dòng' : 'rows'}</option>
+              <option value={-1}>{lang === 'vi' ? `Tất cả (${totalItems})` : `All (${totalItems})`}</option>
             </select>
           </div>
 
@@ -138,7 +140,7 @@ export const CelebTable: React.FC<CelebTableProps> = ({
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black text-white bg-buzz hover:bg-orange-600 active:bg-orange-700 rounded-xl shadow transition-colors cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
-            Export Data
+            {t.celebTable.exportCsv}
           </button>
         </div>
       </div>
@@ -155,7 +157,7 @@ export const CelebTable: React.FC<CelebTableProps> = ({
                 className="py-3.5 px-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               >
                 <div className="flex items-center gap-1">
-                  CELEBRITY / KOL
+                  {t.celebTable.colName}
                   <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
                 </div>
               </th>
@@ -165,7 +167,7 @@ export const CelebTable: React.FC<CelebTableProps> = ({
                 className="py-3.5 px-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap"
               >
                 <div className="flex items-center gap-1">
-                  PROFESSION
+                  {t.celebTable.colCategory}
                   <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
                 </div>
               </th>
@@ -177,10 +179,10 @@ export const CelebTable: React.FC<CelebTableProps> = ({
               >
                 <div className="flex items-center justify-center gap-1">
                   <Flame className="w-3.5 h-3.5 text-buzz" />
-                  TOP 10 APPEARANCES
+                  {t.celebTable.colAppearances}
                   <InfoTooltip
-                    title="Top 10 Appearances"
-                    content="Total months this celebrity entered the BSI Top 10 ranking during the filtered period."
+                    title={t.celebTable.colAppearances}
+                    content={lang === 'vi' ? 'Tổng số tháng Influencer lọt vào BSI Top 10 trong kỳ lọc.' : 'Total months this influencer entered the BSI Top 10 ranking during the filtered period.'}
                   />
                   <ArrowUpDown className="w-3.5 h-3.5" />
                 </div>
@@ -193,10 +195,10 @@ export const CelebTable: React.FC<CelebTableProps> = ({
               >
                 <div className="flex items-center justify-center gap-1">
                   <Calendar className="w-3.5 h-3.5 text-amber-500" />
-                  AVG TOP 10 RANK
+                  {t.celebTable.colAvgRank}
                   <InfoTooltip
-                    title="Average Top 10 Rank"
-                    content="Average rank = Sum of ranks across Top 10 appearances / Count of appearances. (Includes best rank attained)."
+                    title={t.celebTable.colAvgRank}
+                    content={lang === 'vi' ? 'Thứ hạng TB = Tổng thứ hạng các lần lọt Top 10 / Số lần xuất hiện.' : 'Average rank = Sum of ranks across Top 10 appearances / Count of appearances.'}
                   />
                   <ArrowUpDown className="w-3.5 h-3.5" />
                 </div>
@@ -208,10 +210,10 @@ export const CelebTable: React.FC<CelebTableProps> = ({
                 className="py-3.5 px-4 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap"
               >
                 <div className="flex items-center justify-end gap-1 text-buzz">
-                  AVG BSI SCORE
+                  {t.celebTable.colAvgBsi}
                   <InfoTooltip
-                    title="Average BSI Score"
-                    content="Average BSI score achieved across Top 10 appearances."
+                    title={t.celebTable.colAvgBsi}
+                    content={lang === 'vi' ? 'Điểm BSI trung bình qua các lần lọt Top 10.' : 'Average BSI score achieved across Top 10 appearances.'}
                   />
                   <ArrowUpDown className="w-3.5 h-3.5" />
                 </div>
@@ -223,10 +225,10 @@ export const CelebTable: React.FC<CelebTableProps> = ({
                 className="py-3.5 px-4 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap"
               >
                 <div className="flex items-center justify-end gap-1">
-                  AVG BUZZ VOL
+                  {t.celebTable.colAvgBuzz}
                   <InfoTooltip
-                    title="Average Buzz Volume"
-                    content="Average posts, comments, and shares related to the celebrity."
+                    title={t.celebTable.colAvgBuzz}
+                    content={lang === 'vi' ? 'Tổng thảo luận, chia sẻ và tương tác trung bình.' : 'Average posts, comments, and shares related to the celebrity.'}
                   />
                   <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
                 </div>
@@ -239,10 +241,10 @@ export const CelebTable: React.FC<CelebTableProps> = ({
               >
                 <div className="flex items-center justify-end gap-1 text-buzz-darkblue">
                   <Users className="w-3.5 h-3.5" />
-                  QUALIFIED USER (QU)
+                  {t.celebTable.colAvgQu}
                   <InfoTooltip
-                    title="Qualified User (QU)"
-                    content="Average genuine unique users engaging in discussions."
+                    title={t.celebTable.colAvgQu}
+                    content={lang === 'vi' ? 'Người dùng chất lượng thực tế tương tác trung bình.' : 'Average genuine unique users engaging in discussions.'}
                   />
                   <ArrowUpDown className="w-3.5 h-3.5" />
                 </div>
@@ -254,10 +256,10 @@ export const CelebTable: React.FC<CelebTableProps> = ({
                 className="py-3.5 px-3 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap"
               >
                 <div className="flex items-center justify-end gap-1">
-                  AVG SENTIMENT
+                  {t.celebTable.colAvgSentiment}
                   <InfoTooltip
-                    title="Average Sentiment Index"
-                    content="Average audience sentiment index (from 0 to 1)."
+                    title={t.celebTable.colAvgSentiment}
+                    content={lang === 'vi' ? 'Chỉ số cảm xúc trung bình.' : 'Average audience sentiment index (from 0 to 1).'}
                   />
                   <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
                 </div>
@@ -270,10 +272,10 @@ export const CelebTable: React.FC<CelebTableProps> = ({
               >
                 <div className="flex items-center justify-end gap-1 text-indigo-600 dark:text-indigo-400">
                   <Target className="w-3.5 h-3.5" />
-                  AVG RELEVANCE
+                  {t.celebTable.colAvgRelevancy}
                   <InfoTooltip
-                    title="Average Relevance"
-                    content="Percentage of discussions directly focused on the celebrity."
+                    title={t.celebTable.colAvgRelevancy}
+                    content={lang === 'vi' ? 'Độ gắn kết và liên quan trực tiếp đến Influencer.' : 'Percentage of discussions directly focused on the influencer.'}
                   />
                   <ArrowUpDown className="w-3.5 h-3.5" />
                 </div>
@@ -303,14 +305,14 @@ export const CelebTable: React.FC<CelebTableProps> = ({
                   {/* Profession Column */}
                   <td className="py-3 px-3 text-xs font-bold text-slate-600 dark:text-slate-300">
                     <span className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 whitespace-nowrap inline-block font-extrabold">
-                      {item.category}
+                      {t.celebCategories[item.category] || item.category}
                     </span>
                   </td>
 
                   {/* Total Appearances Column */}
                   <td className="py-3 px-3 text-center font-black text-buzz">
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-orange-100 dark:bg-orange-950/60 text-buzz border border-orange-200 dark:border-orange-900 font-black whitespace-nowrap">
-                      {item.totalAppearances} Months
+                      {item.totalAppearances} {lang === 'vi' ? 'Tháng' : 'Months'}
                     </span>
                   </td>
 
@@ -318,10 +320,10 @@ export const CelebTable: React.FC<CelebTableProps> = ({
                   <td className="py-3 px-4 text-center whitespace-nowrap">
                     <div className="inline-flex flex-col items-center justify-center px-3 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900">
                       <span className="text-xs font-black text-amber-900 dark:text-amber-300">
-                        Avg Rank: #{item.avgRank}
+                        {lang === 'vi' ? 'Hạng TB' : 'Avg Rank'}: #{item.avgRank}
                       </span>
                       <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">
-                        (Best: #{item.bestRank})
+                        ({lang === 'vi' ? 'Cao nhất' : 'Best'}: #{item.bestRank})
                       </span>
                     </div>
                   </td>
@@ -354,7 +356,7 @@ export const CelebTable: React.FC<CelebTableProps> = ({
             {paginatedData.length === 0 && (
               <tr>
                 <td colSpan={10} className="py-8 text-center text-slate-400 font-bold">
-                  No celebrities found matching the selected filter criteria.
+                  {lang === 'vi' ? 'Không tìm thấy Influencers nào phù hợp với bộ lọc.' : 'No influencers found matching the selected filter criteria.'}
                 </td>
               </tr>
             )}
@@ -366,7 +368,11 @@ export const CelebTable: React.FC<CelebTableProps> = ({
       {!isAll && totalPages > 1 && (
         <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-900/40">
           <div>
-            Showing <strong className="text-slate-900 dark:text-white">{startRecordNum}</strong> - <strong className="text-slate-900 dark:text-white">{endRecordNum}</strong> of <strong className="text-buzz">{totalItems}</strong> celebrities
+            {lang === 'vi' ? (
+              <>Hiển thị <strong className="text-slate-900 dark:text-white">{startRecordNum}</strong> - <strong className="text-slate-900 dark:text-white">{endRecordNum}</strong> trong tổng số <strong className="text-buzz">{totalItems}</strong> Influencers</>
+            ) : (
+              <>Showing <strong className="text-slate-900 dark:text-white">{startRecordNum}</strong> - <strong className="text-slate-900 dark:text-white">{endRecordNum}</strong> of <strong className="text-buzz">{totalItems}</strong> influencers</>
+            )}
           </div>
 
           <div className="flex items-center gap-1.5">

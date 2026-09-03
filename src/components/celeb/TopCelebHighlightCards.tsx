@@ -2,6 +2,7 @@ import React from 'react';
 import { Trophy, Flame, Award, Users } from 'lucide-react';
 import { TopCelebHighlights } from '../../types/celeb';
 import { formatNum } from '../../utils/brandStandardizer';
+import { useTranslation } from '../../context/LanguageContext';
 
 interface TopCelebHighlightCardsProps {
   highlights: TopCelebHighlights;
@@ -12,12 +13,14 @@ export const TopCelebHighlightCards: React.FC<TopCelebHighlightCardsProps> = ({
   highlights,
   onSelectCelebName,
 }) => {
-
+  const { t } = useTranslation();
   const { peakBsiCeleb, mostConsistentCeleb, highestAvgBsiCeleb, highestQuCeleb } = highlights;
 
   if (!peakBsiCeleb && !mostConsistentCeleb && !highestAvgBsiCeleb && !highestQuCeleb) {
     return null;
   }
+
+  const getCategoryLabel = (cat: string) => t.celebCategories[cat] || cat;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5 mb-6 animate-fadeIn">
@@ -30,10 +33,10 @@ export const TopCelebHighlightCards: React.FC<TopCelebHighlightCardsProps> = ({
           <div className="flex items-center justify-between gap-1 mb-2">
             <span className="text-[10px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
               <Trophy className="w-4 h-4 text-amber-500 flex-shrink-0" />
-              PEAK SINGLE BSI SCORE
+              {t.celebHighlights.peakBsi}
             </span>
             <span className="text-[9px] font-black uppercase bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-900 whitespace-nowrap">
-              Top 1 Peak
+              {t.celebHighlights.peakBsiBadge}
             </span>
           </div>
 
@@ -47,8 +50,8 @@ export const TopCelebHighlightCards: React.FC<TopCelebHighlightCardsProps> = ({
           </div>
 
           <div className="pt-2 border-t border-amber-100 dark:border-slate-800/80 flex items-center justify-between text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-            <span>Peak: <strong className="text-slate-800 dark:text-slate-200 font-bold">{peakBsiCeleb.month}/{peakBsiCeleb.year}</strong></span>
-            <span className="text-[9px] sm:text-[10px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-extrabold">{peakBsiCeleb.category}</span>
+            <span>{t.celebHighlights.peakAt(peakBsiCeleb.month, peakBsiCeleb.year)}</span>
+            <span className="text-[9px] sm:text-[10px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-extrabold">{getCategoryLabel(peakBsiCeleb.category)}</span>
           </div>
         </div>
       )}
@@ -62,10 +65,10 @@ export const TopCelebHighlightCards: React.FC<TopCelebHighlightCardsProps> = ({
           <div className="flex items-center justify-between gap-1 mb-2">
             <span className="text-[10px] font-black uppercase tracking-wider text-buzz flex items-center gap-1.5">
               <Flame className="w-4 h-4 text-buzz flex-shrink-0" />
-              MOST TOP 10 APPEARANCES
+              {t.celebHighlights.mostConsistent}
             </span>
             <span className="text-[9px] font-black uppercase bg-orange-100 dark:bg-orange-950 text-buzz dark:text-orange-300 px-2 py-0.5 rounded-full border border-orange-200 dark:border-orange-900 whitespace-nowrap">
-              Consistency
+              {t.celebHighlights.mostConsistentBadge}
             </span>
           </div>
 
@@ -74,13 +77,13 @@ export const TopCelebHighlightCards: React.FC<TopCelebHighlightCardsProps> = ({
               {mostConsistentCeleb.name}
             </h4>
             <p className="text-base sm:text-lg font-black text-buzz mt-0.5">
-              {mostConsistentCeleb.appearances} <span className="text-xs font-bold text-slate-400">Months in Top 10</span>
+              {t.celebHighlights.appearancesCount(mostConsistentCeleb.appearances)}
             </p>
           </div>
 
           <div className="pt-2 border-t border-orange-100 dark:border-slate-800/80 flex items-center justify-between text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-            <span>Avg Rank: <strong className="text-slate-800 dark:text-slate-200 font-bold">#{mostConsistentCeleb.avgRank}</strong></span>
-            <span className="text-[9px] sm:text-[10px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-extrabold">{mostConsistentCeleb.category}</span>
+            <span>{t.celebHighlights.avgRank(mostConsistentCeleb.avgRank)}</span>
+            <span className="text-[9px] sm:text-[10px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-extrabold">{getCategoryLabel(mostConsistentCeleb.category)}</span>
           </div>
         </div>
       )}
@@ -94,10 +97,10 @@ export const TopCelebHighlightCards: React.FC<TopCelebHighlightCardsProps> = ({
           <div className="flex items-center justify-between gap-1 mb-2">
             <span className="text-[10px] font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-400 flex items-center gap-1.5">
               <Award className="w-4 h-4 text-indigo-500 flex-shrink-0" />
-              HIGHEST AVG BSI SCORE
+              {t.celebHighlights.highestAvgBsi}
             </span>
             <span className="text-[9px] font-black uppercase bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-900 whitespace-nowrap">
-              Top AVG BSI
+              {t.celebHighlights.highestAvgBsiBadge}
             </span>
           </div>
 
@@ -111,8 +114,8 @@ export const TopCelebHighlightCards: React.FC<TopCelebHighlightCardsProps> = ({
           </div>
 
           <div className="pt-2 border-t border-indigo-100 dark:border-slate-800/80 flex items-center justify-between text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-            <span>Total: <strong className="text-slate-800 dark:text-slate-200 font-bold">{formatNum(highestAvgBsiCeleb.totalBsi)}</strong></span>
-            <span className="text-[9px] sm:text-[10px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-extrabold">{highestAvgBsiCeleb.category}</span>
+            <span>{t.celebHighlights.totalBsi(formatNum(highestAvgBsiCeleb.totalBsi))}</span>
+            <span className="text-[9px] sm:text-[10px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-extrabold">{getCategoryLabel(highestAvgBsiCeleb.category)}</span>
           </div>
         </div>
       )}
@@ -126,10 +129,10 @@ export const TopCelebHighlightCards: React.FC<TopCelebHighlightCardsProps> = ({
           <div className="flex items-center justify-between gap-1 mb-2">
             <span className="text-[10px] font-black uppercase tracking-wider text-buzz-darkblue dark:text-sky-400 flex items-center gap-1.5">
               <Users className="w-4 h-4 text-buzz-darkblue dark:text-sky-400 flex-shrink-0" />
-              HIGHEST QUALIFIED USER (QU)
+              {t.celebHighlights.highestQu}
             </span>
             <span className="text-[9px] font-black uppercase bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300 px-2 py-0.5 rounded-full border border-sky-200 dark:border-sky-900 whitespace-nowrap">
-              Top Reach
+              {t.celebHighlights.highestQuBadge}
             </span>
           </div>
 
@@ -143,8 +146,8 @@ export const TopCelebHighlightCards: React.FC<TopCelebHighlightCardsProps> = ({
           </div>
 
           <div className="pt-2 border-t border-sky-100 dark:border-slate-800/80 flex items-center justify-between text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-            <span>Audience: <strong className="text-slate-800 dark:text-slate-200 font-bold">High Impact</strong></span>
-            <span className="text-[9px] sm:text-[10px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-extrabold">{highestQuCeleb.category}</span>
+            <span>{t.celebHighlights.audienceHighImpact}</span>
+            <span className="text-[9px] sm:text-[10px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-extrabold">{getCategoryLabel(highestQuCeleb.category)}</span>
           </div>
         </div>
       )}

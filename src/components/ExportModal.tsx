@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { X, FileSpreadsheet, Download } from 'lucide-react';
 import { CampaignRecord } from '../types/dashboard';
 import { exportToExcel, exportToCSV } from '../utils/exportUtils';
+import { useTranslation } from '../context/LanguageContext';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -10,6 +11,8 @@ interface ExportModalProps {
 }
 
 export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, data }) => {
+  const { t } = useTranslation();
+
   useEffect(() => {
     if (isOpen) {
       const original = document.body.style.overflow;
@@ -40,7 +43,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, data 
           <div className="flex items-center gap-2">
             <Download className="w-5 h-5 text-buzz" />
             <h3 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-wide">
-              Export Analytics Report
+              {t.exportModal.title}
             </h3>
           </div>
           <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg cursor-pointer">
@@ -51,7 +54,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, data 
         {/* Body */}
         <div className="p-6 space-y-4">
           <p className="text-xs font-bold text-slate-600 dark:text-slate-300">
-            Export <strong className="text-buzz">{data.length} campaigns</strong> matching current filter criteria:
+            {t.exportModal.exportScope(data.length)}
           </p>
 
           <div className="space-y-3">
@@ -62,8 +65,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, data 
               <div className="flex items-center gap-3">
                 <FileSpreadsheet className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                 <div className="text-left">
-                  <p className="text-sm">Export Excel File (.xlsx)</p>
-                  <p className="text-[10px] font-semibold opacity-80">Full multi-sheet formatted workbook</p>
+                  <p className="text-sm">{t.exportModal.excelTitle}</p>
+                  <p className="text-[10px] font-semibold opacity-80">{t.exportModal.excelDesc}</p>
                 </div>
               </div>
               <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -76,8 +79,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, data 
               <div className="flex items-center gap-3">
                 <FileSpreadsheet className="w-6 h-6" />
                 <div className="text-left">
-                  <p className="text-sm">Export CSV File (.csv)</p>
-                  <p className="text-[10px] font-semibold opacity-80">Lightweight raw tabular data format</p>
+                  <p className="text-sm">{t.exportModal.csvTitle}</p>
+                  <p className="text-[10px] font-semibold opacity-80">{t.exportModal.csvDesc}</p>
                 </div>
               </div>
               <Download className="w-4 h-4" />
@@ -91,7 +94,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, data 
             onClick={onClose}
             className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl hover:bg-slate-300 transition cursor-pointer"
           >
-            Close
+            {t.exportModal.closeBtn}
           </button>
         </div>
       </div>

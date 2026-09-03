@@ -3,6 +3,7 @@ import { Table, ArrowUpDown, ChevronLeft, ChevronRight, Eye, Download, ExternalL
 import { CampaignRecord, SortColumn, SortOrder } from '../types/dashboard';
 import { formatNum } from '../utils/brandStandardizer';
 import { InfoTooltip } from './common/InfoTooltip';
+import { useTranslation } from '../context/LanguageContext';
 
 interface CampaignTableProps {
   data: CampaignRecord[];
@@ -10,6 +11,7 @@ interface CampaignTableProps {
 }
 
 export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCampaign }) => {
+  const { t } = useTranslation();
   const [sortColumn, setSortColumn] = useState<SortColumn>('bsi');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [currentPage, setCurrentPage] = useState(1);
@@ -112,31 +114,31 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
       case 'Product Launch & Rebranding':
         return (
           <span className="whitespace-nowrap px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
-            Launch
+            {t.campaignFilters.typeLaunchShort}
           </span>
         );
       case 'Sponsor & Event':
         return (
           <span className="whitespace-nowrap px-2 py-0.5 rounded text-[10px] font-bold bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
-            Sponsor
+            {t.campaignFilters.typeSponsor}
           </span>
         );
       case 'Promotion':
         return (
           <span className="whitespace-nowrap px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-            Promotion
+            {t.campaignFilters.typePromotion}
           </span>
         );
       case 'CSR & Sustainability':
         return (
           <span className="whitespace-nowrap px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-            CSR
+            {t.campaignFilters.typeCsr}
           </span>
         );
       default:
         return (
           <span className="whitespace-nowrap px-2 py-0.5 rounded text-[10px] font-bold bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
-            Thematic
+            {t.campaignFilters.typeThematicShort}
           </span>
         );
     }
@@ -147,30 +149,30 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
         <div>
           <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-            <Table className="w-4 h-4 text-buzz" /> CAMPAIGN PERFORMANCE DETAIL TABLE
+            <Table className="w-4 h-4 text-buzz" /> {t.campaignTable.title}
             <InfoTooltip
-              title="Campaign Detail Performance Table"
-              content="Comprehensive database of all tracked campaigns with granular metrics for Buzz, BSI, Sentiment, Relevance, and Media split. Click any row for deep-dive benchmark analysis."
+              title={t.campaignTable.tooltipTitle}
+              content={t.campaignTable.tooltipContent}
             />
           </h3>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">
-            Click any row to open campaign deep-dive analysis & benchmark spider radar.
+            {t.campaignTable.subtitle}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-            Page {currentPage} of {totalPages} ({sortedData.length} entries)
+            {t.campaignTable.pageInfo(currentPage, totalPages, sortedData.length)}
           </span>
 
           {/* Export Table CSV Button */}
           <button
             onClick={handleExportCSV}
             className="whitespace-nowrap px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-buzz hover:text-white text-slate-600 dark:text-slate-300 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer"
-            title="Export Table Data to CSV"
+            title={t.campaignTable.exportCsv}
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Export CSV</span>
+            <span>{t.campaignTable.exportCsv}</span>
           </button>
         </div>
       </div>
@@ -186,7 +188,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
                 className="p-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition whitespace-nowrap"
               >
                 <div className="flex items-center gap-1">
-                  <span>DATE</span>
+                  <span>{t.campaignTable.colDate}</span>
                   <ArrowUpDown className="w-3 h-3 text-buzz" />
                 </div>
               </th>
@@ -195,7 +197,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
                 className="p-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
               >
                 <div className="flex items-center gap-1">
-                  <span>BRAND</span>
+                  <span>{t.campaignTable.colBrand}</span>
                   <ArrowUpDown className="w-3 h-3 text-buzz" />
                 </div>
               </th>
@@ -204,7 +206,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
                 className="p-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
               >
                 <div className="flex items-center gap-1">
-                  <span>CATEGORY</span>
+                  <span>{t.campaignTable.colCategory}</span>
                   <ArrowUpDown className="w-3 h-3 text-buzz" />
                 </div>
               </th>
@@ -213,7 +215,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
                 className="p-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
               >
                 <div className="flex items-center gap-1">
-                  <span>CAMPAIGN NAME</span>
+                  <span>{t.campaignTable.colCampaign}</span>
                   <ArrowUpDown className="w-3 h-3 text-buzz" />
                 </div>
               </th>
@@ -222,7 +224,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
                 className="p-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition whitespace-nowrap"
               >
                 <div className="flex items-center gap-1">
-                  <span>TYPE</span>
+                  <span>{t.campaignTable.colType}</span>
                   <ArrowUpDown className="w-3 h-3 text-buzz" />
                 </div>
               </th>
@@ -231,7 +233,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
                 className="p-3 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
               >
                 <div className="flex items-center justify-end gap-1">
-                  <span>BUZZ VOL</span>
+                  <span>{t.campaignTable.colBuzz}</span>
                   <ArrowUpDown className="w-3 h-3 text-buzz" />
                 </div>
               </th>
@@ -240,7 +242,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
                 className="p-3 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
               >
                 <div className="flex items-center justify-end gap-1">
-                  <span>BSI SCORE</span>
+                  <span>{t.campaignTable.colBsi}</span>
                   <ArrowUpDown className="w-3 h-3 text-buzz" />
                 </div>
               </th>
@@ -249,7 +251,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
                 className="p-3 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
               >
                 <div className="flex items-center justify-end gap-1">
-                  <span>CONTENT QU</span>
+                  <span>{t.campaignTable.colCfqu}</span>
                   <ArrowUpDown className="w-3 h-3 text-buzz" />
                 </div>
               </th>
@@ -258,7 +260,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
                 className="p-3 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
               >
                 <div className="flex items-center justify-end gap-1">
-                  <span>QU USER</span>
+                  <span>{t.campaignTable.colQu}</span>
                   <ArrowUpDown className="w-3 h-3 text-buzz" />
                 </div>
               </th>
@@ -267,7 +269,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
                 className="p-3 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
               >
                 <div className="flex items-center justify-end gap-1">
-                  <span>SENTIMENT</span>
+                  <span>{t.campaignTable.colSentiment}</span>
                   <ArrowUpDown className="w-3 h-3 text-buzz" />
                 </div>
               </th>
@@ -276,7 +278,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
                 className="p-3 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition whitespace-nowrap"
               >
                 <div className="flex items-center justify-end gap-1">
-                  <span>RELEVANCY</span>
+                  <span>{t.campaignTable.colRelevancy}</span>
                   <ArrowUpDown className="w-3 h-3 text-buzz" />
                 </div>
               </th>
@@ -285,7 +287,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ data, onSelectCamp
                 className="p-3 text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/60 transition whitespace-nowrap"
               >
                 <div className="flex items-center justify-end gap-1">
-                  <span>EARNED MEDIA %</span>
+                  <span>{t.campaignTable.colEarned}</span>
                   <ArrowUpDown className="w-3 h-3 text-buzz" />
                 </div>
               </th>

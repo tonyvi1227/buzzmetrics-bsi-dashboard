@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { X, Send, Building, User, Mail, Phone, LockKeyhole, Tag, Target, FileText, CheckCircle2, AlertCircle, Database } from 'lucide-react';
 import { saveLeadRecord, isCorporateEmail } from '../utils/abTestingEngine';
 import { ABVariant } from '../types/leadGen';
+import { useTranslation } from '../context/LanguageContext';
 
 interface LeadFormModalProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
   onSuccess,
   variant = 'A',
 }) => {
+  const { t } = useTranslation();
   // Use DOM refs for instant 0ms typing with zero React re-renders on keystroke
   const fullNameRef = useRef<HTMLInputElement>(null);
   const workEmailRef = useRef<HTMLInputElement>(null);
@@ -50,8 +52,8 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
   const handleEmailBlur = () => {
     const email = workEmailRef.current?.value || '';
     if (email && !isCorporateEmail(email)) {
-      setError('Please use your official Work/Company email. Personal email domains (@gmail, @yahoo, @outlook, etc.) are not accepted.');
-    } else if (error.includes('Personal email domains')) {
+      setError(t.leadForm.errorEmailDomain);
+    } else if (error === t.leadForm.errorEmailDomain) {
       setError('');
     }
   };
@@ -67,12 +69,12 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
     const customNeedNote = customNeedNoteRef.current?.value || '';
 
     if (!fullName.trim() || !workEmail.trim() || !phone.trim() || !company.trim()) {
-      setError('Please fill in all required contact information (*).');
+      setError(t.leadForm.errorRequired);
       return;
     }
 
     if (!isCorporateEmail(workEmail)) {
-      setError('Please use your official Work/Company email. Personal email domains (@gmail, @yahoo, @outlook, @icloud, etc.) are not accepted.');
+      setError(t.leadForm.errorEmailDomain);
       return;
     }
 
@@ -123,10 +125,10 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
 
             <div>
               <h3 className="text-sm sm:text-base md:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">
-                REGISTRATION SUBMITTED SUCCESSFULLY!
+                {t.leadForm.successTitle}
               </h3>
               <p className="text-xs text-slate-700 dark:text-slate-300 font-bold mt-2 leading-relaxed">
-                Thank you for your interest! The Buzzmetrics Business Development team has received your project details and will contact you via Phone/Email to verify and grant your Access Passcode shortly.
+                {t.leadForm.successDesc}
               </p>
             </div>
 
@@ -139,7 +141,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
               }}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs md:text-sm rounded-xl transition shadow cursor-pointer"
             >
-              ✓ GOT IT
+              {t.leadForm.gotItBtn}
             </button>
           </div>
         ) : (
@@ -150,10 +152,10 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                 <LockKeyhole className="w-4 h-4" />
               </div>
               <h3 className="text-sm sm:text-base md:text-lg font-black text-slate-900 dark:text-white tracking-tight">
-                Register to unlock BSI Campaign Insights
+                {t.leadForm.title}
               </h3>
               <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 font-semibold leading-relaxed mt-0.5 sm:mt-1">
-                Submit your project details for the Buzzmetrics team to verify and grant access to full analytics.
+                {t.leadForm.subtitle}
               </p>
             </div>
 
@@ -167,20 +169,20 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                   {/* SECTION 1: PERSONAL & COMPANY CONTACT INFO */}
                   <div className="bg-slate-50 dark:bg-slate-800/60 p-3 sm:p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2 sm:space-y-2.5">
                     <span className="text-[10px] font-black uppercase tracking-wider text-buzz flex items-center gap-1">
-                      <User className="w-3 h-3" /> 1. CONTACT INFORMATION (*)
+                      <User className="w-3 h-3" /> {t.leadForm.sec1Title}
                     </span>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
-                          FULL NAME (*)
+                          {t.leadForm.fullName}
                         </label>
                         <div className="relative">
                           <input
                             ref={fullNameRef}
                             type="text"
                             required
-                            placeholder="e.g. Nguyen Van A"
+                            placeholder={t.leadForm.fullNamePlaceholder}
                             className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2 sm:p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                           />
                           <User className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 sm:top-3" />
@@ -189,14 +191,14 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
 
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
-                          PHONE / ZALO (*)
+                          {t.leadForm.phone}
                         </label>
                         <div className="relative">
                           <input
                             ref={phoneRef}
                             type="tel"
                             required
-                            placeholder="+84 90x xxx xxx"
+                            placeholder={t.leadForm.phonePlaceholder}
                             className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                           />
                           <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 sm:top-3" />
@@ -207,7 +209,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
-                          WORK EMAIL (*)
+                          {t.leadForm.workEmail}
                         </label>
                         <div className="relative">
                           <input
@@ -215,24 +217,24 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                             type="email"
                             required
                             onBlur={handleEmailBlur}
-                            placeholder="name@company.com"
+                            placeholder={t.leadForm.workEmailPlaceholder}
                             className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2 sm:p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                           />
                           <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 sm:top-3" />
                         </div>
-                        <span className="text-[9px] text-slate-400 font-semibold block mt-0.5">Corporate domain (no @gmail, @yahoo)</span>
+                        <span className="text-[9px] text-slate-400 font-semibold block mt-0.5">{t.leadForm.corporateDomainHint}</span>
                       </div>
 
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
-                          COMPANY / BRAND (*)
+                          {t.leadForm.company}
                         </label>
                         <div className="relative">
                           <input
                             ref={companyRef}
                             type="text"
                             required
-                            placeholder="e.g. Unilever, Vinamilk..."
+                            placeholder={t.leadForm.companyPlaceholder}
                             className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2 sm:p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
                           />
                           <Building className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 sm:top-3" />
@@ -244,13 +246,13 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                   {/* SECTION 2: INDUSTRY & TARGET BRAND */}
                   <div className="bg-slate-50 dark:bg-slate-800/60 p-3 sm:p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2 sm:space-y-2.5">
                     <span className="text-[10px] font-black uppercase tracking-wider text-buzz flex items-center gap-1">
-                      <Tag className="w-3 h-3" /> 2. INDUSTRY & BRAND OF INTEREST (*)
+                      <Tag className="w-3 h-3" /> {t.leadForm.sec2Title}
                     </span>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
-                          INDUSTRY / CATEGORY (*)
+                          {t.leadForm.industryCategory}
                         </label>
                         <select
                           ref={categoryInterestRef}
@@ -275,12 +277,12 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
 
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
-                          TARGET BRAND
+                          {t.leadForm.targetBrand}
                         </label>
                         <input
                           ref={brandInterestRef}
                           type="text"
-                          placeholder="e.g. Heineken, Samsung, OMO..."
+                          placeholder={t.leadForm.targetBrandPlaceholder}
                           className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2 sm:p-2.5 outline-none focus:ring-2 focus:ring-buzz"
                         />
                       </div>
@@ -290,7 +292,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                       <input
                         ref={customCategoryRef}
                         type="text"
-                        placeholder="Please specify your industry category..."
+                        placeholder={t.leadForm.otherCategoryPlaceholder}
                         className="w-full bg-white dark:bg-slate-900 border border-orange-300 dark:border-orange-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2 sm:p-2.5 outline-none focus:ring-2 focus:ring-buzz animate-fadeIn"
                       />
                     )}
@@ -303,13 +305,13 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                   {/* SECTION 3: CURRENT NEED & DATA USAGE OBJECTIVE */}
                   <div className="bg-slate-50 dark:bg-slate-800/60 p-3 sm:p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2 sm:space-y-2.5">
                     <span className="text-[10px] font-black uppercase tracking-wider text-buzz flex items-center gap-1">
-                      <Target className="w-3 h-3" /> 3. PROJECT NEED & DATA OBJECTIVE (*)
+                      <Target className="w-3 h-3" /> {t.leadForm.sec3Title}
                     </span>
 
                     {/* Need hiện tại */}
                     <div>
                       <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-1">
-                        CURRENT NEED / PURPOSE (*)
+                        {t.leadForm.currentNeedTitle}
                       </label>
                       <div className="grid grid-cols-1 gap-1 sm:gap-1.5">
                         {[
@@ -334,7 +336,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                               onChange={() => setActualNeed(needOption)}
                               className="accent-orange-500"
                             />
-                            <span className="leading-tight">{needOption}</span>
+                            <span className="leading-tight">{t.leadForm.needs[needOption] || needOption}</span>
                           </label>
                         ))}
                       </div>
@@ -343,7 +345,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                     {/* Nhu cầu với dữ liệu */}
                     <div className="pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
                       <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-1 flex items-center gap-1">
-                        <Database className="w-3 h-3 text-buzz" /> DATA REQUIREMENT (*)
+                        <Database className="w-3 h-3 text-buzz" /> {t.leadForm.dataReqTitle}
                       </label>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-1.5">
                         {[
@@ -368,7 +370,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                               onChange={() => setDataNeed(item.id)}
                               className="accent-orange-500"
                             />
-                            <span className="leading-tight">{item.label}</span>
+                            <span className="leading-tight">{t.leadForm.dataReqs[item.id] || item.label}</span>
                           </label>
                         ))}
                       </div>
@@ -377,12 +379,12 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                     {/* Nhu cầu khác */}
                     <div className="pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
                       <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5 flex items-center gap-1">
-                        <FileText className="w-3 h-3" /> ADDITIONAL REQUIREMENTS / NOTES
+                        <FileText className="w-3 h-3" /> {t.leadForm.additionalNotesTitle}
                       </label>
                       <textarea
                         ref={customNeedNoteRef}
                         rows={2}
-                        placeholder="Enter specific campaign objectives, scope, or timeline..."
+                        placeholder={t.leadForm.additionalNotesPlaceholder}
                         className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2 outline-none focus:ring-2 focus:ring-buzz"
                       />
                     </div>
@@ -401,11 +403,11 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
                     className="w-full py-3 sm:py-3.5 bg-buzz hover:bg-orange-600 text-white font-black text-xs sm:text-sm rounded-xl transition shadow-md hover:shadow-lg cursor-pointer flex items-center justify-center gap-2 mt-2 sm:mt-auto"
                   >
                     {isSubmitting ? (
-                      <span>Submitting Registration...</span>
+                      <span>{t.leadForm.submittingBtn}</span>
                     ) : (
                       <>
                         <Send className="w-4 h-4" />
-                        <span className="uppercase tracking-wider">SUBMIT REGISTRATION FOR ACCESS</span>
+                        <span className="uppercase tracking-wider">{t.leadForm.submitBtn}</span>
                       </>
                     )}
                   </button>

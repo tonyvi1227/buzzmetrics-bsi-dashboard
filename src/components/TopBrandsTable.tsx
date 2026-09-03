@@ -4,6 +4,7 @@ import { CampaignRecord } from '../types/dashboard';
 import { formatNum } from '../utils/brandStandardizer';
 import { InfoTooltip } from './common/InfoTooltip';
 import { useAdmin } from '../context/AdminContext';
+import { useTranslation } from '../context/LanguageContext';
 import { isUserUnlocked, isInternalUnlocked } from '../utils/abTestingEngine';
 
 interface TopBrandsTableProps {
@@ -13,6 +14,7 @@ interface TopBrandsTableProps {
 
 export const TopBrandsTable: React.FC<TopBrandsTableProps> = ({ data, isUnlocked = false }) => {
   const { isAdmin } = useAdmin();
+  const { lang, t } = useTranslation();
   const showFormula = isAdmin || isUnlocked || isUserUnlocked() || isInternalUnlocked();
 
   const topBrands = useMemo(() => {
@@ -155,17 +157,21 @@ export const TopBrandsTable: React.FC<TopBrandsTableProps> = ({ data, isUnlocked
   };
 
   const tooltipText = showFormula
-    ? "Top Brands Performance: 50% Avg BSI + 25% Avg Rank + 25% Months on Top 10 (Min 2 months on Top 10)."
-    : "Leaderboard of top performing brands ranked by combined BSI performance, average ranking, and campaign consistency.";
+    ? (lang === 'vi' 
+        ? "Hiệu quả thương hiệu hàng đầu: 50% Avg BSI + 25% Avg Rank + 25% Số tháng lọt Top 10 (Tối thiểu 2 tháng vào Top 10)."
+        : "Top Brands Performance: 50% Avg BSI + 25% Avg Rank + 25% Months on Top 10 (Min 2 months on Top 10).")
+    : (lang === 'vi'
+        ? "Bảng xếp hạng các thương hiệu hàng đầu theo tổng hòa hiệu quả BSI, thứ hạng trung bình và tính bền bỉ."
+        : "Leaderboard of top performing brands ranked by combined BSI performance, average ranking, and campaign consistency.");
 
   return (
     <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-amber-500" /> TOP BRANDS RANKING
+            <Trophy className="w-4 h-4 text-amber-500" /> {t.topBrandsTable.title}
             <InfoTooltip
-              title="Top Brands Ranking"
+              title={t.topBrandsTable.tooltipTitle}
               content={tooltipText}
             />
           </h3>
@@ -175,11 +181,11 @@ export const TopBrandsTable: React.FC<TopBrandsTableProps> = ({ data, isUnlocked
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-800 text-[10px] uppercase tracking-wider text-slate-400 font-extrabold">
-                <th className="py-2.5 pl-3 w-12 text-center">Rank</th>
-                <th className="py-2.5 px-2">Brand</th>
-                <th className="py-2.5 px-3 text-right whitespace-nowrap min-w-[90px]">Avg BSI</th>
-                <th className="py-2.5 px-3 text-center whitespace-nowrap min-w-[130px]">Months on Top 10</th>
-                <th className="py-2.5 pr-3 text-right whitespace-nowrap min-w-[80px]">Avg Rank</th>
+                <th className="py-2.5 pl-3 w-12 text-center">{lang === 'vi' ? 'HẠNG' : 'Rank'}</th>
+                <th className="py-2.5 px-2">{t.topBrandsTable.colBrand}</th>
+                <th className="py-2.5 px-3 text-right whitespace-nowrap min-w-[90px]">{t.topBrandsTable.colAvgBsi}</th>
+                <th className="py-2.5 px-3 text-center whitespace-nowrap min-w-[130px]">{t.topBrandsTable.colAppearances}</th>
+                <th className="py-2.5 pr-3 text-right whitespace-nowrap min-w-[80px]">{t.topBrandsTable.colAvgRank}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-bold">
@@ -197,7 +203,7 @@ export const TopBrandsTable: React.FC<TopBrandsTableProps> = ({ data, isUnlocked
                   </td>
                   <td className="py-2.5 px-3 text-center whitespace-nowrap">
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900">
-                      {b.monthsOnTop10} {b.monthsOnTop10 === 1 ? 'Month' : 'Months'}
+                      {lang === 'vi' ? `${b.monthsOnTop10} Tháng` : `${b.monthsOnTop10} ${b.monthsOnTop10 === 1 ? 'Month' : 'Months'}`}
                     </span>
                   </td>
                   <td className="py-2.5 pr-3 text-right font-black text-slate-900 dark:text-white tabular-nums whitespace-nowrap">
@@ -208,7 +214,7 @@ export const TopBrandsTable: React.FC<TopBrandsTableProps> = ({ data, isUnlocked
               {topBrands.length === 0 && (
                 <tr>
                   <td colSpan={5} className="py-4 text-center text-slate-400 text-xs">
-                    No brand data available
+                    {lang === 'vi' ? 'Không có dữ liệu thương hiệu' : 'No brand data available'}
                   </td>
                 </tr>
               )}

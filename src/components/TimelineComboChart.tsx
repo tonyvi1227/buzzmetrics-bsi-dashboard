@@ -4,6 +4,7 @@ import { Chart as ChartJS, registerables } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../context/LanguageContext';
 import { InfoTooltip } from './common/InfoTooltip';
 import { downloadChartAsImage } from '../utils/chartExporter';
 
@@ -15,6 +16,7 @@ interface TimelineComboChartProps {
 
 export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   // Shorten month format from "Jan 2025" -> "01/25" for clean horizontal display without tilting
   const formatMonthShort = (monthYearStr: string) => {
@@ -86,7 +88,7 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
       datasets: [
         {
           type: 'bar' as const,
-          label: 'Buzz Vol (M)',
+          label: t.timelineChart.labelBuzz,
           data: buzzVolMillions,
           backgroundColor: '#e68228', // Signature Buzzmetrics Orange
           borderRadius: 6, // Refined rounded bar tops
@@ -94,7 +96,7 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
         },
         {
           type: 'line' as const,
-          label: '% CFQU',
+          label: t.timelineChart.labelCfqu,
           data: cfquPercentage,
           borderColor: '#125876', // Buzzmetrics Dark Blue
           backgroundColor: '#125876',
@@ -105,7 +107,7 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
         },
       ],
     };
-  }, [data, timelineMonths, formattedLabels]);
+  }, [data, timelineMonths, formattedLabels, t]);
 
   const options = React.useMemo(() => {
     const isDark = theme === 'dark';
@@ -178,10 +180,10 @@ export const TimelineComboChart: React.FC<TimelineComboChartProps> = ({ data }) 
     <div id="timeline-combo-container" className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-buzz" /> MONTHLY BUZZ & % CFQU TIMELINE
+          <TrendingUp className="w-4 h-4 text-buzz" /> {t.timelineChart.title}
           <InfoTooltip
-            title="Monthly Buzz & % CFQU Timeline"
-            content="Monthly evolution of total discussion volume (Orange bars in Millions) and % Content & Form Quality (% CFQU / Total Buzz in Blue trendline)."
+            title={t.timelineChart.tooltipTitle}
+            content={t.timelineChart.tooltipContent}
           />
         </h3>
 

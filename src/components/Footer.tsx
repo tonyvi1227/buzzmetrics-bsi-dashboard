@@ -1,5 +1,6 @@
 import React from 'react';
-import { Calendar, Sparkles, Phone, Mail } from 'lucide-react';
+import { Calendar, Phone, Mail } from 'lucide-react';
+import { useTranslation } from '../context/LanguageContext';
 
 interface FooterProps {
   onOpenDevPassword?: () => void;
@@ -8,10 +9,10 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({
-  onOpenDevPassword,
-  isDevAuthed = false,
   totalRecordsCount = 318,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <footer className="mt-12 pt-6 pb-8 border-t border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-500 dark:text-slate-400 space-y-4">
       {/* Contact Details (Clean, single-row minimal styling without redundant headers) */}
@@ -23,7 +24,7 @@ export const Footer: React.FC<FooterProps> = ({
             className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-buzz transition font-mono"
           >
             <Phone className="w-3.5 h-3.5 text-buzz" />
-            <span>Hotline: (+84) 91 904 0201</span>
+            <span>{t.footer.hotline}</span>
           </a>
 
           {/* Phone 2 */}
@@ -32,7 +33,7 @@ export const Footer: React.FC<FooterProps> = ({
             className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-buzz transition font-mono"
           >
             <Phone className="w-3.5 h-3.5 text-buzz" />
-            <span>Direct: (+84) 909 267 338</span>
+            <span>{t.footer.direct}</span>
           </a>
 
           {/* Email */}
@@ -46,7 +47,6 @@ export const Footer: React.FC<FooterProps> = ({
         </div>
       </div>
 
-      {/* Bottom Metadata Row: Copyright, Scope & Subtle Dev Link */}
       {/* Bottom Metadata Row: Copyright & Scope */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500 dark:text-slate-400">
         {/* Left Copyright */}
@@ -57,9 +57,7 @@ export const Footer: React.FC<FooterProps> = ({
         {/* Right Dataset Scope */}
         <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 font-bold">
           <Calendar className="w-3.5 h-3.5 text-buzz" />
-          <span>
-            Dataset Scope: Jan 2025 – Jun 2026 (18 Months) • <strong className="text-buzz font-black">Total Records: {totalRecordsCount}</strong>
-          </span>
+          <span>{t.footer.datasetScope(totalRecordsCount)}</span>
         </div>
       </div>
     </footer>

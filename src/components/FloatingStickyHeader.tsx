@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, KeyRound, BarChart3, Star } from 'lucide-react';
 import { BUZZMETRICS_LOGO_BASE64 } from '../assets/buzzmetricsLogoData';
+import { useTranslation } from '../context/LanguageContext';
 
 interface FloatingStickyHeaderProps {
   activeTab: 'campaigns' | 'celebs';
@@ -18,6 +19,7 @@ export const FloatingStickyHeader: React.FC<FloatingStickyHeaderProps> = ({
   isUnlocked = false,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const { lang, setLang, t } = useTranslation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -68,7 +70,7 @@ export const FloatingStickyHeader: React.FC<FloatingStickyHeaderProps> = ({
             }`}
           >
             <BarChart3 className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Campaigns</span>
+            <span className="hidden md:inline">{t.nav.campaignsTab}</span>
           </button>
           <button
             onClick={() => onTabChange('celebs')}
@@ -79,11 +81,11 @@ export const FloatingStickyHeader: React.FC<FloatingStickyHeaderProps> = ({
             }`}
           >
             <Star className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden md:inline">Influencers</span>
+            <span className="hidden md:inline">{t.nav.celebsTab}</span>
           </button>
         </div>
 
-        {/* Right CTA Actions */}
+        {/* Right CTA Actions & Language Switch */}
         <div className="flex items-center gap-2">
           {onOpenContactModal && (
             <button
@@ -91,7 +93,7 @@ export const FloatingStickyHeader: React.FC<FloatingStickyHeaderProps> = ({
               className="px-3 py-1.5 bg-buzz hover:bg-orange-600 text-white text-xs font-black rounded-xl shadow-sm transition flex items-center gap-1.5 cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Sign up to Unlock</span>
+              <span className="hidden sm:inline">{lang === 'vi' ? 'Đăng ký tư vấn' : 'Sign up'}</span>
               <span className="sm:hidden">Sign up</span>
             </button>
           )}
@@ -102,9 +104,37 @@ export const FloatingStickyHeader: React.FC<FloatingStickyHeaderProps> = ({
               className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-amber-400 text-xs font-black rounded-xl shadow-sm border border-slate-700 transition flex items-center gap-1.5 cursor-pointer"
             >
               <KeyRound className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden sm:inline">{isUnlocked ? '✓ Unlocked' : 'Unlock Full'}</span>
+              <span className="hidden sm:inline">{isUnlocked ? t.nav.unlocked : (lang === 'vi' ? 'Mở khóa' : 'Unlock Full')}</span>
             </button>
           )}
+
+          {/* Language Switcher: Flag Icons (VN & UK) */}
+          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700 gap-1">
+            <button
+              type="button"
+              onClick={() => setLang('vi')}
+              className={`p-0.5 rounded transition-all cursor-pointer ${
+                lang === 'vi'
+                  ? 'bg-white dark:bg-slate-700 ring-2 ring-buzz shadow-xs'
+                  : 'opacity-60 hover:opacity-100'
+              }`}
+              title="Tiếng Việt"
+            >
+              <img src="/flags/vn.png" alt="Tiếng Việt" className="w-5 h-3.5 object-cover rounded shadow-2xs" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setLang('en')}
+              className={`p-0.5 rounded transition-all cursor-pointer ${
+                lang === 'en'
+                  ? 'bg-white dark:bg-slate-700 ring-2 ring-buzz shadow-xs'
+                  : 'opacity-60 hover:opacity-100'
+              }`}
+              title="English (UK)"
+            >
+              <img src="/flags/uk.png" alt="English (UK)" className="w-5 h-3.5 object-cover rounded shadow-2xs" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

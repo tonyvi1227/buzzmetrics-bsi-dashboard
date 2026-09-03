@@ -3,6 +3,7 @@ import { Filter, Calendar, Search, ArrowRight, RotateCcw, Trophy, Building2 } fr
 import { FilterState } from '../types/dashboard';
 import { ALL_OPTION, MONTH_ORDER } from '../hooks/useSmartFilters';
 import { useAdmin } from '../context/AdminContext';
+import { useTranslation } from '../context/LanguageContext';
 
 interface FilterBarProps {
   filters: FilterState;
@@ -26,6 +27,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   isUnlocked = false,
 }) => {
   const { isAdmin } = useAdmin();
+  const { t } = useTranslation();
   const showScopeToggle = isAdmin || isUnlocked;
 
   return (
@@ -40,11 +42,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white leading-snug">
-                  SMART CASCADING FILTERS
+                  {t.campaignFilters.title}
                 </h2>
               </div>
               <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
-                Filter by Date Range (From ... To ...) ➔ Category ➔ Campaign Type ➔ Brand Keyword
+                {t.campaignFilters.desc}
               </p>
             </div>
           </div>
@@ -59,10 +61,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   ? 'bg-purple-600 text-white border-purple-700 ring-2 ring-purple-300 dark:ring-purple-800'
                   : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
               }`}
-              title={filters.includeExtraBrands ? 'Hide Extra Brands (TW Đoàn)' : 'Show Extra Brands (TW Đoàn)'}
+              title={filters.includeExtraBrands ? t.campaignFilters.twDoanShown : t.campaignFilters.twDoanShow}
             >
               <Building2 className="w-3.5 h-3.5" />
-              <span>{filters.includeExtraBrands ? 'TW Đoàn: Shown' : 'Show TW Đoàn'}</span>
+              <span>{filters.includeExtraBrands ? t.campaignFilters.twDoanShown : t.campaignFilters.twDoanShow}</span>
             </button>
 
             {showScopeToggle && (
@@ -73,10 +75,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                     ? 'bg-amber-500 text-white border-amber-600 ring-2 ring-amber-300 dark:ring-amber-800'
                     : 'bg-emerald-600 text-white border-emerald-700 ring-2 ring-emerald-300 dark:ring-emerald-800'
                 }`}
-                title={filters.top10BsiOnly ? 'Switch to All Campaigns' : 'Switch to Top 10 Monthly Campaigns'}
+                title={filters.top10BsiOnly ? t.campaignFilters.allCampaigns(filteredCount) : t.campaignFilters.top10Only(filteredCount)}
               >
                 <Trophy className="w-3.5 h-3.5 text-white" />
-                <span>{filters.top10BsiOnly ? `Top 10 Monthly (${filteredCount} Campaigns)` : `All ${filteredCount} Campaigns`}</span>
+                <span>{filters.top10BsiOnly ? t.campaignFilters.top10Only(filteredCount) : t.campaignFilters.allCampaigns(filteredCount)}</span>
               </button>
             )}
 
@@ -84,10 +86,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             <button
               onClick={onResetFilters}
               className="whitespace-nowrap px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs border border-slate-200 dark:border-slate-700 transition shadow-sm font-black flex items-center gap-1.5 cursor-pointer"
-              title="Reset all filters"
+              title={t.campaignFilters.reset}
             >
               <RotateCcw className="w-3.5 h-3.5 flex-shrink-0" />
-              <span>Reset</span>
+              <span>{t.campaignFilters.reset}</span>
             </button>
           </div>
         </div>
@@ -99,7 +101,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             {/* Start Date */}
             <div className="space-y-1">
               <label className="text-[10px] font-black uppercase tracking-wider text-sky-700 dark:text-sky-300 flex items-center gap-1">
-                <Calendar className="w-3 h-3 text-sky-600 dark:text-sky-400" /> FROM (START)
+                <Calendar className="w-3 h-3 text-sky-600 dark:text-sky-400" /> {t.campaignFilters.from}
               </label>
               <div className="grid grid-cols-2 gap-1">
                 <select
@@ -126,7 +128,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             {/* End Date */}
             <div className="space-y-1">
               <label className="text-[10px] font-black uppercase tracking-wider text-sky-700 dark:text-sky-300 flex items-center gap-1">
-                <ArrowRight className="w-3 h-3 text-sky-600 dark:text-sky-400" /> TO (END)
+                <ArrowRight className="w-3 h-3 text-sky-600 dark:text-sky-400" /> {t.campaignFilters.to}
               </label>
               <div className="grid grid-cols-2 gap-1">
                 <select
@@ -154,14 +156,14 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           {/* Category Dropdown */}
           <div className="space-y-1">
             <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              CATEGORY
+              {t.campaignFilters.categoryLabel}
             </label>
             <select
               value={filters.category}
               onChange={(e) => onUpdateFilter('category', e.target.value)}
               className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz truncate"
             >
-              <option value={ALL_OPTION}>All Categories</option>
+              <option value={ALL_OPTION}>{t.campaignFilters.allCategories}</option>
               {availableCategories.map(c => (
                 <option key={c} value={c}>{c}</option>
               ))}
@@ -171,33 +173,33 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           {/* Campaign Type Dropdown */}
           <div className="space-y-1">
             <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              CAMPAIGN TYPE
+              {t.campaignFilters.typeLabel}
             </label>
             <select
               value={filters.campaignType}
               onChange={(e) => onUpdateFilter('campaignType', e.target.value)}
               className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz truncate"
             >
-              <option value={ALL_OPTION}>All Campaign Types</option>
-              <option value="Product Launch & Rebranding">Product Launch</option>
-              <option value="Sponsor & Event">Sponsor & Event</option>
-              <option value="Promotion">Promotion</option>
-              <option value="CSR & Sustainability">CSR & Sustainability</option>
-              <option value="Thematic & Brand Building">Thematic</option>
+              <option value={ALL_OPTION}>{t.campaignFilters.allTypes}</option>
+              <option value="Product Launch & Rebranding">{t.campaignFilters.typeLaunchShort}</option>
+              <option value="Sponsor & Event">{t.campaignFilters.typeSponsor}</option>
+              <option value="Promotion">{t.campaignFilters.typePromotion}</option>
+              <option value="CSR & Sustainability">{t.campaignFilters.typeCsr}</option>
+              <option value="Thematic & Brand Building">{t.campaignFilters.typeThematicShort}</option>
             </select>
           </div>
 
           {/* Keyword Search Input */}
           <div className="space-y-1">
             <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              SEARCH BRAND / CAMPAIGN
+              {t.campaignFilters.searchLabel}
             </label>
             <div className="relative">
               <input
                 type="text"
                 value={filters.brandSearch || filters.search || ''}
                 onChange={(e) => onUpdateFilter('brandSearch', e.target.value)}
-                placeholder="Search Brand/Campaign..."
+                placeholder={t.campaignFilters.searchPlaceholder}
                 className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
               />
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3" />

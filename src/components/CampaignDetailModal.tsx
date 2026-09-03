@@ -5,6 +5,7 @@ import { Radar } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { formatNum } from '../utils/brandStandardizer';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../context/LanguageContext';
 
 ChartJS.register(...registerables);
 
@@ -16,6 +17,7 @@ interface CampaignDetailModalProps {
 
 export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campaign, allData, onClose }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<'radar' | 'table'>('radar');
 
   React.useEffect(() => {
@@ -186,19 +188,19 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
     if (diffPct > 0.5) {
       return (
         <span className="inline-flex items-center gap-0.5 text-[10px] font-black text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-          <TrendingUp className="w-3 h-3" /> +{formattedDiff}% vs Industry Avg
+          <TrendingUp className="w-3 h-3" /> +{formattedDiff}% {t.campaignDetail.vsIndustryAvg}
         </span>
       );
     } else if (diffPct < -0.5) {
       return (
         <span className="inline-flex items-center gap-0.5 text-[10px] font-black text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-950/80 px-2 py-0.5 rounded-full border border-rose-200 dark:border-rose-800">
-          <TrendingDown className="w-3 h-3" /> -{formattedDiff}% vs Industry Avg
+          <TrendingDown className="w-3 h-3" /> -{formattedDiff}% {t.campaignDetail.vsIndustryAvg}
         </span>
       );
     } else {
       return (
         <span className="inline-flex items-center gap-0.5 text-[10px] font-black text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">
-          <Minus className="w-3 h-3" /> At Industry Avg
+          <Minus className="w-3 h-3" /> {t.campaignDetail.atIndustryAvg}
         </span>
       );
     }
@@ -209,31 +211,31 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
       case 'Product Launch & Rebranding':
         return (
           <span className="px-2.5 py-1 rounded-md text-xs font-black bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
-            🚀 Product Launch
+            🚀 {t.campaignFilters.typeLaunchShort}
           </span>
         );
       case 'Sponsor & Event':
         return (
           <span className="px-2.5 py-1 rounded-md text-xs font-black bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
-            🎭 Sponsor & Event
+            🎭 {t.campaignFilters.typeSponsor}
           </span>
         );
       case 'Promotion':
         return (
           <span className="px-2.5 py-1 rounded-md text-xs font-black bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-            🎁 Promotion
+            🎁 {t.campaignFilters.typePromotion}
           </span>
         );
       case 'CSR & Sustainability':
         return (
           <span className="px-2.5 py-1 rounded-md text-xs font-black bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-            🌿 CSR & Sustainability
+            🌿 {t.campaignFilters.typeCsr}
           </span>
         );
       default:
         return (
           <span className="px-2.5 py-1 rounded-md text-xs font-black bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
-            💎 Thematic & Brand Building
+            💎 {t.campaignFilters.typeThematic}
           </span>
         );
     }
@@ -331,7 +333,7 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-buzz" />
                   <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                    COMPARE WITH {campaign.category.toUpperCase()} INDUSTRY AVERAGE
+                    {t.campaignDetail.compareWithAvg(campaign.category)}
                   </h4>
                 </div>
 
@@ -347,7 +349,7 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
                       }`}
                     >
                       <Network className="w-3.5 h-3.5" />
-                      <span>Spider Radar Chart</span>
+                      <span>{t.campaignDetail.radarViewBtn}</span>
                     </button>
                     <button
                       onClick={() => setViewMode('table')}
@@ -358,12 +360,12 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
                       }`}
                     >
                       <Table className="w-3.5 h-3.5" />
-                      <span>Detailed Table</span>
+                      <span>{t.campaignDetail.tableViewBtn}</span>
                     </button>
                   </div>
 
                   <span className="text-[10px] font-extrabold bg-orange-100 dark:bg-orange-950 text-buzz px-2.5 py-1 rounded-full border border-orange-300 dark:border-orange-800">
-                    {categoryBenchmark.count} Campaigns in Category
+                    {t.campaignDetail.campaignsInCategory(categoryBenchmark.count)}
                   </span>
                 </div>
               </div>
@@ -372,7 +374,7 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
               {viewMode === 'radar' && radarChartData && (
                 <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 animate-fadeIn">
                   <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-2 text-center">
-                    Comparing % Earned, Relevancy, CFQU, QU & Sentiment (Orange) vs 100 Baseline Industry Avg (Dark Blue).
+                    {t.campaignDetail.radarSubtitle}
                   </p>
                   <div className="h-72 flex justify-center items-center">
                     <Radar data={radarChartData} options={radarOptions} />
@@ -386,10 +388,10 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
                   <table className="w-full text-left text-xs">
                     <thead>
                       <tr className="border-b border-orange-200 dark:border-slate-700 text-[10px] font-black uppercase text-slate-500 dark:text-slate-400">
-                        <th className="py-2">Analysis Metric</th>
-                        <th className="py-2 text-right">This Campaign</th>
-                        <th className="py-2 text-right">Industry Avg ({campaign.category})</th>
-                        <th className="py-2 text-center">Difference (vs Avg)</th>
+                        <th className="py-2">{t.campaignDetail.colMetric}</th>
+                        <th className="py-2 text-right">{t.campaignDetail.colThisCampaign}</th>
+                        <th className="py-2 text-right">{t.campaignDetail.colIndustryAvg(campaign.category)}</th>
+                        <th className="py-2 text-center">{t.campaignDetail.colDiff}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-orange-100 dark:divide-slate-800 font-bold">
@@ -445,13 +447,13 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
           {/* Channel Share Section */}
           <div className="p-5 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-700/60 space-y-3">
             <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-              <Share2 className="w-4 h-4 text-buzz" /> CHANNEL DISTRIBUTION (MEDIA BREAKDOWN)
+              <Share2 className="w-4 h-4 text-buzz" /> {t.campaignDetail.channelDistTitle}
             </h4>
 
             <div className="space-y-3">
               <div>
                 <div className="flex justify-between text-xs font-bold mb-1">
-                  <span className="text-sky-600 dark:text-sky-400">Earned Media (Organic Discussions)</span>
+                  <span className="text-sky-600 dark:text-sky-400">{t.campaignDetail.earnedMediaTitle}</span>
                   <span>{campaign.earnedPct.toFixed(2)}% ({formatNum(campaign.earned)})</span>
                 </div>
                 <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -461,11 +463,11 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({ campai
 
               <div className="grid grid-cols-2 gap-4 text-xs font-bold pt-2 border-t border-slate-200 dark:border-slate-700">
                 <div>
-                  <span className="text-emerald-600 dark:text-emerald-400 block mb-0.5">Paid Media (Sponsored Buzz)</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 block mb-0.5">{t.campaignDetail.paidMediaTitle}</span>
                   <span className="text-sm font-black">{formatNum(campaign.paid)}</span>
                 </div>
                 <div>
-                  <span className="text-rose-500 block mb-0.5">Owned Media (Brand Channels)</span>
+                  <span className="text-rose-500 block mb-0.5">{t.campaignDetail.ownedMediaTitle}</span>
                   <span className="text-sm font-black">{formatNum(campaign.owned)}</span>
                 </div>
               </div>

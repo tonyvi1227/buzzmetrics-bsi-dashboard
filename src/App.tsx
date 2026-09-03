@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import { ThemeProvider } from './context/ThemeContext';
 import { AdminProvider, useAdmin } from './context/AdminContext';
+import { LanguageProvider, useTranslation } from './context/LanguageContext';
 import { CampaignRecord, BenchmarkMetrics, CategoryBenchmark } from './types/dashboard';
 import { getStoredCampaigns, saveStoredCampaigns, resetStoredCampaigns } from './utils/storage';
 import { fetchCampaignsFromSupabase, uploadCampaignsToSupabase, getSupabaseCredentials } from './utils/supabaseClient';
@@ -62,6 +63,7 @@ import { BSIIntroSection } from './components/BSIIntroSection';
 import { TeaserDataSection } from './components/TeaserDataSection';
 
 const DashboardContent: React.FC = () => {
+  const { t } = useTranslation();
   const [dataset, setDataset] = useState<CampaignRecord[]>(() => getStoredCampaigns());
   const [selectedCampaign, setSelectedCampaign] = useState<CampaignRecord | null>(null);
   const [selectedCeleb, setSelectedCeleb] = useState<AggregatedCelebRecord | null>(null);
@@ -486,13 +488,13 @@ const DashboardContent: React.FC = () => {
                     </div>
                     <div className="text-left">
                       <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wide">
-                        ADVANCED DEEP-DIVE ANALYTICS CHARTS
+                        {t.advancedChartsToolbar.title}
                       </h3>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 font-black text-xs text-buzz whitespace-nowrap">
-                    <span>{isAdvancedChartsExpanded ? 'Collapse' : 'Expand'}</span>
+                    <span>{isAdvancedChartsExpanded ? t.advancedChartsToolbar.collapse : t.advancedChartsToolbar.expand}</span>
                     {isAdvancedChartsExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </div>
                 </button>
@@ -530,7 +532,7 @@ const DashboardContent: React.FC = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* TAB 2: CELEBRITIES (NGHỆ SĨ) DASHBOARD */}
+      {/* TAB 2: CELEBRITIES (NGƯỜI NỔI TIẾNG) DASHBOARD */}
       {/* ========================================================================= */}
       {activeTab === 'celebs' && (
         <div className="space-y-6 animate-fadeIn">
@@ -721,7 +723,9 @@ export function App() {
   return (
     <ThemeProvider>
       <AdminProvider>
-        <DashboardContent />
+        <LanguageProvider>
+          <DashboardContent />
+        </LanguageProvider>
       </AdminProvider>
     </ThemeProvider>
   );

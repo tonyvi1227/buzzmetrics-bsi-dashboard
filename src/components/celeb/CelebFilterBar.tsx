@@ -4,6 +4,7 @@ import { CelebFilterState } from '../../types/celeb';
 import { ALL_OPTION } from '../../hooks/useCelebSmartFilters';
 import { MONTH_ORDER } from '../../hooks/useSmartFilters';
 import { useAdmin } from '../../context/AdminContext';
+import { useTranslation } from '../../context/LanguageContext';
 
 interface CelebFilterBarProps {
   filters: CelebFilterState;
@@ -25,6 +26,7 @@ export const CelebFilterBar: React.FC<CelebFilterBarProps> = ({
   isUnlocked = false,
 }) => {
   const { isAdmin } = useAdmin();
+  const { t } = useTranslation();
   const showScopeToggle = isAdmin || isUnlocked;
 
   return (
@@ -39,11 +41,11 @@ export const CelebFilterBar: React.FC<CelebFilterBarProps> = ({
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white leading-snug">
-                  SMART CASCADING CELEB FILTERS
+                  {t.celebFilters.title}
                 </h2>
               </div>
               <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
-                Filter by Date Range (From ... To ...) ➔ Profession / Category ➔ Search Celebrity Name
+                {t.celebFilters.subtitle}
               </p>
             </div>
           </div>
@@ -61,7 +63,7 @@ export const CelebFilterBar: React.FC<CelebFilterBarProps> = ({
                 title={filters.top10BsiOnly ? 'Switch to All Celebrities' : 'Switch to Top 10 Monthly Celebrities'}
               >
                 <Trophy className="w-3.5 h-3.5 text-white" />
-                <span>{filters.top10BsiOnly ? `Top 10 Monthly (${totalResults} Celebrities)` : `All ${totalResults} Celebrities`}</span>
+                <span>{filters.top10BsiOnly ? t.celebFilters.top10Monthly(totalResults) : t.celebFilters.allCelebs(totalResults)}</span>
               </button>
             )}
 
@@ -69,10 +71,10 @@ export const CelebFilterBar: React.FC<CelebFilterBarProps> = ({
             <button
               onClick={resetFilters}
               className="whitespace-nowrap px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs border border-slate-200 dark:border-slate-700 transition shadow-sm font-black flex items-center gap-1.5 cursor-pointer"
-              title="Reset all filters"
+              title={t.celebFilters.resetFilters}
             >
               <RotateCcw className="w-3.5 h-3.5 flex-shrink-0" />
-              <span>Reset</span>
+              <span>{t.celebFilters.resetFilters}</span>
             </button>
           </div>
         </div>
@@ -84,7 +86,7 @@ export const CelebFilterBar: React.FC<CelebFilterBarProps> = ({
             {/* Start Date */}
             <div className="space-y-1">
               <label className="text-[10px] font-black uppercase tracking-wider text-sky-700 dark:text-sky-300 flex items-center gap-1">
-                <Calendar className="w-3 h-3 text-sky-600 dark:text-sky-400" /> FROM (START)
+                <Calendar className="w-3 h-3 text-sky-600 dark:text-sky-400" /> {t.celebFilters.from}
               </label>
               <div className="grid grid-cols-2 gap-1">
                 <select
@@ -111,7 +113,7 @@ export const CelebFilterBar: React.FC<CelebFilterBarProps> = ({
             {/* End Date */}
             <div className="space-y-1">
               <label className="text-[10px] font-black uppercase tracking-wider text-sky-700 dark:text-sky-300 flex items-center gap-1">
-                <ArrowRight className="w-3 h-3 text-sky-600 dark:text-sky-400" /> TO (END)
+                <ArrowRight className="w-3 h-3 text-sky-600 dark:text-sky-400" /> {t.celebFilters.to}
               </label>
               <div className="grid grid-cols-2 gap-1">
                 <select
@@ -139,16 +141,16 @@ export const CelebFilterBar: React.FC<CelebFilterBarProps> = ({
           {/* Category / Profession Dropdown */}
           <div className="space-y-1">
             <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              PROFESSION / CATEGORY
+              {t.celebFilters.profession}
             </label>
             <select
               value={filters.category}
               onChange={(e) => updateFilter('category', e.target.value)}
               className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 outline-none focus:ring-2 focus:ring-buzz truncate"
             >
-              <option value={ALL_OPTION}>All Professions</option>
+              <option value={ALL_OPTION}>{t.celebFilters.allProfessions}</option>
               {availableCategories.map(c => (
-                <option key={c} value={c}>{c}</option>
+                <option key={c} value={c}>{t.celebCategories[c] || c}</option>
               ))}
             </select>
           </div>
@@ -156,14 +158,14 @@ export const CelebFilterBar: React.FC<CelebFilterBarProps> = ({
           {/* Search Celebrity Input */}
           <div className="space-y-1">
             <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              SEARCH CELEBRITY NAME
+              {t.celebFilters.searchName}
             </label>
             <div className="relative">
               <input
                 type="text"
                 value={filters.search}
                 onChange={(e) => updateFilter('search', e.target.value)}
-                placeholder="Search celebrity name..."
+                placeholder={t.celebFilters.searchPlaceholder}
                 className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-bold rounded-xl text-xs p-2.5 pl-8 outline-none focus:ring-2 focus:ring-buzz"
               />
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3" />

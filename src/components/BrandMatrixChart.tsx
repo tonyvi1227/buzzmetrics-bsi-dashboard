@@ -4,6 +4,7 @@ import { Chart as ChartJS, registerables } from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
 import { CampaignRecord } from '../types/dashboard';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../context/LanguageContext';
 import { formatNum } from '../utils/brandStandardizer';
 import { InfoTooltip } from './common/InfoTooltip';
 import { downloadChartAsImage } from '../utils/chartExporter';
@@ -55,6 +56,7 @@ interface BrandMatrixChartProps {
 
 export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   // Aggregate stats for brands using AVG Buzz Volume & AVG BSI
   const matrixData = useMemo(() => {
@@ -200,7 +202,7 @@ export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
           
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-black text-buzz bg-orange-50 dark:bg-orange-950/60 px-2 py-0.5 rounded-md border border-orange-200 dark:border-orange-900">
-              {matrixData.length} BRANDS
+              {t.brandMatrix.brandsBadge(matrixData.length)}
             </span>
 
             {/* Export PNG Chart Widget Button */}
@@ -215,7 +217,7 @@ export const BrandMatrixChart: React.FC<BrandMatrixChartProps> = ({ data }) => {
         </div>
 
         <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mb-3">
-          Statistical Means: <strong>AVG Buzz = {formatNum(avgX * 1000)}</strong> | <strong>AVG BSI = {formatNum(avgY)}</strong>
+          {t.brandMatrix.subtitle(formatNum(avgX * 1000), formatNum(avgY))}
         </p>
 
         <div className="h-[250px] relative">

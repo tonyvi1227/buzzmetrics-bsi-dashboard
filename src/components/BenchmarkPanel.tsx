@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BenchmarkMetrics } from '../types/dashboard';
 import { formatNum } from '../utils/brandStandardizer';
+import { useTranslation } from '../context/LanguageContext';
 
 interface BenchmarkPanelProps {
   metrics: BenchmarkMetrics;
@@ -38,16 +39,17 @@ const InfoTooltip: React.FC<CardTooltipProps> = ({ content }) => {
 };
 
 export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
+  const { t } = useTranslation();
   const cfquRatioPct = metrics.avgBuzz > 0 ? ((metrics.avgContentQU / metrics.avgBuzz) * 100).toFixed(1) : '0.0';
 
   return (
     <div className="space-y-2 mb-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-1 gap-1">
         <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-          AVERAGE BENCHMARK METRICS (Current Filter Scope)
+          {t.campaignBenchmarks.title}
         </span>
         <span className="text-[10px] sm:text-[11px] font-bold text-buzz">
-          Scope: {metrics.totalCount} Campaigns
+          {t.campaignBenchmarks.scope(metrics.totalCount)}
         </span>
       </div>
 
@@ -55,8 +57,10 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
         {/* 1. Total Campaigns */}
         <div className="bg-white dark:bg-slate-900 p-2.5 sm:p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition flex flex-col justify-between min-h-[76px] sm:min-h-[82px]">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">Total Campaigns</span>
-            <InfoTooltip content="Total number of campaigns matching the current filter criteria." />
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">
+              {t.campaignBenchmarks.totalCampaigns}
+            </span>
+            <InfoTooltip content={t.campaignBenchmarks.totalCampaignsTooltip} />
           </div>
           <div>
             <p className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white leading-none">{metrics.totalCount}</p>
@@ -66,8 +70,10 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
         {/* 2. AVG Buzz Volume */}
         <div className="bg-white dark:bg-slate-900 p-2.5 sm:p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition flex flex-col justify-between min-h-[76px] sm:min-h-[82px]">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">AVG Buzz Vol</span>
-            <InfoTooltip content={`Average total social discussions per campaign in dataset. Min: ${formatNum(metrics.minBuzz)} | Max: ${formatNum(metrics.maxBuzz)}`} />
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">
+              {t.campaignBenchmarks.avgBuzz}
+            </span>
+            <InfoTooltip content={t.campaignBenchmarks.avgBuzzTooltip(formatNum(metrics.minBuzz), formatNum(metrics.maxBuzz))} />
           </div>
           <div>
             <p className="text-lg sm:text-xl md:text-2xl font-black text-buzz leading-none">{formatNum(metrics.avgBuzz)}</p>
@@ -77,8 +83,10 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
         {/* 3. AVG BSI Score */}
         <div className="bg-white dark:bg-slate-900 p-2.5 sm:p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition flex flex-col justify-between min-h-[76px] sm:min-h-[82px]">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">AVG BSI Score</span>
-            <InfoTooltip content="Average Buzzmetrics Social Index (BSI) overall brand health score across selected campaigns." />
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">
+              {t.campaignBenchmarks.avgBsi}
+            </span>
+            <InfoTooltip content={t.campaignBenchmarks.avgBsiTooltip} />
           </div>
           <div>
             <p className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white leading-none">{formatNum(metrics.avgBSI)}</p>
@@ -88,8 +96,10 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
         {/* 4. AVG CFQU */}
         <div className="bg-white dark:bg-slate-900 p-2.5 sm:p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition flex flex-col justify-between min-h-[76px] sm:min-h-[82px]">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">AVG CFQU</span>
-            <InfoTooltip content="Content from Qualified Users - Average discussions/posts generated by real, high-quality users." />
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">
+              {t.campaignBenchmarks.avgCfqu}
+            </span>
+            <InfoTooltip content={t.campaignBenchmarks.avgCfquTooltip} />
           </div>
           <div>
             <p className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white leading-none">{formatNum(metrics.avgContentQU)}</p>
@@ -99,8 +109,10 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
         {/* 5. Average QU */}
         <div className="bg-white dark:bg-slate-900 p-2.5 sm:p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition flex flex-col justify-between min-h-[76px] sm:min-h-[82px]">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">Average QU</span>
-            <InfoTooltip content="Qualified Users - Average number of genuine unique users participating in discussions." />
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">
+              {t.campaignBenchmarks.avgQu}
+            </span>
+            <InfoTooltip content={t.campaignBenchmarks.avgQuTooltip} />
           </div>
           <div>
             <p className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white leading-none">{formatNum(metrics.avgQUUser)}</p>
@@ -110,8 +122,10 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
         {/* 6. AVG Sentiment */}
         <div className="bg-white dark:bg-slate-900 p-2.5 sm:p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition flex flex-col justify-between min-h-[76px] sm:min-h-[82px]">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">AVG Sentiment</span>
-            <InfoTooltip content="Average Sentiment Index (Ratio of Positive vs Negative discussions) for selected campaigns." />
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">
+              {t.campaignBenchmarks.avgSentiment}
+            </span>
+            <InfoTooltip content={t.campaignBenchmarks.avgSentimentTooltip} />
           </div>
           <div>
             <p className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white leading-none">{metrics.avgSentiment.toFixed(2)}</p>
@@ -121,8 +135,10 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
         {/* 7. AVG Relevancy */}
         <div className="bg-white dark:bg-slate-900 p-2.5 sm:p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition flex flex-col justify-between min-h-[76px] sm:min-h-[82px]">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">AVG Relevancy</span>
-            <InfoTooltip content="Average Relevancy Score (Proportion of discussions directly mentioning brand or campaign message)." />
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">
+              {t.campaignBenchmarks.avgRelevancy}
+            </span>
+            <InfoTooltip content={t.campaignBenchmarks.avgRelevancyTooltip} />
           </div>
           <div>
             <p className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white leading-none">{metrics.avgRelevancy.toFixed(2)}</p>
@@ -132,8 +148,10 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
         {/* 8. AVG Earned Media % */}
         <div className="bg-white dark:bg-slate-900 p-2.5 sm:p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition flex flex-col justify-between min-h-[76px] sm:min-h-[82px]">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">AVG Earned %</span>
-            <InfoTooltip content="Average % of organic word-of-mouth discussions generated by the community." />
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">
+              {t.campaignBenchmarks.avgEarned}
+            </span>
+            <InfoTooltip content={t.campaignBenchmarks.avgEarnedTooltip} />
           </div>
           <div>
             <p className="text-lg sm:text-xl md:text-2xl font-black text-emerald-600 dark:text-emerald-400 leading-none">{metrics.avgEarnedPct.toFixed(1)}%</p>
@@ -143,8 +161,10 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ metrics }) => {
         {/* 9. % CFQU / Total Buzz Ratio */}
         <div className="bg-white dark:bg-slate-900 p-2.5 sm:p-3.5 rounded-xl border border-orange-200 dark:border-orange-900/60 shadow-sm hover:shadow-md transition flex flex-col justify-between min-h-[76px] sm:min-h-[82px] col-span-2 sm:col-span-1">
           <div className="flex items-center justify-between text-buzz">
-            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider truncate">% CFQU / BUZZ</span>
-            <InfoTooltip content="Percentage ratio of Content from Qualified Users (CFQU) over Total Buzz Volume." />
+            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider truncate">
+              {t.campaignBenchmarks.cfquBuzzRatio}
+            </span>
+            <InfoTooltip content={t.campaignBenchmarks.cfquBuzzRatioTooltip} />
           </div>
           <div>
             <p className="text-lg sm:text-xl md:text-2xl font-black text-buzz leading-none">

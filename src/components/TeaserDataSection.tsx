@@ -1,5 +1,6 @@
 import React from 'react';
 import { Target, TrendingUp, Star, Sparkles } from 'lucide-react';
+import { useTranslation } from '../context/LanguageContext';
 
 interface TeaserDataSectionProps {
   onOpenContactModal?: () => void;
@@ -10,6 +11,7 @@ export const TeaserDataSection: React.FC<TeaserDataSectionProps> = ({
   onOpenContactModal,
   isUnlocked = false,
 }) => {
+  const { t } = useTranslation();
   if (isUnlocked) return null;
 
   return (
@@ -20,10 +22,10 @@ export const TeaserDataSection: React.FC<TeaserDataSectionProps> = ({
             <Sparkles className="w-3.5 h-3.5" />
           </span>
           <h3 className="text-xs md:text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white">
-            FULL VERSION BENEFITS & USE CASES
+            {t.teaserSection.title}
           </h3>
           <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 text-buzz border border-orange-200 dark:border-orange-800 shadow-2xs">
-            Premium Insights
+            {t.teaserSection.badge}
           </span>
         </div>
 
@@ -32,7 +34,7 @@ export const TeaserDataSection: React.FC<TeaserDataSectionProps> = ({
             onClick={onOpenContactModal}
             className="text-xs font-black text-buzz hover:text-orange-600 dark:hover:text-orange-400 flex items-center gap-1 cursor-pointer transition"
           >
-            <span>Unlock Full Dataset</span>
+            <span>{t.teaserSection.unlockBtn}</span>
             <span>&rarr;</span>
           </button>
         )}
@@ -43,10 +45,10 @@ export const TeaserDataSection: React.FC<TeaserDataSectionProps> = ({
         <div className="p-3.5 rounded-xl bg-white/90 dark:bg-slate-800/80 border border-orange-100 dark:border-slate-800 shadow-2xs space-y-1.5">
           <div className="flex items-center gap-2 text-buzz font-black text-xs">
             <Target className="w-4 h-4" />
-            <span>Campaign ROI & Post-Audit</span>
+            <span>{t.teaserSection.card1Title}</span>
           </div>
           <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-            Benchmark campaign health vs. Top 10 category leaders and evaluate authentic virality (% Earned Media vs. Paid distribution).
+            {t.teaserSection.card1Desc}
           </p>
         </div>
 
@@ -54,10 +56,10 @@ export const TeaserDataSection: React.FC<TeaserDataSectionProps> = ({
         <div className="p-3.5 rounded-xl bg-white/90 dark:bg-slate-800/80 border border-orange-100 dark:border-slate-800 shadow-2xs space-y-1.5">
           <div className="flex items-center gap-2 text-buzz font-black text-xs">
             <TrendingUp className="w-4 h-4" />
-            <span>Competitor & Category Trends</span>
+            <span>{t.teaserSection.card2Title}</span>
           </div>
           <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-            Track multi-industry shift patterns, analyze category discussion shares, and diagnose underlying sentiment drivers.
+            {t.teaserSection.card2Desc}
           </p>
         </div>
 
@@ -65,10 +67,10 @@ export const TeaserDataSection: React.FC<TeaserDataSectionProps> = ({
         <div className="p-3.5 rounded-xl bg-white/90 dark:bg-slate-800/80 border border-orange-100 dark:border-slate-800 shadow-2xs space-y-1.5">
           <div className="flex items-center gap-2 text-buzz font-black text-xs">
             <Star className="w-4 h-4 text-buzz" />
-            <span>Understanding Top Influencer Landscape</span>
+            <span>{t.teaserSection.card3Title}</span>
           </div>
           <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-            Analyze prominent Celebrities & Influencers with verified Relevancy, positive Sentiment Index, and genuine audience resonance.
+            {t.teaserSection.card3Desc}
           </p>
         </div>
       </div>
